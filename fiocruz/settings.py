@@ -63,6 +63,9 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        # Since APP_DIRS is True, Django automatically looks for templates/
+        # subdirectory within each application package (as django.contrib.admin
+        # is an application, it found its templates even though DIRS was empty)
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
