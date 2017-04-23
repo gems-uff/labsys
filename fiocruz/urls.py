@@ -16,7 +16,21 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-urlpatterns = [
-    url(r'^polls/', include('polls.urls')),
+from .settings import DEBUG
+
+core_urlpatterns = [
     url(r'^admin/', admin.site.urls),
 ]
+
+third_party_urlpatterns = []
+if DEBUG:
+    import debug_toolbar
+    third_party_urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]
+
+my_urlpatterns = [
+    url(r'^polls/', include('polls.urls')),
+]
+
+urlpatterns = core_urlpatterns + third_party_urlpatterns + my_urlpatterns
