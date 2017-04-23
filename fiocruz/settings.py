@@ -133,8 +133,9 @@ USE_TZ = True
 # Referred by {% static %}
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 ### DEBUG TOOLBAR ###
-#debug_toolbar settings
 if DEBUG:
     INTERNAL_IPS = ('127.0.0.1',)
     MIDDLEWARE += (
