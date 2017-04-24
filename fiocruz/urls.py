@@ -31,6 +31,7 @@ if DEBUG:
 
 my_urlpatterns = [
     url(r'^polls/', include('polls.urls')),
+    url(r'^samples/', include('samples.urls')),
 ]
 
 urlpatterns = core_urlpatterns + third_party_urlpatterns + my_urlpatterns
