@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Patient, PatientRegister, FluVaccine, Sample
+from .models import Patient, PatientRegister, FluVaccine, Sample, CollectionType
 
 
 class FluVaccineInline(admin.StackedInline):
@@ -25,4 +25,5 @@ class PatientRegisterAdmin(admin.ModelAdmin):
 
 admin.site.register(Patient)
 admin.site.register(Sample)
+admin.site.register(CollectionType)
 admin.site.register(PatientRegister, PatientRegisterAdmin)
