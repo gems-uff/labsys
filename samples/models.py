@@ -23,7 +23,7 @@ class PatientRegister(models.Model):
     )
 
     def __str__(self):
-        return "{}, ID Gal: {}".format(self.patient.name, self.id_gal_origin)
+        return "ID Gal: {}".format(self.id_gal_origin)
 
 
 class FluVaccine(models.Model):
@@ -36,5 +36,4 @@ class FluVaccine(models.Model):
     )
 
     def __str__(self):
-        return "Vacina contra gripe aplicada em {}".format(
-            self.patient_register.patient.name)
+        return "Vacina contra gripe"
