@@ -17,6 +17,10 @@ class PatientRegister(models.Model):
         on_delete=models.SET_NULL,
         null=True,
     )
+    observed_symptoms = models.ManyToManyField(
+        'Symptom',
+        through='ObservedSymptom',
+    )
     id_gal_origin = models.CharField(
         verbose_name="ID Gal Origem",
         max_length=255,
