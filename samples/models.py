@@ -37,3 +37,12 @@ class FluVaccine(models.Model):
 
     def __str__(self):
         return "Vacina contra gripe"
+
+
+class Sample(models.Model):
+    collection_date = models.DateField(
+        verbose_name="Data de coleta",
+    )
+    patient_register = models.ForeignKey(
+        PatientRegister,
+    )
