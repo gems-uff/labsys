@@ -46,3 +46,6 @@ class Sample(models.Model):
     patient_register = models.ForeignKey(
         PatientRegister,
     )
+
+    def __str__(self):
+        return "Amostra"

@@ -1,14 +1,14 @@
 from django.contrib import admin
-from .models import Patient, PatientRegister, FluVaccine
-
-
-class PatientInline(admin.TabularInline):
-    model = Patient
-    extra = 0
+from .models import Patient, PatientRegister, FluVaccine, Sample
 
 
 class FluVaccineInline(admin.StackedInline):
     model = FluVaccine
+    extra = 1
+
+
+class SampleInline(admin.StackedInline):
+    model = Sample
     extra = 1
 
 
@@ -17,8 +17,12 @@ class PatientRegisterAdmin(admin.ModelAdmin):
         ('Informações do Paciente', {'fields': ['patient']}),
         ('Dados institucionais', {'fields': ['id_gal_origin']}),
     ]
-    inlines = [FluVaccineInline]
+    inlines = [
+        SampleInline,
+        FluVaccineInline,
+    ]
 
 
 admin.site.register(Patient)
+admin.site.register(Sample)
 admin.site.register(PatientRegister, PatientRegisterAdmin)
