@@ -68,3 +68,17 @@ class Sample(models.Model):
 
     def __str__(self):
         return "Amostra"
+
+
+class Symptom(models.Model):
+    name = models.CharField(
+        verbose_name="Nome do sintoma",
+        max_length=255,
+    )
+    is_primary = models.BooleanField(
+        verbose_name="Principal?",
+        default=True,
+    )
+
+    def __str__(self):
+        return self.name
