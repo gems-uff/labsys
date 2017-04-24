@@ -82,3 +82,21 @@ class Symptom(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ObservedSymptom(models.Model):
+    symptom = models.ForeignKey(
+        Symptom,
+        on_delete=models.CASCADE,
+    )
+    patient_register = models.ForeignKey(
+        PatientRegister,
+        on_delete=models.CASCADE,
+    )
+    observed = models.NullBooleanField(
+        verbose_name="Apresenta sintoma?",
+        default=None,
+    )
+
+    def __str__(self):
+        return "Sintoma apresentado"
