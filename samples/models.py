@@ -102,5 +102,10 @@ class ObservedSymptom(models.Model):
         default=None,
     )
 
+    class Meta:
+        unique_together = (
+            ('symptom', 'patient_register'),
+        )
+
     def __str__(self):
         return "Sintoma apresentado"
