@@ -28,7 +28,7 @@ class PatientRegister(models.Model):
 
 class FluVaccine(models.Model):
     was_applied = models.NullBooleanField(
-        verbose_name="Recebeu vacina contra gripe"
+        verbose_name="Recebeu vacina contra gripe?"
     )
     patient_register = models.OneToOneField(
         PatientRegister,
@@ -39,12 +39,31 @@ class FluVaccine(models.Model):
         return "Vacina contra gripe"
 
 
+class CollectionType(models.Model):
+    method_name = models.CharField(
+        verbose_name="Método de coleta",
+        max_length=255,
+    )
+    is_primary = models.BooleanField(
+        verbose_name="Principal?",
+        default=True,
+    )
+
+    def __str__(self):
+        return self.method_name
+
+
 class Sample(models.Model):
     collection_date = models.DateField(
         verbose_name="Data de coleta",
     )
     patient_register = models.ForeignKey(
         PatientRegister,
+    )
+    collection_type = models.ForeignKey(
+        CollectionType,
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     def __str__(self):
