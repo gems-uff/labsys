@@ -1,3 +1,40 @@
 from django.db import models
 
-# Create your models here.
+
+class Patient(models.Model):
+    name = models.CharField(
+        verbose_name="Nome do paciente",
+        max_length=255,
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class PatientRegister(models.Model):
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    id_gal_origin = models.CharField(
+        verbose_name="ID Gal Origem",
+        max_length=255,
+    )
+
+    def __str__(self):
+        return "{}, ID Gal: {}".format(self.patient.name, self.id_gal_origin)
+
+
+class FluVaccine(models.Model):
+    was_applied = models.NullBooleanField(
+        verbose_name="Recebeu vacina contra gripe"
+    )
+    patient_register = models.OneToOneField(
+        PatientRegister,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return "Vacina contra gripe aplicada em {}".format(
+            self.patient_register.patient.name)
