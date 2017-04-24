@@ -19,7 +19,7 @@ class SampleInline(admin.StackedInline):
 
 class ObservedSymptomInline(admin.StackedInline):
     model = ObservedSymptom
-    extra = 2
+    extra = 1
 
 
 class PatientRegisterAdmin(admin.ModelAdmin):
