@@ -14,8 +14,6 @@ class Patient(models.Model):
 class AdmissionNote(models.Model):
     patient = models.ForeignKey(
         Patient,
-        on_delete=models.SET_NULL,
-        null=True,
     )
     observed_symptoms = models.ManyToManyField(
         'Symptom',

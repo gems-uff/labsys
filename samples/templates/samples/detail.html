@@ -1,0 +1,6 @@
+<h1>{{ admission_note.id_gal_origin }}</h1>
+    <p>
+      Vacina: {{ admission_note.fluvaccine.was_applied }}
+    </p>
+    <a href="{% url 'samples:index' %}">Voltar</a>
+</form>

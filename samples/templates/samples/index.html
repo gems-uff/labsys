@@ -1,0 +1,9 @@
+{% if admission_note_list %}
+    <ul>
+    {% for admission_note in admission_note_list %}
+        <li><a href="{%  url 'samples:detail' admission_note.id %}">{{ admission_note.id_gal_origin }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhum registo de paciente</p>
+{% endif %}
