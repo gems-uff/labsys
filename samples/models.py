@@ -11,7 +11,7 @@ class Patient(models.Model):
         return self.name
 
 
-class PatientRegister(models.Model):
+class AdmissionNote(models.Model):
     patient = models.ForeignKey(
         Patient,
         on_delete=models.SET_NULL,
@@ -34,8 +34,8 @@ class FluVaccine(models.Model):
     was_applied = models.NullBooleanField(
         verbose_name="Recebeu vacina contra gripe?"
     )
-    patient_register = models.OneToOneField(
-        PatientRegister,
+    admission_note = models.OneToOneField(
+        AdmissionNote,
         on_delete=models.CASCADE,
     )
 
@@ -57,12 +57,12 @@ class CollectionType(models.Model):
         return self.method_name
 
 
-class Sample(models.Model):
+class CollectedSample(models.Model):
     collection_date = models.DateField(
         verbose_name="Data de coleta",
     )
-    patient_register = models.ForeignKey(
-        PatientRegister,
+    admission_note = models.ForeignKey(
+        AdmissionNote,
     )
     collection_type = models.ForeignKey(
         CollectionType,
@@ -71,7 +71,7 @@ class Sample(models.Model):
     )
 
     def __str__(self):
-        return "Amostra"
+        return "Amostra coletada"
 
 
 class Symptom(models.Model):
@@ -93,8 +93,8 @@ class ObservedSymptom(models.Model):
         Symptom,
         on_delete=models.CASCADE,
     )
-    patient_register = models.ForeignKey(
-        PatientRegister,
+    admission_note = models.ForeignKey(
+        AdmissionNote,
         on_delete=models.CASCADE,
     )
     observed = models.NullBooleanField(
@@ -104,7 +104,7 @@ class ObservedSymptom(models.Model):
 
     class Meta:
         unique_together = (
-            ('symptom', 'patient_register'),
+            ('symptom', 'admission_note'),
         )
 
     def __str__(self):

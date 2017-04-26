@@ -1,8 +1,9 @@
 from django.contrib import admin
 from .models import (
-    Patient, PatientRegister,
+    Patient,
+    AdmissionNote,
     FluVaccine,
-    Sample, CollectionType,
+    CollectedSample, CollectionType,
     Symptom, ObservedSymptom
 )
 
@@ -12,8 +13,8 @@ class FluVaccineInline(admin.StackedInline):
     extra = 1
 
 
-class SampleInline(admin.StackedInline):
-    model = Sample
+class CollectedSampleInline(admin.StackedInline):
+    model = CollectedSample
     extra = 1
 
 
@@ -22,20 +23,20 @@ class ObservedSymptomInline(admin.StackedInline):
     extra = 1
 
 
-class PatientRegisterAdmin(admin.ModelAdmin):
+class AdmissionNoteAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Informações do Paciente', {'fields': ['patient']}),
         ('Dados institucionais', {'fields': ['id_gal_origin']}),
     ]
     inlines = [
-        SampleInline,
+        CollectedSampleInline,
         FluVaccineInline,
         ObservedSymptomInline,
     ]
 
 
 admin.site.register(Patient)
-admin.site.register(PatientRegister, PatientRegisterAdmin)
-admin.site.register(Sample)
+admin.site.register(AdmissionNote, AdmissionNoteAdmin)
+admin.site.register(CollectedSample)
 admin.site.register(CollectionType)
 admin.site.register(Symptom)
