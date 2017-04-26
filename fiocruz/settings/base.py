@@ -1,12 +1,5 @@
 import os
 
-"""
-Options to use different environments (dev, prod, staging...)
-
-export DJANGO_SETTINGS_MODULE="fiocruz.settings.<environment>"
-./manage.py migrate -settings=fiocruz.settings.<environment>
-"""
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -15,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '4qlll1^5_v#oeqlovsw-nj7i)sz@u!m7*9&)4p4=gi!&w5%bcp'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 ALLOWED_HOSTS = []
 
