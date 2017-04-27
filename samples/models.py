@@ -1,4 +1,7 @@
 from django.db import models
+from django import forms
+
+from samples.custom import models as cmodels
 
 
 class Patient(models.Model):
@@ -14,6 +17,7 @@ class Patient(models.Model):
 class AdmissionNote(models.Model):
     patient = models.ForeignKey(
         Patient,
+        null=True,
     )
     observed_symptoms = models.ManyToManyField(
         'Symptom',
@@ -29,7 +33,7 @@ class AdmissionNote(models.Model):
 
 
 class FluVaccine(models.Model):
-    was_applied = models.NullBooleanField(
+    was_applied = cmodels.YesNoIgnoredField(
         verbose_name="Recebeu vacina contra gripe?"
     )
     admission_note = models.OneToOneField(
