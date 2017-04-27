@@ -32,3 +32,10 @@ class FluVaccineForm(forms.ModelForm):
         fields = [
             'was_applied',
         ]
+        widgets = {
+            'was_applied': forms.RadioSelect(
+                choices=(
+                    (True, "Sim"), (False, "Não"), (None, "Ignorado"),
+                ),
+            ),
+        }
