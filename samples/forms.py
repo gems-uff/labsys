@@ -1,8 +1,12 @@
 import datetime #for checking renewal date range.
+import collections
 
-from django import forms
+#from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django import forms
+
+from betterforms import multiform
 
 from .models import (Patient, AdmissionNote, FluVaccine,
     CollectionType, CollectedSample,
@@ -32,3 +36,11 @@ class FluVaccineForm(forms.ModelForm):
         fields = [
             'was_applied',
         ]
+
+
+class AdmissionNoteMultiForm(multiform.MultiModelForm):
+    form_classes = {
+        'patient_form': PatientForm,
+        'admission_note_form': AdmissionNoteForm,
+        'flu_vaccine': FluVaccineForm,
+    }
