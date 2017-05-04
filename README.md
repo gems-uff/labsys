@@ -4,11 +4,11 @@ LabSys main objective is to assist scientists from the Laboratory of Respiratory
 
 # Team
 
-* Gabriel Saldanha (joined in January 2017)
+* [Gabriel Saldanha](https://github.com/gcrsaldanha) (joined in January 2017)
 
 # Documentation
 
-* [working on it!]
+* Working on it!
 
 # Development
 
@@ -17,8 +17,8 @@ LabSys main objective is to assist scientists from the Laboratory of Respiratory
 
 # Technologies
 
-* [Python][https://www.python.org] (v3.6.1)
-* [Django][https://www.djangoproject.com] (v.1.11)
+* [Python](https://www.python.org) (v3.6.1)
+* [Django](https://www.djangoproject.com) (v.1.11)
 * [PostgreSQL](https://www.postgresql.org) (v9.6.2)
 
 # Acknowledgements
