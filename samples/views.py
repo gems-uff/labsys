@@ -42,7 +42,6 @@ def create_admission_note(request):
             admission_note = admission_note_form.save(commit=False)
             admission_note.patient = patient_form.save()
             admission_note.save()
-            print(admission_note)
             flu_vaccine = flu_vaccine_form.save(commit=False)
             flu_vaccine.admission_note = admission_note
             flu_vaccine.save()
