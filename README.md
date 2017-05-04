@@ -1,10 +1,25 @@
 # About
 
+LabSys main objective is to assist scientists from the Laboratory of Respiratory Virus and Measles (Fiocruz) to manage and analyze laboratorial samples received in their lab.
+
 # Team
+
+* Gabriel Saldanha (joined in January 2017)
 
 # Documentation
 
+* [working on it!]
+
+# Development
+
+* [Source Code](https://github.com/gems-uff/labsys)
+* [Issue Tracking](https://github.com/gems-uff/labsys/issues)
+
 # Technologies
+
+* [Python][https://www.python.org] (v3.6.1)
+* [Django][https://www.djangoproject.com] (v.1.11)
+* [PostgreSQL](https://www.postgresql.org) (v9.6.2)
 
 # Acknowledgements
 
