@@ -9,6 +9,8 @@ from .models import (Patient, AdmissionNote, FluVaccine,
     Symptom, ObservedSymptom,
 )
 
+from fiocruz.settings.base import DATE_INPUT_FORMATS
+
 
 class AdmissionNoteForm(forms.ModelForm):
     class Meta:
@@ -27,8 +29,9 @@ class PatientForm(forms.ModelForm):
 
 
 class FluVaccineForm(forms.ModelForm):
+    date_applied = forms.DateField(input_formats=DATE_INPUT_FORMATS)
+
     class Meta:
         model = FluVaccine
-        fields = [
-            'was_applied',
-        ]
+        fields = ['was_applied', 'date_applied', ]
+

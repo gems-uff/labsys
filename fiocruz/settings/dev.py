@@ -17,7 +17,6 @@ DATABASES = {
     }
 }
 
-
 ### DEBUG TOOLBAR ###
 INTERNAL_IPS = ('127.0.0.1',)
 MIDDLEWARE += (
@@ -38,6 +37,7 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.logging.LoggingPanel',
     'debug_toolbar.panels.redirects.RedirectsPanel',
 ]
+
 
 def show_toolbar(request):
     return True

@@ -2,5 +2,8 @@
     <p>
       Vacina: {{ admission_note.fluvaccine.was_applied }}
     </p>
+    <p>
+        Data Aplicação: {{ admission_note.fluvaccine.date_applied }}
+    </p>
     <a href="{% url 'samples:index' %}">Voltar</a>
 </form>
