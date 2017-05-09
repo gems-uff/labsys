@@ -33,5 +33,5 @@ class FluVaccineForm(forms.ModelForm):
 
     class Meta:
         model = FluVaccine
-        exclude = ['admission_note', ]
+        fields = ['was_applied', 'date_applied', ]
 
