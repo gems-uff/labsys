@@ -34,3 +34,4 @@ class FluVaccineForm(forms.ModelForm):
     class Meta:
         model = FluVaccine
         exclude = ['admission_note', ]
+
