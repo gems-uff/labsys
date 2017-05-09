@@ -28,13 +28,14 @@ class DetailView(generic.DetailView):
 def create_admission_note(request):
     admission_note_form = AdmissionNoteForm(prefix='admission_note')
     patient_form = PatientForm(prefix='patient')
-    flu_vaccine_form = FluVaccineForm(request.POST, prefix='flu_vaccine' or None)
+    flu_vaccine_form = FluVaccineForm(prefix='flu_vaccine')
 
     if request.POST:
         admission_note_form = AdmissionNoteForm(
             request.POST,
             prefix='admission_note')
         patient_form = PatientForm(request.POST, prefix='patient')
+        flu_vaccine_form = FluVaccineForm(request.POST, prefix='flu_vaccine')
 
         if admission_note_form.is_valid() \
                 and patient_form.is_valid() \
@@ -47,6 +48,7 @@ def create_admission_note(request):
             flu_vaccine.save()
 
             return HttpResponseRedirect(reverse('samples:index'))
+
     else:
         return render(request, 'samples/admission_note_create.html',
             {

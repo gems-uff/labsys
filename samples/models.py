@@ -34,7 +34,11 @@ class AdmissionNote(models.Model):
 
 class FluVaccine(models.Model):
     was_applied = cmodels.YesNoIgnoredField(
-        verbose_name="Recebeu vacina contra gripe?"
+        verbose_name="Recebeu vacina contra gripe?",
+    )
+    date_applied = models.DateField(
+        verbose_name="Data de aplicação",
+        null=True,
     )
     admission_note = models.OneToOneField(
         AdmissionNote,
