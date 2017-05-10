@@ -37,9 +37,9 @@ def create_admission_note(request):
             patient = patient_form.save()
             admission_note = admission_note_form.save(commit=False)
             admission_note.patient = patient
-            admission_note.save()
+            admission_note.save_fk()
 
-            flu_vaccine_form.save(admission_note)
+            flu_vaccine_form.save_fk(admission_note)
 
             return HttpResponseRedirect(reverse('samples:index'))
 

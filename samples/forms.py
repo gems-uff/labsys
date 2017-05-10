@@ -38,7 +38,7 @@ class FluVaccineForm(forms.ModelForm):
         model = FluVaccine
         fields = ['was_applied', 'date_applied', ]
 
-    def save(self, foreign_key=None):
+    def save_fk(self, foreign_key=None):
         # TODO: raise error if foreign_key is None
         flu_vaccine = super().save(commit=False)
         flu_vaccine.admission_note = foreign_key

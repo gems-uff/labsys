@@ -78,7 +78,7 @@ def vote(request, question_id):
         })
     else:
         selected_choice.votes += 1
-        selected_choice.save()
+        selected_choice.save_fk()
         # Return HttpResponseRedirect after successfully dealing with POST
         # Prevents data from being posted twice (user hits back)
         return HttpResponseRedirect(reverse('polls:results',
