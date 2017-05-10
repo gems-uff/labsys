@@ -9,6 +9,8 @@ from .models import (Patient, AdmissionNote, FluVaccine,
     Symptom, ObservedSymptom,
 )
 
+from fiocruz.settings.base import DATE_INPUT_FORMATS
+
 
 class AdmissionNoteForm(forms.ModelForm):
     class Meta:
@@ -27,8 +29,24 @@ class PatientForm(forms.ModelForm):
 
 
 class FluVaccineForm(forms.ModelForm):
+    # TODO: see if it's possible not to override "blank=True" when declaring a field
+    date_applied = forms.DateField(input_formats=DATE_INPUT_FORMATS,
+                                   required=False)
+
     class Meta:
         model = FluVaccine
-        fields = [
-            'was_applied',
-        ]
+        fields = ['was_applied', 'date_applied', ]
+
+    def __init__(self, *args, **kwargs):
+        if 'admission_note' in kwargs:
+            self.admission_note = kwargs.pop('admission_note')
+        super().__init__(*args, **kwargs)
+
+    def save(self, foreign_key=None):
+        # TODO: raise error if foreign_key is None
+        flu_vaccine = super().save(commit=False)
+        flu_vaccine.admission_note = foreign_key
+        flu_vaccine = super().save()
+        return flu_vaccine
+
+    # TODO: clean_date_applied to check if was_applied is True or False
