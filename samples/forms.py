@@ -37,11 +37,6 @@ class FluVaccineForm(forms.ModelForm):
         model = FluVaccine
         fields = ['was_applied', 'date_applied', ]
 
-    def __init__(self, *args, **kwargs):
-        if 'admission_note' in kwargs:
-            self.admission_note = kwargs.pop('admission_note')
-        super().__init__(*args, **kwargs)
-
     def save(self, foreign_key=None):
         # TODO: raise error if foreign_key is None
         flu_vaccine = super().save(commit=False)
