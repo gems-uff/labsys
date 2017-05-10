@@ -29,9 +29,22 @@ class PatientForm(forms.ModelForm):
 
 
 class FluVaccineForm(forms.ModelForm):
-    date_applied = forms.DateField(input_formats=DATE_INPUT_FORMATS)
+    # TODO: see if it's possible not to overried "blank=True" when declaring a field
+    date_applied = forms.DateField(input_formats=DATE_INPUT_FORMATS,
+                                   required=False)
 
     class Meta:
         model = FluVaccine
         fields = ['was_applied', 'date_applied', ]
 
+    def __init__(self, *args, **kwargs):
+        self.admission_note = kwargs.pop('admission_note')
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        flu_vaccine = super().save(commit=False)
+        flu_vaccine.admission_note = self.admission_note
+        flu_vaccine.save()
+        return flu_vaccine
+
+    # TODO: clean_date_applied to check if was_applied is True or False

@@ -39,6 +39,7 @@ class FluVaccine(models.Model):
     date_applied = models.DateField(
         verbose_name="Data de aplicação",
         null=True,
+        blank=True,
     )
     admission_note = models.OneToOneField(
         AdmissionNote,
