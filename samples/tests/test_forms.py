@@ -69,3 +69,23 @@ class AdmissionNoteFormTest(TestCase):
         admission_note = form.save()
         self.assertEqual(admission_note.id_gal_origin, "123")
 
+
+class PatientFormTest(TestCase):
+
+    def test_blank_invalid_data(self):
+        form = PatientForm({})
+        self.assertFalse(form.is_valid())
+
+    def test_valid_data(self):
+        form = PatientForm({
+            'name': "Gabriel Test Name",
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_save_object(self):
+        form = PatientForm({
+            'name': "Gabriel Test Name",
+        })
+        patient = form.save()
+        self.assertEqual(patient.name, "Gabriel Test Name")
+
