@@ -53,3 +53,15 @@ class FluVaccineForm(forms.ModelForm):
         # Always return a value to use as the new cleaned data, even if
         # this method didn't change it.
         return date_applied
+
+
+class CollectedSampleForm(forms.ModelForm):
+    collection_date = forms.DateField(input_formats=DATE_INPUT_FORMATS,
+                                      required=False)
+
+    class Meta:
+        model = CollectedSample
+        fields = [
+            'collection_type',
+            'collection_date',
+         ]

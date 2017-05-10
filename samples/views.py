@@ -6,7 +6,10 @@ from django.views import generic
 from django.core.urlresolvers import reverse
 
 from .models import AdmissionNote
-from .forms import PatientForm, AdmissionNoteForm, FluVaccineForm
+from .forms import (
+    PatientForm, AdmissionNoteForm, FluVaccineForm,
+    CollectedSampleForm,
+)
 
 
 class IndexView(generic.ListView):
@@ -29,6 +32,7 @@ def create_admission_note(request):
     admission_note_form = AdmissionNoteForm(request.POST or None, prefix='admission_note')
     patient_form = PatientForm(request.POST or None, prefix='patient')
     flu_vaccine_form = FluVaccineForm(request.POST or None, prefix='flu_vaccine')
+    collected_sample_form = CollectedSampleForm(request.POST or None, prefix='collected_sample')
 
     if request.POST:
         if admission_note_form.is_valid() \
@@ -48,5 +52,6 @@ def create_admission_note(request):
             'admission_note_form': admission_note_form,
             'patient_form': patient_form,
             'flu_vaccine_form': flu_vaccine_form,
+            'collected_sample_form': collected_sample_form,
         }
     )

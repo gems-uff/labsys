@@ -67,6 +67,8 @@ class CollectionType(models.Model):
 class CollectedSample(models.Model):
     collection_date = models.DateField(
         verbose_name="Data de coleta",
+        null=True,
+        blank=True,
     )
     admission_note = models.ForeignKey(
         AdmissionNote,
