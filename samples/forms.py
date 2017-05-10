@@ -29,7 +29,8 @@ class PatientForm(forms.ModelForm):
 
 
 class FluVaccineForm(forms.ModelForm):
-    # TODO: see if it's possible not to override "blank=True" when declaring a field
+    # TODO: see if it's possible not to override "blank=True"
+    # when declaring a field
     date_applied = forms.DateField(input_formats=DATE_INPUT_FORMATS,
                                    required=False)
 
@@ -44,4 +45,11 @@ class FluVaccineForm(forms.ModelForm):
         flu_vaccine = super().save()
         return flu_vaccine
 
-    # TODO: clean_date_applied to check if was_applied is True or False
+    def clean_date_applied(self):
+        date_applied = self.cleaned_data['date_applied']
+        if self.cleaned_data['was_applied'] and date_applied is None:
+            raise forms.ValidationError("Fornecer data de aplicação da vacina")
+
+        # Always return a value to use as the new cleaned data, even if
+        # this method didn't change it.
+        return date_applied

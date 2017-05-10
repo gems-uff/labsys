@@ -14,7 +14,7 @@ class FluVaccineFormTest(TestCase):
         self.admission_note = AdmissionNote.objects.create(
             patient=patient, id_gal_origin="1234567890")
 
-    def test_valid_data_applied_true(self):
+    def test_valid_data_vaccine_applied(self):
         form = FluVaccineForm({
             'was_applied': True,
             'date_applied': "09/12/2017",
@@ -25,10 +25,9 @@ class FluVaccineFormTest(TestCase):
         self.assertEqual(flu_vaccine.date_applied, datetime.date(2017, 12, 9))
         self.assertEqual(flu_vaccine.admission_note, self.admission_note)
 
-    def test_valid_data_applied_false(self):
+    def test_valid_data_vaccine_not_applied(self):
         form = FluVaccineForm({
             'was_applied': False,
-            'date_applied': None,
         })
         self.assertTrue(form.is_valid())
         flu_vaccine = form.save(self.admission_note)
@@ -36,7 +35,16 @@ class FluVaccineFormTest(TestCase):
         self.assertEqual(flu_vaccine.date_applied, None)
         self.assertEqual(flu_vaccine.admission_note, self.admission_note)
 
-    def test_blank_date_applied(self):
+    def test_valid_blank_data_vaccine_not_applied(self):
         form = FluVaccineForm({})
         self.assertTrue(form.fields['date_applied'], None)
-        self.assertTrue(form.fields['was_applied'], None or False)
+        self.assertTrue(form.fields['was_applied'], None)
+        self.assertTrue(form.is_valid(), True)
+
+    def test_invalid_data_vaccine_applied_no_date_provided(self):
+        form = FluVaccineForm({
+            'was_applied': False,
+            'date_applied': "09/12/2017",
+            'admission_note': self.admission_note,
+        })
+        self.assertTrue(form.is_valid(), False)
