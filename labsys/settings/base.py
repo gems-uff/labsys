@@ -43,7 +43,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'fiocruz.urls'
+ROOT_URLCONF = 'labsys.urls'
 
 TEMPLATES = [
     {
@@ -64,7 +64,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'fiocruz.wsgi.application'
+WSGI_APPLICATION = 'labsys.wsgi.application'
 
 
 # Database

@@ -9,7 +9,7 @@ from .models import (Patient, AdmissionNote, FluVaccine,
     Symptom, ObservedSymptom,
 )
 
-from fiocruz.settings.base import DATE_INPUT_FORMATS
+from labsys.settings.base import DATE_INPUT_FORMATS
 
 
 class AdmissionNoteForm(forms.ModelForm):
