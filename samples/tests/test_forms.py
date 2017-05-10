@@ -2,7 +2,7 @@ import datetime
 
 from django.test import TestCase
 
-from samples.forms import FluVaccineForm
+from samples.forms import FluVaccineForm, AdmissionNoteForm, PatientForm
 from samples.models import AdmissionNote, Patient
 
 
@@ -48,3 +48,24 @@ class FluVaccineFormTest(TestCase):
             'admission_note': self.admission_note,
         })
         self.assertTrue(form.is_valid(), False)
+
+
+class AdmissionNoteFormTest(TestCase):
+
+    def test_blank_invalid_data(self):
+        form = AdmissionNoteForm({})
+        self.assertFalse(form.is_valid())
+
+    def test_valid_data(self):
+        form = AdmissionNoteForm({
+            'id_gal_origin': "123",
+        })
+        self.assertTrue(form.is_valid())
+
+    def test_save_object(self):
+        form = AdmissionNoteForm({
+            'id_gal_origin': "123",
+        })
+        admission_note = form.save()
+        self.assertEqual(admission_note.id_gal_origin, "123")
+
