@@ -58,10 +58,20 @@ class FluVaccineForm(forms.ModelForm):
 class CollectedSampleForm(forms.ModelForm):
     collection_date = forms.DateField(input_formats=DATE_INPUT_FORMATS,
                                       required=False)
+    other_collection_types = forms.ModelChoiceField(
+        queryset=CollectionType.objects.filter(is_primary=False),
+        required=False,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(CollectedSampleForm, self).__init__(*args, **kwargs)
+        self.fields['collection_type'].queryset = \
+            CollectionType.objects.filter(is_primary=True)
 
     class Meta:
         model = CollectedSample
         fields = [
             'collection_type',
+            'other_collection_types',
             'collection_date',
          ]

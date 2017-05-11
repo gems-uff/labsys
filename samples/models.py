@@ -64,6 +64,7 @@ class CollectionType(models.Model):
         return self.method_name
 
 
+
 class CollectedSample(models.Model):
     collection_date = models.DateField(
         verbose_name="Data de coleta",
