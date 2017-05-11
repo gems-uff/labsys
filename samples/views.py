@@ -41,7 +41,7 @@ def create_admission_note(request):
             patient = patient_form.save()
             admission_note = admission_note_form.save(commit=False)
             admission_note.patient = patient
-            admission_note.save_fk()
+            admission_note.save()
 
             flu_vaccine_form.save_fk(admission_note)
 
