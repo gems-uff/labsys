@@ -37,13 +37,15 @@ def create_admission_note(request):
     if request.POST:
         if admission_note_form.is_valid() \
                 and patient_form.is_valid() \
-                and flu_vaccine_form.is_valid():
+                and flu_vaccine_form.is_valid() \
+                and collected_sample_form.is_valid():
             patient = patient_form.save()
             admission_note = admission_note_form.save(commit=False)
             admission_note.patient = patient
             admission_note.save()
 
             flu_vaccine_form.save_fk(admission_note)
+            collected_sample_form.save_fk(admission_note)
 
             return HttpResponseRedirect(reverse('samples:index'))
 
