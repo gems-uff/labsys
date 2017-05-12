@@ -29,10 +29,6 @@ class PatientForm(forms.ModelForm):
 
 
 class FluVaccineForm(forms.ModelForm):
-    # TODO: see if it's possible not to override "blank=True"
-    # when declaring a field
-    date_applied = forms.DateField(input_formats=DATE_INPUT_FORMATS,
-                                   required=False)
 
     class Meta:
         model = FluVaccine
@@ -40,6 +36,10 @@ class FluVaccineForm(forms.ModelForm):
             'was_applied',
             'date_applied',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(FluVaccineForm, self).__init__(*args, **kwargs)
+        self.fields['date_applied'].input_formats = DATE_INPUT_FORMATS
 
     def save_fk(self, foreign_key=None):
         # TODO: raise error if foreign_key is None
@@ -81,7 +81,4 @@ class CollectedSampleForm(forms.ModelForm):
             'collection_type',
             'other_collection_types',
             'collection_date',
-         ]
-        widgets = {
-            'collection_date':
-        }
+        ]
