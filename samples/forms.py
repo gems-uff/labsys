@@ -48,6 +48,7 @@ class FluVaccineForm(forms.ModelForm):
         flu_vaccine = super().save()
         return flu_vaccine
 
+    # TODO: move it to change method, since it is related to more than one field
     def clean_date_applied(self):
         date_applied = self.cleaned_data['date_applied']
         if self.cleaned_data['was_applied'] and date_applied is None:
@@ -59,26 +60,49 @@ class FluVaccineForm(forms.ModelForm):
 
 
 class CollectedSampleForm(forms.ModelForm):
-    # TODO: decide if "other" should be a primary collection type
-    # or if it should be added through the Form
-    # downside: more static. upside: semantics
-    # TODO: validation: cannot select a collection type AND other
-    collection_date = forms.DateField(input_formats=DATE_INPUT_FORMATS,
-                                      required=False)
-    other_collection_types = forms.ModelChoiceField(
+    other_collection_type = forms.ModelChoiceField(
         queryset=CollectionType.objects.filter(is_primary=False),
         required=False,
     )
-
-    def __init__(self, *args, **kwargs):
-        super(CollectedSampleForm, self).__init__(*args, **kwargs)
-        self.fields['collection_type'].queryset = \
-            CollectionType.objects.filter(is_primary=True)
 
     class Meta:
         model = CollectedSample
         fields = [
             'collection_type',
-            'other_collection_types',
+            'other_collection_type',
             'collection_date',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super(CollectedSampleForm, self).__init__(*args, **kwargs)
+        self.fields['collection_type'].queryset = \
+            CollectionType.objects.filter(is_primary=True)
+        self.fields['collection_type'].required = False
+        self.fields['collection_date'].input_formats = DATE_INPUT_FORMATS
+
+    def save_fk(self, foreign_key=None):
+        # TODO: raise error if foreign_key is None
+        collected_sample = super().save(commit=False)
+        collected_sample.admission_note = foreign_key
+        collected_sample = super().save()
+        return collected_sample
+
+    def clean(self):
+        cleaned_data = super(CollectedSampleForm, self).clean()
+        collection_type = cleaned_data.get('collection_type')
+        other_collection_type = cleaned_data.get('other_collection_type')
+
+        if collection_type and other_collection_type:
+            raise forms.ValidationError(
+                "Selecionar somente um método de coleta"
+            )
+
+        if collection_type is None and other_collection_type is None:
+            raise forms.ValidationError(
+                "Selecionar pelo menos um método de coleta"
+            )
+
+        if other_collection_type and collection_type is None:
+            cleaned_data['collection_type'] = other_collection_type
+
+        return cleaned_data
