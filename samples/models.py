@@ -68,7 +68,7 @@ class CollectedSample(models.Model):
     collection_date = models.DateField(
         verbose_name="Data de coleta",
         null=True,
-        blank=True,
+        blank=False,
     )
     admission_note = models.ForeignKey(
         AdmissionNote,
@@ -77,6 +77,7 @@ class CollectedSample(models.Model):
         CollectionType,
         on_delete=models.SET_NULL,
         null=True,
+        blank=False,
     )
 
     def __str__(self):
