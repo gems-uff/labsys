@@ -36,7 +36,10 @@ class FluVaccineForm(forms.ModelForm):
 
     class Meta:
         model = FluVaccine
-        fields = ['was_applied', 'date_applied', ]
+        fields = [
+            'was_applied',
+            'date_applied',
+        ]
 
     def save_fk(self, foreign_key=None):
         # TODO: raise error if foreign_key is None
@@ -56,6 +59,10 @@ class FluVaccineForm(forms.ModelForm):
 
 
 class CollectedSampleForm(forms.ModelForm):
+    # TODO: decide if "other" should be a primary collection type
+    # or if it should be added through the Form
+    # downside: more static. upside: semantics
+    # TODO: validation: cannot select a collection type AND other
     collection_date = forms.DateField(input_formats=DATE_INPUT_FORMATS,
                                       required=False)
     other_collection_types = forms.ModelChoiceField(
@@ -75,3 +82,6 @@ class CollectedSampleForm(forms.ModelForm):
             'other_collection_types',
             'collection_date',
          ]
+        widgets = {
+            'collection_date':
+        }
