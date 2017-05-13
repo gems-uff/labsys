@@ -1,5 +1,4 @@
 from django.db import models
-from django import forms
 
 from samples.custom import models as cmodels
 

@@ -1,9 +1,22 @@
-<h1>{{ admission_note.id_gal_origin }}</h1>
-    <p>
-      Vacina: {{ admission_note.fluvaccine.was_applied }}
-    </p>
-    <p>
-        Data Aplicação: {{ admission_note.fluvaccine.date_applied }}
-    </p>
-    <a href="{% url 'samples:index' %}">Voltar</a>
-</form>
+<h1>Registro</h1>
+<h3>Dados da admissão</h3>
+    <p>ID do GAL de origem: {{ admission_note.id_gal_origin }}</p>
+
+<h3>Dados do paciente</h3>
+    <p>Nome do paciente: {{ admission_note.patient }}</p>
+
+<h3>Amostras coletadas</h3>
+{% for collected_sample in admission_note.collectedsample_set.all %}
+    <p>Método de coleta: {{ collected_sample.collection_type }}</p>
+    <p>Data de coleta: {{ collected_sample.collection_date|date:"d/m/Y" }}</p>
+{% endfor %}
+
+<h3>Tomou vacina contra a gripe?</h3>
+    {% if admission_note.fluvaccine.was_applied %}
+        <p>Sim</p>
+        <p>Data de aplicação: {{ admission_note.fluvaccine.date_applied|date:"d/m/Y" }}</p>
+    {% else %}
+        <p>Não</p>
+    {% endif %}
+
+<a href="{% url 'samples:index' %}">Voltar</a>
