@@ -17,12 +17,12 @@ class FluVaccineFormTest(TestCase):
     def test_valid_data_vaccine_applied(self):
         form = FluVaccineForm({
             'was_applied': True,
-            'date_applied': "09/12/2017",
+            'date_applied': "30/12/2017",
         })
         self.assertTrue(form.is_valid())
         flu_vaccine = form.save_fk(self.admission_note)
         self.assertEqual(flu_vaccine.was_applied, True)
-        self.assertEqual(flu_vaccine.date_applied, datetime.date(2017, 12, 9))
+        self.assertEqual(flu_vaccine.date_applied, datetime.date(2017, 12, 30))
         self.assertEqual(flu_vaccine.admission_note, self.admission_note)
 
     def test_valid_data_vaccine_not_applied(self):
