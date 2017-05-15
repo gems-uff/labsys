@@ -106,7 +106,7 @@ class CollectedSampleForm(forms.ModelForm):
         return cleaned_data
 
 
-class CollectedSampleFormSet(BaseFormSet):
+class BaseCollectedSampleFormSet(BaseFormSet):
     def clean(self):
         """
         Adds validation to check that all collected samples have both
