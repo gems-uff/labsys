@@ -1,9 +1,17 @@
-{% if admission_note_list %}
-    <ul>
-    {% for admission_note in admission_note_list %}
-        <li><a href="{%  url 'samples:detail' admission_note.id %}">{{ admission_note.id_gal_origin }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>Nenhum registo de paciente</p>
+{% if messages %}
+  {% for message in messages %}
+    <p>{{ message }}</p>
+  {% endfor %}
 {% endif %}
+
+{% if admission_note_list %}
+  <ul>
+  {% for admission_note in admission_note_list %}
+    <li><a href="{%  url 'samples:detail' admission_note.id %}">{{ admission_note.id_gal_origin }}</a></li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>Nenhum registo de paciente</p>
+{% endif %}
+
+<a href="{% url 'samples:create_admission_note' %}">Cadastrar nova amostra</a>
