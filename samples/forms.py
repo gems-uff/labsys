@@ -104,3 +104,33 @@ class CollectedSampleForm(forms.ModelForm):
             cleaned_data['collection_type'] = other_collection_type
 
         return cleaned_data
+
+
+class CollectedSampleFormSet(BaseFormSet):
+    def clean(self):
+        """
+        Adds validation to check that all collected samples have both
+        method and collection date.
+        """
+        if any(self.errors):
+            return
+
+        collection_types = []
+        collection_dates = []
+
+        for form in self.forms:
+            if form.cleaned_data:
+                collection_type = form.cleaned_data['collection_type']
+                collection_date = form.cleaned_data['collection_date']
+
+                # Check all samples have both date and method
+                if collection_type and not collection_date:
+                    raise forms.ValidationError(
+                        "Todas amostras devem ter uma data de coleta",
+                        code="missing_collection_date",
+                    )
+                elif collection_date and not collection_type:
+                    raise forms.ValidationError(
+                        "Todas amostras devem ter um método de coleta",
+                        code="missing_collection_type",
+                    )
