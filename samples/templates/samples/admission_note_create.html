@@ -18,6 +18,7 @@
   <h3>Tomou vacina contra a gripe?</h3>
   {{ flu_vaccine_form.as_p }}
 
+  <h3>Amostras coletadas</h3>
   {{ collected_sample_formset.management_form }}
   {% for sample_form in collected_sample_formset %}
     <div class="sample-form">
