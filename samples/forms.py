@@ -61,6 +61,7 @@ class FluVaccineForm(forms.ModelForm):
 
 class CollectedSampleForm(forms.ModelForm):
     other_collection_type = forms.ModelChoiceField(
+        label="Outro método de coleta",
         queryset=CollectionType.objects.filter(is_primary=False),
         required=False,
     )
@@ -81,7 +82,7 @@ class CollectedSampleForm(forms.ModelForm):
         self.fields['collection_date'].input_formats = DATE_INPUT_FORMATS
 
     def save_fk(self, foreign_key=None):
-        # TODO: raise error if foreign_key is None
+        # TODO: raise program (not user) error if foreign_key is None
         collected_sample = super().save(commit=False)
         collected_sample.admission_note = foreign_key
         collected_sample = super().save()
