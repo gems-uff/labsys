@@ -43,11 +43,13 @@ def create_admission_note(request):
                 and patient_form.is_valid() \
                 and flu_vaccine_form.is_valid() \
                 and collected_sample_form.is_valid():
-            patient = patient_form.save()
+            patient = patient_form.save(commit=False)
             admission_note = admission_note_form.save(commit=False)
+
+            # Effectively saves
+            patient.save()
             admission_note.patient = patient
             admission_note.save()
-
             flu_vaccine_form.save_fk(admission_note)
             collected_sample_form.save_fk(admission_note)
 

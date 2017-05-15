@@ -88,4 +88,7 @@ class PatientFormTest(TestCase):
         })
         patient = form.save()
         self.assertEqual(patient.name, "Gabriel Test Name")
+        self.assertEqual(
+            patient.name, Patient.objects.filter(
+                name=patient.name).first().name)
 
