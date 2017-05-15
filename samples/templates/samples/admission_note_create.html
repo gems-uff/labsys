@@ -1,4 +1,11 @@
-{{  form.media }}
+{% load staticfiles %}
+
+{% if messages %}
+  {% for message in messages %}
+    <p>{{ message }}</p>
+  {% endfor %}
+{% endif %}
+
 <form method="POST">
   {% csrf_token %}
   <h2>Cadastro de Amostras:</h2>
@@ -11,9 +18,25 @@
   <h3>Tomou vacina contra a gripe?</h3>
   {{ flu_vaccine_form.as_p }}
 
-  <h3>Coletou que tipo de amostras?</h3>
-  {{ collected_sample_form.as_p }}
-  <a href="#">Adicionar amostra coletada</a>
+  {{ collected_sample_formset.management_form }}
+  {% for sample_form in collected_sample_formset %}
+    <div class="sample-form">
+      {{ sample_form.as_p }}
+    </div>
+  {% endfor %}
 
-  <p><button type="submit">Cadastrar</button></p>
+  {% for error in collected_sample_formset.non_form_%}
+    {{ error|escape }}
+  {% endfor %}
+
+  <p><button type="submit" class="button">Cadastrar</button></p>
 </form>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="{% static 'jquery.formset.js' %}"></script>
+<script>
+    $('.sample-form').formset({
+        addText: 'nova amostra',
+        deleteText: 'remover'
+    });
+</script>
