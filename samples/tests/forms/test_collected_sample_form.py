@@ -27,51 +27,63 @@ class CollectedSampleFormTest(TestCase):
 
     def test_valid_form_primary(self):
         form = CollectedSampleForm({
-            'collection_type': CollectionType.objects.filter(id=self.collection_type.id),
+            'collection_type': CollectionType.objects.filter(
+                id=self.collection_type.id),
             'collection_date': "30/12/2018",
         })
         self.assertTrue(form.is_valid())
         collected_sample = form.save_fk(self.admission_note)
-        self.assertEquals(collected_sample.collection_type, self.collection_type)
-        self.assertEquals(collected_sample.collection_date, datetime.date(2018, 12, 30))
+        self.assertEquals(
+            collected_sample.collection_type, self.collection_type)
+        self.assertEquals(
+            collected_sample.collection_date, datetime.date(2018, 12, 30))
 
     def test_valid_form_secondary(self):
         form = CollectedSampleForm({
-            'other_collection_type': CollectionType.objects.filter(id=self.other_collection_type.id),
+            'other_collection_type': CollectionType.objects.filter(
+                id=self.other_collection_type.id),
             'collection_date': "30/12/2018",
         })
         self.assertTrue(form.is_valid())
 
     def test_save_other_collection_in_instance(self):
         form = CollectedSampleForm({
-            'other_collection_type': CollectionType.objects.filter(id=self.other_collection_type.id),
+            'other_collection_type': CollectionType.objects.filter(
+                id=self.other_collection_type.id),
             'collection_date': "30/12/2018",
         })
         self.assertTrue(form.is_valid())
         collected_sample = form.save_fk(self.admission_note)
         self.assertEquals(collected_sample.admission_note, self.admission_note)
-        self.assertEquals(collected_sample.collection_type, self.other_collection_type)
+        self.assertEquals(
+            collected_sample.collection_type, self.other_collection_type)
 
     def test_two_selected_methods(self):
         form = CollectedSampleForm({
-            'collection_type': CollectionType.objects.filter(id=self.collection_type.id),
-            'other_collection_type': CollectionType.objects.filter(id=self.other_collection_type.id),
+            'collection_type': CollectionType.objects.filter(
+                id=self.collection_type.id),
+            'other_collection_type': CollectionType.objects.filter(
+                id=self.other_collection_type.id),
             'collection_date': "30/12/2018",
         })
-        self.assertIn("Selecionar somente um método de coleta", form.errors['__all__'])
+        self.assertIn(
+            "Selecionar somente um método de coleta", form.errors['__all__'])
         self.assertFalse(form.is_valid())
 
     def test_no_selected_method(self):
         form = CollectedSampleForm({
             'collection_date': "30/12/2018",
         })
-        self.assertIn("Selecionar pelo menos um método de coleta", form.errors['__all__'])
+        self.assertIn(
+            "Selecionar pelo menos um método de coleta", form.errors['__all__'])
         self.assertFalse(form.is_valid())
 
     def test_invalid_date_format(self):
         form = CollectedSampleForm({
-            'collection_type': CollectionType.objects.filter(id=self.collection_type.id),
+            'collection_type': CollectionType.objects.filter(
+                id=self.collection_type.id),
             'collection_date': "300/12/2018",
         })
         self.assertFalse(form.is_valid())
-        self.assertIn("Informe uma data válida.", form.errors['collection_date'])
+        self.assertIn(
+            "Informe uma data válida.", form.errors['collection_date'])
