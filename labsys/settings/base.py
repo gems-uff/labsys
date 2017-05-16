@@ -120,4 +120,10 @@ USE_TZ = True
 # Referred by {% static %}
 STATIC_URL = '/static/'
 
+# Additional static files dirs for collecstatic to lookup
+STATICFILES_DIRS = [
+    #os.path.join(BASE_DIR, 'static')
+]
+
+# collecstatic: copies all files from static dirs to this folder
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
