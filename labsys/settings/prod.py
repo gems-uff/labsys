@@ -2,7 +2,7 @@ from .base import *
 
 
 # TODO: Serve files via a dedicated static server then change this value
-DEBUG=True
+DEBUG=False
 
 ALLOWED_HOSTS = ['*']
 
