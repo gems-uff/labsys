@@ -1,1 +1,1 @@
-web: gunicorn labsys.wsgi:application --log-file -
+web: gunicorn labsys.wsgi

@@ -11,7 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "labsys.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "labsys.settings.dev")
 
 from dj_static import Cling
 
