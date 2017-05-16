@@ -1,7 +1,10 @@
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(
+    os.path.dirname(
+        os.path.dirname(
+            os.path.abspath(__file__))))
 
 
 # Quick-start development settings - unsuitable for production
@@ -48,7 +51,7 @@ ROOT_URLCONF = 'labsys.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(PROJECT_ROOT, 'templates')],
         # Since APP_DIRS is True, Django automatically looks for templates/
         # subdirectory within each application package (as django.contrib.admin
         # is an application, it found its templates even though DIRS was empty)
@@ -116,14 +119,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-# Look up for a 'static' folder inside each INSTALLED_APP
-# Referred by {% static %}
+# collecstatic: copies all files from staticfiles dirs to this folder
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+
+# Look up for a 'staticfiles' folder inside each INSTALLED_APP
+# Referred by {% staticfiles %}
 STATIC_URL = '/static/'
 
-# Additional static files dirs for collecstatic to lookup
+# Additional staticfiles files dirs for collecstatic to lookup
 STATICFILES_DIRS = [
-    #os.path.join(BASE_DIR, 'static')
+    os.path.join(PROJECT_ROOT, 'static')
 ]
 
-# collecstatic: copies all files from static dirs to this folder
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
