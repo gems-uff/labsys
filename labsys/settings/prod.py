@@ -3,7 +3,7 @@ import dj_database_url
 from .base import *
 
 
-DEBUG=True
+DEBUG=False
 
 #ALLOWED_HOSTS = ['labsys.herokuapp.com']
 ALLOWED_HOSTS = ['*']
