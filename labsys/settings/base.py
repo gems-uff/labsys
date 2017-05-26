@@ -28,7 +28,7 @@ THIRD_PARTY_APPS = [
 
 MY_APPS = [
     'polls.apps.PollsConfig',
-    'samples.apps.SamplesConfig'
+    'samples.apps.SamplesConfig',
 ]
 
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + MY_APPS
