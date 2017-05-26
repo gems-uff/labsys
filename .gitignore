@@ -91,5 +91,3 @@ ENV/
 ###### MINE!!! ######
 .idea
 .DS_Store
-staticfiles/
-!staticfiles/.gitkeep
