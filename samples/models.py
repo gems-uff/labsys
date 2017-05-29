@@ -102,12 +102,13 @@ class ObservedSymptom(models.Model):
     symptom = models.ForeignKey(
         Symptom,
         on_delete=models.CASCADE,
+        verbose_name="Sintoma principal"
     )
     admission_note = models.ForeignKey(
         AdmissionNote,
         on_delete=models.CASCADE,
     )
-    observed = models.NullBooleanField(
+    observed = cmodels.YesNoIgnoredField(
         verbose_name="Apresenta sintoma?",
         default=None,
     )
