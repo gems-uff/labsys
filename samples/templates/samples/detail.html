@@ -19,5 +19,11 @@
   <p>Data de coleta: {{ collected_sample.collection_date|date:"d/m/Y" }}</p>
 {% endfor %}
 
+<h3>Sintomas apresentados</h3>
+{% for observed_symptom in admission_note.observedsymptom_set.all %}
+  <p>Sintoma: {{ observed_symptom.symptom }}</p>
+  <p>Apresenta sintoma: {{ observed_symptom.observed }}</p>
+{% endfor %}
+
 <a href="{% url 'samples:index' %}">Listagem de registros</a>
 <a href="{% url 'samples:create_admission_note' %}">Cadastrar nova amostra</a>

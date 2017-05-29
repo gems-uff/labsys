@@ -135,71 +135,40 @@ class BaseCollectedSampleFormSet(BaseFormSet):
 
 class ObservedSymptomForm(forms.ModelForm):
 
-    other_symptom = forms.ModelChoiceField(
-        label="Sintoma secundário",
-        queryset=Symptom.objects.filter(is_primary=False),
-        required=False,
-    )
-
     class Meta:
         model = ObservedSymptom
         fields = [
             'symptom',
-            'other_symptom',
             'observed',
         ]
 
     def __init__(self, *args, **kwargs):
         super(ObservedSymptomForm, self).__init__(*args, **kwargs)
-        #self.fields['symptom'].queryset = \
-        #    Symptom.objects.filter(is_primary=True)
-        #self.fields['symptom'].required = False
 
     def save_fk(self, foreign_key=None):
         # TODO: raise program (not user) error if foreign_key is None
         observed_symptom = super().save(commit=False)
         observed_symptom.admission_note = foreign_key
-        observed_symptom= super().save()
+        observed_symptom = super().save()
         return observed_symptom
 
     def clean(self):
         cleaned_data = super(ObservedSymptomForm, self).clean()
         symptom = cleaned_data.get('symptom')
-        other_symptom = cleaned_data.get('other_symptom')
 
-        if symptom and other_symptom:
-            raise forms.ValidationError(
-                "Selecionar sintoma principal OU secundário"
-            )
-
-        if symptom is None and other_symptom is None:
-            raise forms.ValidationError(
-                "Selecionar sintoma observado"
-            )
-
-        if other_symptom and symptom is None:
-            cleaned_data['symptom'] = other_symptom
+        # TODO: validate
 
         return cleaned_data
 
 
 class BaseObservedSymptomFormSet(BaseFormSet):
+
+    def __init__(self, *args, **kwargs):
+        super(BaseObservedSymptomFormSet, self).__init__(*args, **kwargs)
+        self.queryset = Symptom.objects.filter(is_primary=True)
+
     def clean(self):
         """
-        Adds validation to check that there are no repeated symptoms (should not
-        even be allowed)
         """
         if any(self.errors):
             return
-
-        symptoms = []
-        for form in self.forms:
-            if form.cleaned_data:
-                symptom = form.cleaned_data['symptom']
-
-                if symptom in symptoms:
-                    raise forms.ValidationError(
-                        "Não deve haver sintoma duplicado ({})".format(symptom),
-                        code="duplicate_symptom_form",
-                    )
-

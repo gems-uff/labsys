@@ -119,4 +119,7 @@ class ObservedSymptom(models.Model):
         )
 
     def __str__(self):
-        return "Sintoma apresentado"
+        if self.symptom is not None:
+            return self.symptom.name
+        else:
+            return "Sintoma apresentado"

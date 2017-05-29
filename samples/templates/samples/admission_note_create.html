@@ -33,6 +33,9 @@
       {{ observed_symptom_form.as_p }}
     </div>
   {% endfor %}
+  <div class="observed-symptom-form">
+    {{ observed_symptom_form.as_p }}
+  </div>
 
   {% for error in observed_symptom_formset.non_form_%}
     {{ error|escape }}
