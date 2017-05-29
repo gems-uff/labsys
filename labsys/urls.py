@@ -16,8 +16,6 @@ my_urlpatterns = [
 
 api_urls = [
     url(r'^', include('snippets.urls')),
-    url(r'^api-auth/', include('rest_framework.urls',
-                               namespace='rest_framework')),
 ]
 
 urlpatterns = core_urlpatterns + my_urlpatterns + api_urls
