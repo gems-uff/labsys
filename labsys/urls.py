@@ -14,7 +14,11 @@ my_urlpatterns = [
     url(r'^samples/', include('samples.urls')),
 ]
 
-urlpatterns = core_urlpatterns + my_urlpatterns
+api_urls = [
+    url(r'^', include('api.urls')),
+]
+
+urlpatterns = core_urlpatterns + my_urlpatterns + api_urls
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
