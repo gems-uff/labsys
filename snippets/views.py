@@ -8,7 +8,7 @@ from snippets.serializers import SnippetSerializer
 @csrf_exempt
 def snippet_list(request):
     """
-    list all code snippets, or create a new snippet.
+    List all code snippets, or create a new snippet.
     """
     if request.method == 'GET':
         snippets = Snippet.objects.all()
@@ -24,9 +24,10 @@ def snippet_list(request):
         return JsonResponse(serializer.errors, status=400)
 
 
+@csrf_exempt
 def snippet_detail(request, pk):
     """
-    Retrieve, update or delete a code snippet
+    Retrieve, update or delete a code snippet.
     """
     try:
         snippet = Snippet.objects.get(pk=pk)
@@ -34,7 +35,11 @@ def snippet_detail(request, pk):
         return HttpResponse(status=404)
 
     if request.method == 'GET':
-        data = JSONParser().parte(request)
+        serializer = SnippetSerializer(snippet)
+        return JsonResponse(serializer.data)
+
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
         serializer = SnippetSerializer(snippet, data=data)
         if serializer.is_valid():
             serializer.save()
