@@ -6,10 +6,11 @@ from django.forms import formset_factory
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 
-from .models import AdmissionNote, CollectedSample
+from .models import AdmissionNote, CollectedSample, ObservedSymptom
 from .forms import (
     PatientForm, AdmissionNoteForm, FluVaccineForm,
     CollectedSampleForm, BaseCollectedSampleFormSet,
+    ObservedSymptomForm, BaseObservedSymptomFormSet,
 )
 
 
@@ -41,11 +42,16 @@ def create_admission_note(request):
         CollectedSampleForm, formset=BaseCollectedSampleFormSet)
     collected_sample_formset = CollectedSampleFormSet(request.POST or None)
 
+    ObservedSymptomFormSet = formset_factory(
+        ObservedSymptomForm, formset=BaseObservedSymptomFormSet)
+    observed_symptom_formset = ObservedSymptomFormSet(request.POST or None)
+
     if request.POST:
         if admission_note_form.is_valid() \
                 and patient_form.is_valid() \
                 and flu_vaccine_form.is_valid() \
-                and collected_sample_formset.is_valid():
+                and collected_sample_formset.is_valid() \
+                and observed_symptom_formset.is_valid():
             patient = patient_form.save(commit=False)
             admission_note = admission_note_form.save(commit=False)
 
@@ -71,12 +77,29 @@ def create_admission_note(request):
                     )
                     new_samples.append(collected_sample)
 
+            # Create all ObservedSymptom objects (do not persist yet)
+            new_observed_symptoms = []
+            for symptom_form in observed_symptom_formset:
+                symptom = symptom_form.cleaned_data.get(
+                    'symptom')
+                observed = symptom_form.cleaned_data.get(
+                    'observed')
+
+                if symptom and observed:
+                    observed_symptom = ObservedSymptom(
+                        symptom=symptom,
+                        observed_symptom=observed_symptom,
+                        admission_note=admission_note,
+                    )
+                    new_observed_symptoms.append(observed_symptom)
+
             # Persist in a transaction
             try:
                 with transaction.atomic():
                     # If we want, replace old with new
                     # CollectedSample.objects.filter(admission_note=admission_note).delete()
                     CollectedSample.objects.bulk_create(new_samples)
+                    ObservedSymptom.objects.bulk_create(new_observed_symptoms)
 
                     # Notify our users
                     messages.success(request, "Registro criado com sucesso")
@@ -91,5 +114,6 @@ def create_admission_note(request):
             'patient_form': patient_form,
             'flu_vaccine_form': flu_vaccine_form,
             'collected_sample_formset': collected_sample_formset,
+            'observed_symptom_formset': observed_symptom_formset,
         }
     )
