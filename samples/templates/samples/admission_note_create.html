@@ -26,6 +26,18 @@
     {{ error|escape }}
   {% endfor %}
 
+  <h3>Sintomas observados</h3>
+  {{ observed_symptom_formset.management_form }}
+  {% for observed_symptom_form in observed_symptom_formset %}
+    <div class="observed-symptom-form">
+      {{ observed_symptom_form.as_p }}
+    </div>
+  {% endfor %}
+
+  {% for error in observed_symptom_formset.non_form_%}
+    {{ error|escape }}
+  {% endfor %}
+
   <p><button type="submit" class="button">Cadastrar</button></p>
 </form>
 
@@ -36,4 +48,8 @@
         addText: 'nova amostra',
         deleteText: 'remover'
     });
+    $('.observed-symptom-form').formset({
+        addText: 'novo sintoma',
+        deleteText: 'remover',
+    })
 </script>
