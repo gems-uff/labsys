@@ -15,7 +15,6 @@ my_urlpatterns = [
 ]
 
 api_urls = [
-    url(r'^', include('snippets.urls')),
 ]
 
 urlpatterns = core_urlpatterns + my_urlpatterns + api_urls
