@@ -40,6 +40,7 @@ CollectedSampleFormSet = formset_factory(
     formset=BaseCollectedSampleFormSet
 )
 
+
 def create_admission_note(request):
     admission_note_form = AdmissionNoteForm(
         request.POST or None, prefix='admission_note')
@@ -69,7 +70,6 @@ def create_admission_note(request):
             admission_note.patient = patient
             admission_note.save()
             flu_vaccine_form.save_fk(admission_note)
-            #observed_symptom_form.save_fk(admission_note)
 
             # Create all CollectedSample objects (do not persist yet)
             new_samples = []
@@ -87,12 +87,23 @@ def create_admission_note(request):
                     )
                     new_samples.append(collected_sample)
 
+            # Create all ObservedSymptom objects (do not persist yet)
+            new_obs_symptoms = []
+            for symptom_form in observed_symptom_formset:
+                observed_symptom = ObservedSymptom(
+                    observed=symptom_form.cleaned_data.get('observed'),
+                    symptom=symptom_form.cleaned_data.get('symptom'),
+                    admission_note=admission_note,
+                )
+                new_obs_symptoms.append(observed_symptom)
+
             # Persist in a transaction
             try:
                 with transaction.atomic():
                     # If we want, replace old with new
                     # CollectedSample.objects.filter(admission_note=admission_note).delete()
                     CollectedSample.objects.bulk_create(new_samples)
+                    ObservedSymptom.objects.bulk_create(new_obs_symptoms)
 
                     # Notify our users
                     messages.success(request, "Registro criado com sucesso")
@@ -107,7 +118,6 @@ def create_admission_note(request):
             'patient_form': patient_form,
             'flu_vaccine_form': flu_vaccine_form,
             'collected_sample_formset': collected_sample_formset,
-            #'observed_symptom_form': observed_symptom_form,
             'observed_symptom_formset': observed_symptom_formset,
         }
     )

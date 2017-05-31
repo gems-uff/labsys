@@ -134,16 +134,17 @@ class BaseCollectedSampleFormSet(BaseFormSet):
 
 
 class ObservedSymptomForm(forms.ModelForm):
-
     class Meta:
         model = ObservedSymptom
         fields = [
             'symptom',
             'observed',
         ]
+        '''
         widgets = {
             'symptom': forms.TextInput(attrs={'readonly': 'readonly'}),
         }
+        '''
 
     def __init__(self, *args, **kwargs):
         super(ObservedSymptomForm, self).__init__(*args, **kwargs)

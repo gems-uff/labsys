@@ -97,6 +97,9 @@ class Symptom(models.Model):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return self.name
+
 
 class ObservedSymptom(models.Model):
     symptom = models.ForeignKey(
@@ -121,7 +124,7 @@ class ObservedSymptom(models.Model):
     @classmethod
     def get_primary_symptoms_dict(cls):
         primary_symptoms = [
-            {'symptom': symptom.name}
+            {'symptom': symptom}
             for symptom in Symptom.objects.all() if symptom.is_primary
         ]
         return primary_symptoms
