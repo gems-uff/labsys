@@ -38,37 +38,33 @@ def create_admission_note(request):
     flu_vaccine_form = FluVaccineForm(
         request.POST or None, prefix='flu_vaccine')
 
-    observed_symptom_form = ObservedSymptomForm(
+
+    ObservedSymptomFormSet = formset_factory(
+        ObservedSymptomForm,
+        extra=0,
+    )
+
+    initial_data = []
+    for sympton in Symptom.objects.all():
+        initial_data.append({'symptom': sympton.name})
+
+    observed_symptom_formset = ObservedSymptomFormSet(
         request.POST or None, prefix='observed_symptom',
-        initial={'symptom': Symptom.objects.all().first()})
+        initial=initial_data
+    )
 
     CollectedSampleFormSet = formset_factory(
         CollectedSampleForm, formset=BaseCollectedSampleFormSet)
     collected_sample_formset = CollectedSampleFormSet(
         request.POST or None, prefix='collected_sample')
 
-    '''
-        ObservedSymptomFormSet = modelformset_factory(
-            ObservedSymptom,
-            formset=BaseObservedSymptomFormSet,
-            fields=(['observed']),
-        )
-    
-        if request.POST:
-            observed_symptom_formset = ObservedSymptomFormSet(
-                request.POST, prefix='observed_symptom')
-        else:
-            observed_symptom_formset = ObservedSymptomFormSet(
-                prefix='observed_symptom'
-            )
-    '''
 
     if request.POST:
         if admission_note_form.is_valid() \
                 and patient_form.is_valid() \
                 and flu_vaccine_form.is_valid() \
                 and collected_sample_formset.is_valid() \
-                and observed_symptom_form.is_valid():
+                and observed_symptom_formset.is_valid():
             patient = patient_form.save(commit=False)
             admission_note = admission_note_form.save(commit=False)
 
@@ -77,7 +73,7 @@ def create_admission_note(request):
             admission_note.patient = patient
             admission_note.save()
             flu_vaccine_form.save_fk(admission_note)
-            observed_symptom_form.save_fk(admission_note)
+            #observed_symptom_form.save_fk(admission_note)
 
             # Create all CollectedSample objects (do not persist yet)
             new_samples = []
@@ -115,7 +111,7 @@ def create_admission_note(request):
             'patient_form': patient_form,
             'flu_vaccine_form': flu_vaccine_form,
             'collected_sample_formset': collected_sample_formset,
-            'observed_symptom_form': observed_symptom_form,
-            #'observed_symptom_formset': observed_symptom_formset,
+            #'observed_symptom_form': observed_symptom_form,
+            'observed_symptom_formset': observed_symptom_formset,
         }
     )

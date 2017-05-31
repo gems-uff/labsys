@@ -141,6 +141,9 @@ class ObservedSymptomForm(forms.ModelForm):
             'symptom',
             'observed',
         ]
+        widgets = {
+            'symptom': forms.TextInput(),
+        }
 
     def __init__(self, *args, **kwargs):
         super(ObservedSymptomForm, self).__init__(*args, **kwargs)
