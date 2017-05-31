@@ -55,7 +55,6 @@ def create_admission_note(request):
     collected_sample_formset = CollectedSampleFormSet(
         request.POST or None, prefix='collected_sample')
 
-
     if request.POST:
         if admission_note_form.is_valid() \
                 and patient_form.is_valid() \

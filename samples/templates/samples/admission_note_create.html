@@ -33,9 +33,6 @@
       {{ observed_symptom_form.as_p }}
     </div>
   {% endfor %}
-  <div class="observed-symptom-form">
-    {{ observed_symptom_form.as_p }}
-  </div>
 
   {% for error in observed_symptom_formset.non_form_%}
     {{ error|escape }}
@@ -51,8 +48,4 @@
         addText: 'nova amostra',
         deleteText: 'remover'
     });
-    $('.observed-symptom-form').formset({
-        addText: 'novo sintoma',
-        deleteText: 'remover',
-    })
 </script>

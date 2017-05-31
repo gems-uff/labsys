@@ -142,7 +142,7 @@ class ObservedSymptomForm(forms.ModelForm):
             'observed',
         ]
         widgets = {
-            'symptom': forms.TextInput(),
+            'symptom': forms.TextInput(attrs={'readonly': 'readonly'}),
         }
 
     def __init__(self, *args, **kwargs):
