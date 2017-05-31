@@ -158,7 +158,7 @@ class ObservedSymptomForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super(ObservedSymptomForm, self).clean()
-        symptom = cleaned_data.get('symptom')
+        #symptom = cleaned_data.get('symptom')
 
         # TODO: validate
 
