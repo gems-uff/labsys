@@ -29,6 +29,16 @@ class DetailView(generic.DetailView):
     def get_queryset(self):
         return AdmissionNote.objects.all()
 
+ObservedSymptomFormSet = formset_factory(
+    ObservedSymptomForm,
+    formset=BaseObservedSymptomFormSet,
+    extra=0,
+)
+
+CollectedSampleFormSet = formset_factory(
+    CollectedSampleForm,
+    formset=BaseCollectedSampleFormSet
+)
 
 def create_admission_note(request):
     admission_note_form = AdmissionNoteForm(
@@ -38,23 +48,10 @@ def create_admission_note(request):
     flu_vaccine_form = FluVaccineForm(
         request.POST or None, prefix='flu_vaccine')
 
-
-    ObservedSymptomFormSet = formset_factory(
-        ObservedSymptomForm,
-        extra=0,
-    )
-
-    initial_data = []
-    for sympton in Symptom.objects.all():
-        initial_data.append({'symptom': sympton.name})
-
     observed_symptom_formset = ObservedSymptomFormSet(
         request.POST or None, prefix='observed_symptom',
-        initial=initial_data
+        initial=ObservedSymptom.get_primary_symptoms_dict(),
     )
-
-    CollectedSampleFormSet = formset_factory(
-        CollectedSampleForm, formset=BaseCollectedSampleFormSet)
     collected_sample_formset = CollectedSampleFormSet(
         request.POST or None, prefix='collected_sample')
 

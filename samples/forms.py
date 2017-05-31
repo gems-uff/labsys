@@ -168,10 +168,8 @@ class BaseObservedSymptomFormSet(BaseFormSet):
 
     def __init__(self, *args, **kwargs):
         super(BaseObservedSymptomFormSet, self).__init__(*args, **kwargs)
-        self.queryset = Symptom.objects.filter(is_primary=True)
+        #self.queryset = Symptom.objects.filter(is_primary=True)
 
     def clean(self):
-        """
-        """
         if any(self.errors):
             return

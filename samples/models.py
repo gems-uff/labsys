@@ -118,6 +118,14 @@ class ObservedSymptom(models.Model):
             ('symptom', 'admission_note'),
         )
 
+    @classmethod
+    def get_primary_symptoms_dict(cls):
+        primary_symptoms = [
+            {'symptom': symptom.name}
+            for symptom in Symptom.objects.all() if symptom.is_primary
+        ]
+        return primary_symptoms
+
     def __str__(self):
         if self.symptom is not None:
             return self.symptom.name
