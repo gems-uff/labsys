@@ -12,6 +12,7 @@ core_urlpatterns = [
 my_urlpatterns = [
     url(r'^polls/', include('polls.urls')),
     url(r'^samples/', include('samples.urls')),
+    url(r'^admission_notes/', include('admission_notes.urls')),
 ]
 
 urlpatterns = core_urlpatterns + my_urlpatterns
