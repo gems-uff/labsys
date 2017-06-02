@@ -16,5 +16,6 @@ class AdmissionNote(models.Model):
         null=True,
         blank=True,
     )
+
     def __str__(self):
         return "ID Gal: {}".format(self.id_gal)

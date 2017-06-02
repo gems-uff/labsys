@@ -1,7 +1,5 @@
 {% load crispy_forms_tags %}
 
-<form method="POST">
-  {% csrf_token %}
-  {{ admission_note_form|crispy }}
-  <p><button type="submit" class="button">Cadastrar</button></p>
+<form action="{% url 'admission_notes:create' %}" method="post">
+  {% crispy admission_note_form %}
 </form>

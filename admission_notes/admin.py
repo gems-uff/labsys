@@ -7,10 +7,11 @@ class AdmissionNoteAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Dados institucionais', {'fields': [
             'id_gal',
-            'requestor',
+            'requester',
             'health_unit',
             'state',
             'city',
+            'admission_date',
         ]}),
     ]
 
