@@ -24,7 +24,9 @@ CORE_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    'crispy_forms',
 ]
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 MY_APPS = [
     'polls.apps.PollsConfig',
