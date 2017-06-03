@@ -1,7 +1,8 @@
 from django import forms
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout
+from crispy_forms.layout import Layout, Fieldset, Submit, Button
+from crispy_forms.bootstrap import FormActions
 
 from .models import AdmissionNote
 
@@ -16,21 +17,24 @@ class AdmissionNoteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AdmissionNoteForm, self).__init__(*args, **kwargs)
-        # Builds automacally using default
-        #self.helper = FormHelper(self)
-        # If you want to manipulate some bits of a big layout,
-        # use dynamic layouts (Docs)
-        # FormHelper attributes:
-        # http://django-crispy-forms.readthedocs.io/en/latest/form_helper.html
         self.helper = FormHelper()
-        # self.helper.form_action = 'admission_notes:create'
-        #self.helper.form_method = 'post'
-        # action set to reverse('<form_action>')
         self.helper.form_tag = False
-        self.helper.form_id = 'id-admissionNoteForm'
-        self.helper.form_class = 'form-horizontal'
-        self.helper.label_class= 'col-lg-2'
-        self.helper.field_class = 'col-lg-8'
-        self.helper.add_input(Submit('submit', 'Enviar'))
+
+
+        self.helper.layout = Layout(
+            Fieldset(
+                'Dados institucionais',
+                'id_gal',
+                'admission_date',
+                'requester',
+                'health_unit',
+                'state',
+                'city',
+            ),
+            FormActions(
+                Submit('save', 'Salvar'),
+                Button('cancel', 'Cancelar'),
+            ),
+        )
 
         self.fields['admission_date'].input_formats = DATE_INPUT_FORMATS

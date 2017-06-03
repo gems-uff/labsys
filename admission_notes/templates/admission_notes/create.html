@@ -2,9 +2,10 @@
 {% load crispy_forms_tags %}
 
 {% block body-content %}
-
-<form action="{% url 'admission_notes:create' %}" method="post">
-  {% crispy admission_note_form %}
-</form>
+  <div class="container">
+    <form action="{% url 'admission_notes:create' %}" method="post">
+      {% crispy admission_note_form %}
+    </form>
+  </div>
 
 {% endblock body-content %}
