@@ -35,6 +35,7 @@ MY_APPS = [
     'polls.apps.PollsConfig',
     'samples.apps.SamplesConfig',
     'admission_notes.apps.AdmissionNotesConfig',
+    'patients.apps.PatientsConfig',
 ]
 
 INSTALLED_APPS = CORE_APPS + THIRD_PARTY_APPS + MY_APPS
