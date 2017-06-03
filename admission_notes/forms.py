@@ -19,6 +19,8 @@ class AdmissionNoteForm(forms.ModelForm):
         super(AdmissionNoteForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_tag = False
+        self.helper.label_class = 'col-lg-2'
+        self.helper.field_class = 'col-lg-6'
 
 
         self.helper.layout = Layout(
