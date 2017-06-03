@@ -1,5 +1,10 @@
+{% extends 'labsys/base.html' %}
 {% load crispy_forms_tags %}
+
+{% block body-content %}
 
 <form action="{% url 'admission_notes:create' %}" method="post">
   {% crispy admission_note_form %}
 </form>
+
+{% endblock body-content %}

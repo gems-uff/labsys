@@ -53,7 +53,7 @@ def create_admission_note(request):
                 messages.error(request, "Erro ao salvar o registro")
 
 
-    return render(request, 'admission_notes/admission_note_create.html',
+    return render(request, 'admission_notes/create.html',
         {
             'admission_note_form': admission_note_form,
         }

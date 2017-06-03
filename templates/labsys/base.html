@@ -20,16 +20,10 @@
   </head>
   <body>
     <div class="page-header">
-      <h1><a href="/">Fiocruz - Gestão de amostras</a></h1>
+      <h1><a href="#">Fiocruz - Gestão de amostras</a></h1>
     </div>
-    <div class="content container">
-      <div class="row">
-        <div class="col-md-8">
-          {% block content %}
-          {% endblock %}
-        </div>
-      </div>
-    </div>
+    {% block body-content %}
+    {% endblock %}
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
