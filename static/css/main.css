@@ -1,0 +1,18 @@
+.icon-success {
+  color: #469A46;
+  margin-right: 4px;
+}
+
+.icon-fail {
+  color: #FF3333;
+  margin-right: 4px;
+}
+
+.radio-inline {
+  margin-right: 3%;
+}
+
+.fieldset-subtitle {
+  font-size: 16px;
+  font-weight: bold;
+}
