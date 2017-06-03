@@ -17,6 +17,7 @@ class Locality(models.Model):
     city = models.CharField(
         'Município',
         max_length=255,
+        blank=True,
     )
     neighborhood = models.CharField(
         'Bairro',
