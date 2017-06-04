@@ -1,11 +1,8 @@
 from django.contrib import admin
 
-from .models import Patient, Address
+
+from .models import Patient, Locality
 from admission_notes.models import AdmissionNote
-
-
-class ResidenceInline(admin.StackedInline):
-    model = Address
 
 
 class AdmissionNoteInline(admin.StackedInline):
@@ -13,6 +10,17 @@ class AdmissionNoteInline(admin.StackedInline):
     max_num = 1
     extra = 1
 
+
+class LocalityAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('Localidade', {'fields': [
+            'country',
+            'state',
+            'city',
+            'neighborhood',
+            'zone',
+        ]})
+    ]
 
 
 class PatientAdmin(admin.ModelAdmin):
@@ -23,12 +31,13 @@ class PatientAdmin(admin.ModelAdmin):
             'age_in_hours',
             'gender',
             'pregnant',
+            'residence',
         ]}),
     ]
     inlines = [
-        ResidenceInline,
         AdmissionNoteInline,
     ]
 
 
 admin.site.register(Patient, PatientAdmin)
+admin.site.register(Locality, LocalityAdmin)

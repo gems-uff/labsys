@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AdmissionNote, Patient
+from .models import AdmissionNote
 
 
 class AdmissionNoteAdmin(admin.ModelAdmin):
@@ -12,7 +12,9 @@ class AdmissionNoteAdmin(admin.ModelAdmin):
             'state',
             'city',
             'admission_date',
+            'patient',
         ]}),
     ]
 
 admin.site.register(AdmissionNote, AdmissionNoteAdmin)
+

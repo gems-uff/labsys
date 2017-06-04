@@ -1,42 +1,7 @@
 from django.db import models
 
 
-class Patient(models.Model):
-    name = models.CharField(max_length=255)
-    birth_date = models.DateField(
-        'Data de nascimento',
-        null=True,
-        blank=True,
-    )
-    age_in_hours = models.PositiveIntegerField(
-        'Idade',
-    )
-    gender = models.CharField(
-        'Sexo',
-        max_length=1,
-        choices=(
-            ('M', 'Masculino'),
-            ('F', 'Feminino'),
-            ('I', 'Ignorado'),
-        ),
-        default='I',
-    )
-    pregnant = models.IntegerField(
-        'Gestante',
-        choices=(
-            (1, '1 - 1° Trimestre'),
-            (2, '2 - 2° Trimestre'),
-            (3, '3 - 3° Trimestre'),
-            (4, '4 - Idade gestacional ignorada'),
-            (5, '5 - Não'),
-            (6, '6 - Não se aplica'),
-            (9, '9 - Ignorado'),
-        ),
-        default=9,
-    )
-
-
-class Address(models.Model):
+class Locality(models.Model):
     country = models.IntegerField(
         'País',
         choices=(
@@ -69,8 +34,44 @@ class Address(models.Model):
         ),
         default=9,
     )
-    patient = models.OneToOneField(
-        Patient,
-        on_delete=models.CASCADE,
-        related_name='residence',
+
+
+class Patient(models.Model):
+    name = models.CharField(max_length=255)
+    birth_date = models.DateField(
+        'Data de nascimento',
+        null=True,
+        blank=True,
+    )
+    age_in_hours = models.PositiveIntegerField(
+        'Idade',
+    )
+    gender = models.CharField(
+        'Sexo',
+        max_length=1,
+        choices=(
+            ('M', 'Masculino'),
+            ('F', 'Feminino'),
+            ('I', 'Ignorado'),
+        ),
+        default='I',
+    )
+    pregnant = models.IntegerField(
+        'Gestante',
+        choices=(
+            (1, '1° Trimestre'),
+            (2, '2° Trimestre'),
+            (3, '3° Trimestre'),
+            (4, 'Idade gestacional ignorada'),
+            (5, 'Não'),
+            (6, 'Não se aplica'),
+            (9, 'Ignorado'),
+        ),
+        default=9,
+    )
+    residence = models.OneToOneField(
+        Locality,
+        on_delete=models.SET_NULL,
+        verbose_name='Endereço de residência',
+        null=True,
     )
