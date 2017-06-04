@@ -50,22 +50,22 @@ class Patient(models.Model):
         'Sexo',
         max_length=1,
         choices=(
-            ('M', 'Masculino'),
-            ('F', 'Feminino'),
-            ('I', 'Ignorado'),
+            ('M', 'M - Masculino'),
+            ('F', 'F - Feminino'),
+            ('I', 'I - Ignorado'),
         ),
         default='I',
     )
     pregnant = models.IntegerField(
         'Gestante',
         choices=(
-            (1, '1° Trimestre'),
-            (2, '2° Trimestre'),
-            (3, '3° Trimestre'),
-            (4, 'Idade gestacional ignorada'),
-            (5, 'Não'),
-            (6, 'Não se aplica'),
-            (9, 'Ignorado'),
+            (1, '1 - 1° Trimestre'),
+            (2, '2 - 2° Trimestre'),
+            (3, '3 - 3° Trimestre'),
+            (4, '4 - Idade gestacional ignorada'),
+            (5, '5 - Não'),
+            (6, '6 - Não se aplica'),
+            (9, '7 - Ignorado'),
         ),
         default=9,
     )
