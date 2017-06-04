@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AdmissionNote
+from .models import AdmissionNote, Patient
 
 
 class AdmissionNoteAdmin(admin.ModelAdmin):

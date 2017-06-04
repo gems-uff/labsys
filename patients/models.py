@@ -1,41 +1,6 @@
 from django.db import models
 
 
-class Locality(models.Model):
-    country = models.IntegerField(
-        'País',
-        choices=(
-            (1, 'Brasil'),
-            (2, 'Outros'),
-        ),
-        default=1,
-    )
-    state = models.CharField(
-        'Estado UF',
-        max_length=2,
-    )
-    city = models.CharField(
-        'Município',
-        max_length=255,
-        blank=True,
-    )
-    neighborhood = models.CharField(
-        'Bairro',
-        max_length=255,
-        blank=True,
-    )
-    zone = models.IntegerField(
-        'Zona',
-        choices=(
-            (1, 'Urbana'),
-            (2, 'Rural'),
-            (3, 'Periurbana'),
-            (9, 'Ignorado'),
-        ),
-        default=9,
-    )
-
-
 class Patient(models.Model):
     name = models.CharField(max_length=255)
     birth_date = models.DateField(
@@ -69,11 +34,43 @@ class Patient(models.Model):
         ),
         default=9,
     )
-    residence = models.OneToOneField(
-        Locality,
-        on_delete=models.SET_NULL,
-        verbose_name='Endereço de residência',
-        null=True,
+
+
+class Address(models.Model):
+    country = models.IntegerField(
+        'País',
+        choices=(
+            (1, 'Brasil'),
+            (2, 'Outros'),
+        ),
+        default=1,
     )
-
-
+    state = models.CharField(
+        'Estado UF',
+        max_length=2,
+    )
+    city = models.CharField(
+        'Município',
+        max_length=255,
+        blank=True,
+    )
+    neighborhood = models.CharField(
+        'Bairro',
+        max_length=255,
+        blank=True,
+    )
+    zone = models.IntegerField(
+        'Zona',
+        choices=(
+            (1, 'Urbana'),
+            (2, 'Rural'),
+            (3, 'Periurbana'),
+            (9, 'Ignorado'),
+        ),
+        default=9,
+    )
+    patient = models.OneToOneField(
+        Patient,
+        on_delete=models.CASCADE,
+        related_name='residence',
+    )

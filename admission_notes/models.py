@@ -1,8 +1,6 @@
-import datetime
-
-#from labsys.patients import Patient
-
 from django.db import models
+
+from patients.models import Patient
 
 
 class AdmissionNote(models.Model):
@@ -27,6 +25,11 @@ class AdmissionNote(models.Model):
         help_text='quando a amostra chegou no LVRS',
         null=True,
         blank=True,
+    )
+    patient = models.ForeignKey(
+        Patient,
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     def __str__(self):

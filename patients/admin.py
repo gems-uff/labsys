@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import Patient, Locality
+from .models import Patient, Address
+
+
+class ResidenceInline(admin.StackedInline):
+    model = Address
+
 
 class PatientAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -11,9 +16,10 @@ class PatientAdmin(admin.ModelAdmin):
             'gender',
             'pregnant',
         ]}),
-        ('Endereço de residência', {'fields': ['residence']}),
+    ]
+    inlines = [
+        ResidenceInline,
     ]
 
 
-admin.site.register(Locality)
 admin.site.register(Patient, PatientAdmin)
