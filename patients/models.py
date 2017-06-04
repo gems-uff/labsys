@@ -24,13 +24,13 @@ class Patient(models.Model):
     pregnant = models.IntegerField(
         'Gestante',
         choices=(
-            (1, '1° Trimestre'),
-            (2, '2° Trimestre'),
-            (3, '3° Trimestre'),
-            (4, 'Idade gestacional ignorada'),
-            (5, 'Não'),
-            (6, 'Não se aplica'),
-            (9, 'Ignorado'),
+            (1, '1 - 1° Trimestre'),
+            (2, '2 - 2° Trimestre'),
+            (3, '3 - 3° Trimestre'),
+            (4, '4 - Idade gestacional ignorada'),
+            (5, '5 - Não'),
+            (6, '6 - Não se aplica'),
+            (9, '9 - Ignorado'),
         ),
         default=9,
     )
@@ -62,10 +62,10 @@ class Address(models.Model):
     zone = models.IntegerField(
         'Zona',
         choices=(
-            (1, 'Urbana'),
-            (2, 'Rural'),
-            (3, 'Periurbana'),
-            (9, 'Ignorado'),
+            (1, '1 - Urbana'),
+            (2, '2 - Rural'),
+            (3, '3 - Periurbana'),
+            (9, '9 - Ignorado'),
         ),
         default=9,
     )

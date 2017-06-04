@@ -1,10 +1,18 @@
 from django.contrib import admin
 
 from .models import Patient, Address
+from admission_notes.models import AdmissionNote
 
 
 class ResidenceInline(admin.StackedInline):
     model = Address
+
+
+class AdmissionNoteInline(admin.StackedInline):
+    model = AdmissionNote
+    max_num = 1
+    extra = 1
+
 
 
 class PatientAdmin(admin.ModelAdmin):
@@ -19,6 +27,7 @@ class PatientAdmin(admin.ModelAdmin):
     ]
     inlines = [
         ResidenceInline,
+        AdmissionNoteInline,
     ]
 
 
