@@ -1,6 +1,13 @@
 from django.contrib import admin
 
+from collected_sample.models import CollectedSample
+
 from .models import AdmissionNote
+
+
+class CollectedSampleInline(admin.StackedInline):
+    model = CollectedSample
+    extra = 1
 
 
 class AdmissionNoteAdmin(admin.ModelAdmin):
@@ -15,6 +22,7 @@ class AdmissionNoteAdmin(admin.ModelAdmin):
             'patient',
         ]}),
     ]
+    inlines = [CollectedSampleInline]
 
 admin.site.register(AdmissionNote, AdmissionNoteAdmin)
 

@@ -9,7 +9,7 @@ class CollectionMethod(models.Model):
         max_length=255,
     )
     is_primary = models.BooleanField(
-        verbose_name='Principal?',
+        verbose_name='Método principal?',
         default=False,
     )
 
@@ -23,9 +23,6 @@ class CollectedSample(models.Model):
         null=True,
         blank=True,
     )
-    admission_note = models.ForeignKey(
-        AdmissionNote,
-    )
     collection_type = models.ForeignKey(
         CollectionMethod,
         verbose_name='Método de coleta',
@@ -33,6 +30,9 @@ class CollectedSample(models.Model):
         null=True,
         blank=True,
     )
+    admission_note = models.ForeignKey(
+        AdmissionNote,
+    )
 
     def __str__(self):
-        return "Amostra coletada"
+        return "Amostra coletada em {}".format(self.collection_date)
