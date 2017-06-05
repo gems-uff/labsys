@@ -32,6 +32,7 @@ class AdmissionNote(models.Model):
         Patient,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
     )
 
     def __str__(self):

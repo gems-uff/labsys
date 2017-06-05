@@ -52,6 +52,9 @@ def create_admission_note(request):
             except IntegrityError:  # Transaction failed
                 messages.error(request, "Erro ao salvar o registro")
 
+        else:
+            print(admission_note_form.errors)
+
 
     return render(request, 'admission_notes/create.html',
         {

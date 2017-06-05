@@ -33,10 +33,6 @@ class AdmissionNoteForm(forms.ModelForm):
                 'state',
                 'city',
             ),
-            FormActions(
-                Submit('save', 'Salvar'),
-                Button('cancel', 'Cancelar'),
-            ),
         )
 
         self.fields['admission_date'].input_formats = DATE_INPUT_FORMATS

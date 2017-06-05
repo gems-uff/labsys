@@ -34,9 +34,6 @@ class PatientAdmin(admin.ModelAdmin):
             'residence',
         ]}),
     ]
-    inlines = [
-        AdmissionNoteInline,
-    ]
 
 
 admin.site.register(Patient, PatientAdmin)
