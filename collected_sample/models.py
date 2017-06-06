@@ -7,6 +7,7 @@ class CollectionMethod(models.Model):
     name = models.CharField(
         'Nome do método de coleta',
         max_length=255,
+        unique=True,
     )
     is_primary = models.BooleanField(
         'Método principal?',
@@ -14,7 +15,7 @@ class CollectionMethod(models.Model):
     )
 
     def __str__(self):
-        return self.method_name
+        return self.name
 
 
 class CollectedSample(models.Model):

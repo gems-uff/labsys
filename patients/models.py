@@ -35,6 +35,9 @@ class Locality(models.Model):
         default=9,
     )
 
+    def __str__(self):
+        return '{}-{}-{}'.format(self.country, self.state, self.city)
+
 
 class Patient(models.Model):
     name = models.CharField(max_length=255)
@@ -75,3 +78,6 @@ class Patient(models.Model):
         verbose_name='Endereço de residência',
         null=True,
     )
+
+    def __str__(self):
+        return self.name

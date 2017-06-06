@@ -9,6 +9,7 @@ class Symptom(models.Model):
     name = models.CharField(
         'Nome do sintoma',
         max_length=255,
+        unique=True,
     )
     is_primary = models.BooleanField(
         'Sintoma principal?',
