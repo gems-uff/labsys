@@ -31,7 +31,6 @@ class DetailView(generic.DetailView):
 
 ObservedSymptomFormSet = formset_factory(
     ObservedSymptomForm,
-    formset=BaseObservedSymptomFormSet,
     extra=0,
 )
 

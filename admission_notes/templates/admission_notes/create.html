@@ -1,9 +1,6 @@
 {% extends 'labsys/base.html' %}
 {% load crispy_forms_tags %}
 
-
-
-
 {% block body-content %}
   {% if messages %}
     {% for message in messages %}
@@ -14,11 +11,13 @@
   {% if admission_note_form.errors %}
     <div class="error errorlist">
       {{ admission_note_form.errors }}
+      {{ observed_symptom_formset }}
     </div>
   {% endif %}
 
   <form action="{% url 'admission_notes:create' %}" method="post" class="form-horizontal">
     {% crispy admission_note_form %}
+    {% crispy observed_symptom_formset %}
     <input type="submit" name="save" value="Salvar" class="btn btn-primary" id="submit-id-save">
     <input type="button" name="cancel" value="Cancelar" class="btn" id="button-id-cancel">
   </form>

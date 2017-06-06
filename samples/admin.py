@@ -37,7 +37,7 @@ class AdmissionNoteAdmin(admin.ModelAdmin):
 
 
 #admin.site.register(Patient)
-#admin.site.register(AdmissionNote, AdmissionNoteAdmin)
+admin.site.register(AdmissionNote, AdmissionNoteAdmin)
 #admin.site.register(CollectedSample)
 #admin.site.register(CollectionType)
 #admin.site.register(Symptom)

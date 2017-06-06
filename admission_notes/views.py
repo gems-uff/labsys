@@ -4,9 +4,12 @@ from django.urls import reverse
 from django.views import generic
 from django.db import IntegrityError, transaction
 from django.contrib import messages
+from django.forms import inlineformset_factory
 
 from .models import AdmissionNote
 from .forms import AdmissionNoteForm
+from symptoms.models import ObservedSymptom, Symptom
+from symptoms.forms import ObservedSymptomForm
 
 
 class IndexView(generic.ListView):
@@ -25,15 +28,41 @@ class DetailView(generic.DetailView):
     def get_queryset(self):
         return AdmissionNote.objects.all()
 
+
 def are_valid(forms):
     for form in forms:
         if not form.is_valid():
             return False
     return True
 
+
+def get_initial_admission_note():
+    admin_note = AdmissionNote.objects.all().first()
+
+    return {
+        'id_gal': admin_note.id_gal,
+        'requester': admin_note.requester,
+        'health_unit': admin_note.health_unit,
+        'state': admin_note.state,
+        'city': admin_note.city,
+        'admission_date': admin_note.admission_date,
+        'patient': admin_note.patient,
+    }
+
+ObservedSymptomFormSet = inlineformset_factory(
+    AdmissionNote, ObservedSymptom, form=ObservedSymptomForm)
 def create_admission_note(request):
     admission_note_form = AdmissionNoteForm(
-        request.POST or None, prefix='admission_note')
+        initial=get_initial_admission_note()
+        # request.POST or None, prefix='admission_note')
+    )
+    admin_note = AdmissionNote.objects.all().first()
+
+    observed_symptom_formset = ObservedSymptomFormSet(
+        request.POST or None, prefix='observed_symptom',
+        initial=ObservedSymptom.get_primary_symptoms_dict(),
+        instance=admin_note,
+    )
 
     forms = []
     forms.append(admission_note_form)
@@ -59,5 +88,6 @@ def create_admission_note(request):
     return render(request, 'admission_notes/create.html',
         {
             'admission_note_form': admission_note_form,
+            'observed_symptom_formset': observed_symptom_formset,
         }
     )
