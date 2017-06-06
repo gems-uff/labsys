@@ -20,6 +20,10 @@ class Symptom(models.Model):
 
 
 class ObservedSymptom(models.Model):
+    symptom = models.ForeignKey(
+        Symptom,
+        on_delete=models.CASCADE,
+    )
     observed = cmodels.YesNoIgnoredField(
         'Apresenta o sintoma?',
         default=None,
@@ -28,10 +32,6 @@ class ObservedSymptom(models.Model):
         'Informações adicionais',
         max_length=255,
         blank=True,
-    )
-    symptom = models.ForeignKey(
-        Symptom,
-        on_delete=models.CASCADE,
     )
     admission_note = models.ForeignKey(
         AdmissionNote,
