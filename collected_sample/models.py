@@ -4,12 +4,12 @@ from admission_notes.models import AdmissionNote
 
 
 class CollectionMethod(models.Model):
-    method_name = models.CharField(
-        'Método de coleta',
+    name = models.CharField(
+        'Nome do método de coleta',
         max_length=255,
     )
     is_primary = models.BooleanField(
-        verbose_name='Método principal?',
+        'Método principal?',
         default=False,
     )
 
@@ -28,6 +28,11 @@ class CollectedSample(models.Model):
         verbose_name='Método de coleta',
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
+    )
+    details = models.CharField(
+        'Informações adicionais',
+        max_length=255,
         blank=True,
     )
     admission_note = models.ForeignKey(

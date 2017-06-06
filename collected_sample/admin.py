@@ -6,7 +6,7 @@ from .models import CollectedSample, CollectionMethod
 class CollectionMethodAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Métodos de coleta', {'fields': [
-            'method_name',
+            'name',
             'is_primary',
         ]})
     ]
