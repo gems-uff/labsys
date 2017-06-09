@@ -18,12 +18,40 @@
   <form action="{% url 'admission_notes:create' %}" method="post" class="form-horizontal">
     {% crispy admission_note_form %}
 
-    <div class="form-inline">
-      {{  observed_symptom_formset.management_form }}
-      {% for form in  observed_symptom_formset %}
-        {{ form }}
-      {% endfor %}
-    </div>
+    <fieldset>
+      <legend>Sintomas observados</legend>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Sintoma</th>
+            <th>Observado?</th>
+            <th>Detalhes adicionais</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{  observed_symptom_formset.management_form }}
+          {% for form in  observed_symptom_formset %}
+            <tr>
+              <td>
+                <div class="form-group col-lg-4 control-label">
+                  {{ form.symptom }}
+                </div>
+              </td>
+              <td>
+                <div class="form-group col-lg-2 radio-inline">
+                  {{ form.observed}}
+                </div>
+              </td>
+              <td>
+                <div class="form-group col-lg-6">
+                  {{ form.details}}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
     <input type="submit" name="save" value="Salvar" class="btn btn-primary" id="submit-id-save">
     <input type="button" name="cancel" value="Cancelar" class="btn" id="button-id-cancel">
   </form>

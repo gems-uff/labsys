@@ -9,7 +9,7 @@ from django.forms import inlineformset_factory, formset_factory
 from .models import AdmissionNote
 from .forms import AdmissionNoteForm
 from symptoms.models import ObservedSymptom, Symptom
-from symptoms.forms import ObservedSymptomForm, ObservedSymptomFormSetHelper
+from symptoms.forms import ObservedSymptomForm
 
 
 class IndexView(generic.ListView):
@@ -54,7 +54,6 @@ ObservedSymptomFormSet = formset_factory(
     ObservedSymptomForm,
     extra=0,
 )
-# obssymptom_formset_helper = ObservedSymptomFormSetHelper()
 def create_admission_note(request):
 
     admission_note_form = AdmissionNoteForm(
@@ -93,6 +92,5 @@ def create_admission_note(request):
         {
             'admission_note_form': admission_note_form,
             'observed_symptom_formset': observed_symptom_formset,
-            # 'obssymptom_formset_helper': obssymptom_formset_helper,
         }
     )

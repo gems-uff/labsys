@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.safestring import mark_safe
 
 
 class YesNoIgnoredField(forms.NullBooleanField):
@@ -8,3 +9,4 @@ class YesNoIgnoredField(forms.NullBooleanField):
             (True, "Sim"), (False, "Não"), (None, "Ignorado"),
         ),
     )
+
