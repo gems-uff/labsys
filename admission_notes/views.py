@@ -4,12 +4,12 @@ from django.urls import reverse
 from django.views import generic
 from django.db import IntegrityError, transaction
 from django.contrib import messages
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, formset_factory
 
 from .models import AdmissionNote
 from .forms import AdmissionNoteForm
 from symptoms.models import ObservedSymptom, Symptom
-from symptoms.forms import ObservedSymptomForm
+from symptoms.forms import ObservedSymptomForm, ObservedSymptomFormSetHelper
 
 
 class IndexView(generic.ListView):
@@ -49,9 +49,14 @@ def get_initial_admission_note():
         'patient': admin_note.patient,
     }
 
-ObservedSymptomFormSet = inlineformset_factory(
-    AdmissionNote, ObservedSymptom, form=ObservedSymptomForm)
+
+ObservedSymptomFormSet = formset_factory(
+    ObservedSymptomForm,
+    extra=0,
+)
+# obssymptom_formset_helper = ObservedSymptomFormSetHelper()
 def create_admission_note(request):
+
     admission_note_form = AdmissionNoteForm(
         initial=get_initial_admission_note()
         # request.POST or None, prefix='admission_note')
@@ -61,7 +66,6 @@ def create_admission_note(request):
     observed_symptom_formset = ObservedSymptomFormSet(
         request.POST or None, prefix='observed_symptom',
         initial=ObservedSymptom.get_primary_symptoms_dict(),
-        instance=admin_note,
     )
 
     forms = []
@@ -89,5 +93,6 @@ def create_admission_note(request):
         {
             'admission_note_form': admission_note_form,
             'observed_symptom_formset': observed_symptom_formset,
+            # 'obssymptom_formset_helper': obssymptom_formset_helper,
         }
     )

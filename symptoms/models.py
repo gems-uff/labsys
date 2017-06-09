@@ -25,7 +25,7 @@ class ObservedSymptom(models.Model):
         Symptom,
         on_delete=models.CASCADE,
     )
-    observed = cmodels.YesNoIgnoredField(
+    observed = models.NullBooleanField(
         'Apresenta o sintoma?',
         default=None,
     )
