@@ -54,13 +54,26 @@ ObservedSymptomFormSet = formset_factory(
     ObservedSymptomForm,
     extra=0,
 )
+
+def create_observed_symptoms(formset, admin_note):
+    new_obs_symptoms = []
+    for symptom_form in formset:
+        observed_symptom = ObservedSymptom(
+            observed=symptom_form.cleaned_data.get('observed'),
+            symptom=symptom_form.cleaned_data.get('symptom'),
+            admission_note=admin_note,
+        )
+        new_obs_symptoms.append(observed_symptom)
+
+    return new_obs_symptoms
+
+
 def create_admission_note(request):
 
     admission_note_form = AdmissionNoteForm(
-        initial=get_initial_admission_note()
-        # request.POST or None, prefix='admission_note')
+        request.POST or None, prefix='admission_note',
+        initial=get_initial_admission_note(),
     )
-    admin_note = AdmissionNote.objects.all().first()
 
     observed_symptom_formset = ObservedSymptomFormSet(
         request.POST or None, prefix='observed_symptom',
@@ -69,12 +82,16 @@ def create_admission_note(request):
 
     forms = []
     forms.append(admission_note_form)
+    forms.append(observed_symptom_formset)
 
     if request.POST:
         if are_valid(forms):
+            admin_note = admission_note_form.save()
+            new_obs_symptoms = create_observed_symptoms(
+                observed_symptom_formset, admin_note)
             try:
                 with transaction.atomic():
-                    admission_note_form.save()
+                    ObservedSymptom.objects.bulk_create(new_obs_symptoms)
 
                     # Notify our users
                     messages.success(request, "Registro criado com sucesso")
