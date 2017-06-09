@@ -61,6 +61,7 @@ def create_observed_symptoms(formset, admin_note):
         observed_symptom = ObservedSymptom(
             observed=symptom_form.cleaned_data.get('observed'),
             symptom=symptom_form.cleaned_data.get('symptom'),
+            details=symptom_form.cleaned_data.get('details'),
             admission_note=admin_note,
         )
         new_obs_symptoms.append(observed_symptom)
@@ -86,11 +87,11 @@ def create_admission_note(request):
 
     if request.POST:
         if are_valid(forms):
-            admin_note = admission_note_form.save()
-            new_obs_symptoms = create_observed_symptoms(
-                observed_symptom_formset, admin_note)
             try:
                 with transaction.atomic():
+                    admin_note = admission_note_form.save()
+                    new_obs_symptoms = create_observed_symptoms(
+                        observed_symptom_formset, admin_note)
                     ObservedSymptom.objects.bulk_create(new_obs_symptoms)
 
                     # Notify our users
