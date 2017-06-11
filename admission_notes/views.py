@@ -9,7 +9,7 @@ from django.forms import inlineformset_factory, formset_factory
 from .models import AdmissionNote
 from .forms import AdmissionNoteForm
 from symptoms.models import ObservedSymptom, Symptom
-from symptoms.forms import ObservedSymptomForm
+from symptoms.forms import ObservedSymptomForm, ObservedSymptomFormSet
 
 
 class IndexView(generic.ListView):
@@ -49,11 +49,6 @@ def get_initial_admission_note():
         'patient': admin_note.patient,
     }
 
-
-ObservedSymptomFormSet = formset_factory(
-    ObservedSymptomForm,
-    extra=0,
-)
 
 def create_observed_symptoms(formset, admin_note):
     new_obs_symptoms = []
