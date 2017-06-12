@@ -10,9 +10,6 @@ class ObservedSymptomInlineFormset(BaseInlineFormSet):
         super(ObservedSymptomInlineFormset, self).__init__(*args, **kwargs)
         #self.initial = Symptom.get_primary_symptoms_dict()
 
-    def get_queryset(self):
-        return Symptom.objects.all()
-
 
 class ObservedSymptomForm(forms.ModelForm):
 
