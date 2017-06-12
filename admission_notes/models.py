@@ -8,7 +8,13 @@ from patients.models import Patient
 class AdmissionNote(models.Model):
     id_gal = models.CharField(
         'Número da requisição (GAL interno)',
-        max_length=30
+        max_length=30,
+    )
+    details = models.CharField(
+        'Informações adicionais',
+        help_text='Qualquer informação considerada relevante',
+        max_length=1023,
+        blank=True,
     )
     requester = models.CharField(
         'Instituto solicitante',
@@ -20,8 +26,8 @@ class AdmissionNote(models.Model):
         max_length=255,
         help_text='unidade onde o paciente foi avaliado',
     )
-    state = models.CharField(max_length=2)
-    city = models.CharField(max_length=255)
+    state = models.CharField('Estado', max_length=2)
+    city = models.CharField('Município', max_length=255)
     admission_date = models.DateField(
         'Data de entrada (LVRS)',
         help_text='quando a amostra chegou no LVRS',

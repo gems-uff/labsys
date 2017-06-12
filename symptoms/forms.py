@@ -1,7 +1,17 @@
 from django import forms
-from django.forms import formset_factory
-from labsys.custom.forms import YesNoIgnoredField
-from .models import ObservedSymptom
+from django.forms import formset_factory, BaseInlineFormSet
+
+from .models import Symptom, ObservedSymptom
+
+
+class ObservedSymptomInlineFormset(BaseInlineFormSet):
+
+    def __init__(self, *args, **kwargs):
+        super(ObservedSymptomInlineFormset, self).__init__(*args, **kwargs)
+        #self.initial = Symptom.get_primary_symptoms_dict()
+
+    def get_queryset(self):
+        return Symptom.objects.all()
 
 
 class ObservedSymptomForm(forms.ModelForm):

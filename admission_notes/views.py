@@ -10,6 +10,7 @@ from .models import AdmissionNote
 from .forms import AdmissionNoteForm
 from symptoms.models import ObservedSymptom, Symptom
 from symptoms.forms import ObservedSymptomForm, ObservedSymptomFormSet
+from patients.models import Patient
 
 
 class IndexView(generic.ListView):
@@ -37,16 +38,16 @@ def are_valid(forms):
 
 
 def get_initial_admission_note():
-    admin_note = AdmissionNote.objects.all().first()
 
     return {
-        'id_gal': admin_note.id_gal,
-        'requester': admin_note.requester,
-        'health_unit': admin_note.health_unit,
-        'state': admin_note.state,
-        'city': admin_note.city,
-        'admission_date': admin_note.admission_date,
-        'patient': admin_note.patient,
+        'id_gal': 'teste_gal',
+        'requester': 'teste requestes',
+        'health_unit': 'teste health unit',
+        'state': 'rj',
+        'city': 'niteroi',
+        'admission_date': '20-12-2012',
+        'patient': Patient.objects.all().first(),
+        'details': 'Teste de details'
     }
 
 
@@ -73,7 +74,7 @@ def create_admission_note(request):
 
     observed_symptom_formset = ObservedSymptomFormSet(
         request.POST or None, prefix='observed_symptom',
-        initial=ObservedSymptom.get_primary_symptoms_dict(),
+        initial=Symptom.get_primary_symptoms_dict(),
     )
 
     forms = []

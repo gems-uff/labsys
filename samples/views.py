@@ -6,6 +6,8 @@ from django.forms import formset_factory, modelformset_factory
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 
+
+from symptoms.forms import ObservedSymptomFormSet
 from .models import AdmissionNote, CollectedSample, ObservedSymptom, Symptom
 from .forms import (
     PatientForm, AdmissionNoteForm, FluVaccineForm,
@@ -29,10 +31,6 @@ class DetailView(generic.DetailView):
     def get_queryset(self):
         return AdmissionNote.objects.all()
 
-ObservedSymptomFormSet = formset_factory(
-    ObservedSymptomForm,
-    extra=0,
-)
 
 CollectedSampleFormSet = formset_factory(
     CollectedSampleForm,
@@ -48,6 +46,10 @@ def create_admission_note(request):
     flu_vaccine_form = FluVaccineForm(
         request.POST or None, prefix='flu_vaccine')
 
+    observed_symptom_formset = ObservedSymptomFormSet(
+        request.POST or None, prefix='observed_symptom',
+        initial=ObservedSymptom.get_primary_symptoms_dict(),
+    )
     observed_symptom_formset = ObservedSymptomFormSet(
         request.POST or None, prefix='observed_symptom',
         initial=ObservedSymptom.get_primary_symptoms_dict(),

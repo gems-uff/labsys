@@ -32,6 +32,7 @@ class AdmissionNoteForm(forms.ModelForm):
                 'health_unit',
                 'state',
                 'city',
+                'details',
             ),
         )
 

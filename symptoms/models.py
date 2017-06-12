@@ -16,6 +16,14 @@ class Symptom(models.Model):
         default=False,
     )
 
+    @classmethod
+    def get_primary_symptoms_dict(cls):
+        primary_symptoms = [
+            {'symptom': symptom}
+            for symptom in cls.objects.all() if symptom.is_primary
+        ]
+        return primary_symptoms
+
     def __str__(self):
         return self.name
 
@@ -24,6 +32,7 @@ class ObservedSymptom(models.Model):
     symptom = models.ForeignKey(
         Symptom,
         on_delete=models.CASCADE,
+        verbose_name='Sintoma',
     )
     observed = cmodels.YesNoIgnoredField(
         'Apresenta o sintoma?',
@@ -37,20 +46,13 @@ class ObservedSymptom(models.Model):
     admission_note = models.ForeignKey(
         AdmissionNote,
         on_delete=models.CASCADE,
+        verbose_name='Nota de admissão',
     )
 
     class Meta:
         unique_together = (
             ('symptom', 'admission_note'),
         )
-
-    @classmethod
-    def get_primary_symptoms_dict(cls):
-        primary_symptoms = [
-            {'symptom': symptom}
-            for symptom in Symptom.objects.all() if symptom.is_primary
-        ]
-        return primary_symptoms
 
     def __str__(self):
         if self.symptom is not None:

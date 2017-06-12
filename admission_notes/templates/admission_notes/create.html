@@ -18,8 +18,9 @@
   <form action="{% url 'admission_notes:create' %}" method="post" class="form-horizontal">
     {% crispy admission_note_form %}
 
+    <!-- Sintomas principais -->
     <fieldset>
-      <legend>Sintomas observados</legend>
+      <legend>Sintomas principais</legend>
       <table class="table">
         <thead>
           <tr>
@@ -52,6 +53,7 @@
         </tbody>
       </table>
     </fieldset>
+
     <input type="submit" name="save" value="Salvar" class="btn btn-primary" id="submit-id-save">
     <input type="button" name="cancel" value="Cancelar" class="btn" id="button-id-cancel">
   </form>
