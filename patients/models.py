@@ -72,7 +72,7 @@ class Patient(models.Model):
         ),
         default=9,
     )
-    residence = models.OneToOneField(
+    residence = models.ForeignKey(
         Locality,
         on_delete=models.SET_NULL,
         verbose_name='Endereço de residência',
