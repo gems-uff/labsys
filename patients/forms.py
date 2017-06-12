@@ -13,7 +13,7 @@ class PatientForm(forms.ModelForm):
 
     class Meta:
         model = Patient
-        fields = '__all__'
+        exclude = ['residence']
 
     def __init__(self, *args, **kwargs):
         super(PatientForm, self).__init__(*args, **kwargs)
@@ -21,7 +21,6 @@ class PatientForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.label_class = 'col-lg-2'
         self.helper.field_class = 'col-lg-6'
-
 
         self.helper.layout = Layout(
             Fieldset(
@@ -31,8 +30,32 @@ class PatientForm(forms.ModelForm):
                 'age_in_hours',
                 'gender',
                 'pregnant',
-                'residence',
             ),
         )
 
-        self.fields['admission_date'].input_formats = DATE_INPUT_FORMATS
+        self.fields['birth_date'].input_formats = DATE_INPUT_FORMATS
+
+
+class ResidenceForm(forms.ModelForm):
+
+    class Meta:
+        model = Locality
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(ResidenceForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.label_class = 'col-lg-2'
+        self.helper.field_class = 'col-lg-6'
+
+        self.helper.layout = Layout(
+            Fieldset(
+                'Residência',
+                'country',
+                'state',
+                'city',
+                'neighborhood',
+                'zone',
+            ),
+        )

@@ -10,7 +10,8 @@ from .models import AdmissionNote
 from .forms import AdmissionNoteForm
 from symptoms.models import ObservedSymptom, Symptom
 from symptoms.forms import ObservedSymptomForm, ObservedSymptomFormSet
-from patients.models import Patient
+from patients.models import Patient, Locality
+from patients.forms import PatientForm, ResidenceForm
 
 
 class IndexView(generic.ListView):
@@ -67,6 +68,13 @@ def create_observed_symptoms(formset, admin_note):
 
 def create_admission_note(request):
 
+    patient_form = PatientForm(
+        request.POST or None, prefix='patient_form',
+    )
+    residence_form = ResidenceForm(
+        request.POST or None, prefix='residence_form',
+    )
+
     admission_note_form = AdmissionNoteForm(
         request.POST or None, prefix='admission_note',
         initial=get_initial_admission_note(),
@@ -78,6 +86,8 @@ def create_admission_note(request):
     )
 
     forms = []
+    forms.append(patient_form)
+    forms.append(residence_form)
     forms.append(admission_note_form)
     forms.append(observed_symptom_formset)
 
@@ -85,7 +95,12 @@ def create_admission_note(request):
         if are_valid(forms):
             try:
                 with transaction.atomic():
-                    admin_note = admission_note_form.save()
+                    patient = patient_form.save(commit=False)
+                    patient.residence = residence_form.save()
+                    patient.save()
+                    admin_note = admission_note_form.save(commit=False)
+                    admin_note.patient = patient
+                    admin_note.save()
                     new_obs_symptoms = create_observed_symptoms(
                         observed_symptom_formset, admin_note)
                     ObservedSymptom.objects.bulk_create(new_obs_symptoms)
@@ -104,6 +119,8 @@ def create_admission_note(request):
 
     return render(request, 'admission_notes/create.html',
         {
+            'patient_form': patient_form,
+            'residence_form': residence_form,
             'admission_note_form': admission_note_form,
             'observed_symptom_formset': observed_symptom_formset,
         }

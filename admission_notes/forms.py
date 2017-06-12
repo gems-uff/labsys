@@ -13,7 +13,8 @@ class AdmissionNoteForm(forms.ModelForm):
 
     class Meta:
         model = AdmissionNote
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ['patient']
 
     def __init__(self, *args, **kwargs):
         super(AdmissionNoteForm, self).__init__(*args, **kwargs)

@@ -40,7 +40,7 @@ class Locality(models.Model):
 
 
 class Patient(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField('Nome', max_length=255)
     birth_date = models.DateField(
         'Data de nascimento',
         null=True,
