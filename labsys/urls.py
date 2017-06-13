@@ -15,10 +15,17 @@ my_urlpatterns = [
     url(r'^admission_notes/', include('admission_notes.urls')),
 ]
 
+
 urlpatterns = core_urlpatterns + my_urlpatterns
 
 if 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]
+
+
+if 'nested_admin' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        url(r'^_nested_admin/', include('nested_admin.urls')),
     ]

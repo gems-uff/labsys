@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+import nested_admin
 
 from .models import Patient, Locality
 from admission_notes.models import AdmissionNote
@@ -23,7 +24,7 @@ class LocalityAdmin(admin.ModelAdmin):
     ]
 
 
-class PatientAdmin(admin.ModelAdmin):
+class PatientAdmin(nested_admin.NestedModelAdmin):
     fieldsets = [
         ('Dados do paciente', {'fields': [
             'name',

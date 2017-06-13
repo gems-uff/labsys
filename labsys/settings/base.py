@@ -26,6 +26,7 @@ CORE_APPS = [
 
 THIRD_PARTY_APPS = [
     'crispy_forms',
+    'nested_admin',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
