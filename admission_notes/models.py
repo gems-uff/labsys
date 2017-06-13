@@ -47,4 +47,4 @@ class AdmissionNote(models.Model):
     )
 
     def __str__(self):
-        return "ID Gal: {}".format(self.id_gal)
+        return "Número interno: {}".format(self.id_lvrs_intern)

@@ -15,14 +15,17 @@ class CollectedSampleInline(admin.StackedInline):
 class AdmissionNoteAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Dados institucionais', {'fields': [
-            'id_gal',
+            'id_request_gal',
+            'id_lvrs_intern',
             'requester',
             'health_unit',
             'state',
             'city',
             'admission_date',
-            'patient',
         ]}),
+        ('Dados do paciente', {'fields': [
+            'patient',
+        ]})
     ]
     inlines = [CollectedSampleInline, ObservedSymptomInline]
 
