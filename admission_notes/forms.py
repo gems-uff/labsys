@@ -15,6 +15,9 @@ class AdmissionNoteForm(forms.ModelForm):
         model = AdmissionNote
         # fields = '__all__'
         exclude = ['patient']
+        widgets = {
+            'details': forms.Textarea(attrs={'cols': 40, 'rows': 2}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(AdmissionNoteForm, self).__init__(*args, **kwargs)
@@ -27,7 +30,8 @@ class AdmissionNoteForm(forms.ModelForm):
         self.helper.layout = Layout(
             Fieldset(
                 'Dados institucionais',
-                'id_gal',
+                'id_request_gal',
+                'id_lvrs_intern',
                 'admission_date',
                 'requester',
                 'health_unit',

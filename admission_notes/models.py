@@ -6,8 +6,13 @@ from patients.models import Patient
 
 
 class AdmissionNote(models.Model):
-    id_gal = models.CharField(
-        'Número da requisição (GAL interno)',
+    id_request_gal = models.CharField(
+        'Número da requisição (GAL)',
+        max_length=30,
+    )
+    id_lvrs_intern = models.CharField(
+        'Número interno (LVRS)',
+        help_text='Número interno do laboratório, ex: 334/2017',
         max_length=30,
     )
     details = models.CharField(
