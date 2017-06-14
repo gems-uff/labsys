@@ -19,7 +19,7 @@ class IndexView(generic.ListView):
     context_object_name = 'admission_notes_list'
 
     def get_queryset(self):
-        return AdmissionNote.objects.all().order_by('id_gal')
+        return AdmissionNote.objects.all().order_by('id_lvrs_intern')
 
 
 class DetailView(generic.DetailView):
@@ -41,7 +41,8 @@ def are_valid(forms):
 def get_initial_admission_note():
 
     return {
-        'id_gal': 'teste_gal',
+        'id_request_gal': 'teste_gal',
+        'id_lvrs_intern': '334/2017',
         'requester': 'teste requestes',
         'health_unit': 'teste health unit',
         'state': 'rj',

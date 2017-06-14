@@ -46,8 +46,21 @@ class Patient(models.Model):
         null=True,
         blank=True,
     )
-    age_in_hours = models.PositiveIntegerField(
+    age = models.PositiveIntegerField(
         'Idade',
+        blank=True,
+    )
+    age_unit = models.CharField(
+        'Tipo Idade',
+        max_length=1,
+        choices=(
+            ('A', 'A - Anos'),
+            ('M', 'M - Meses'),
+            ('D', 'D - Dias'),
+            ('H', 'H - Horas'),
+        ),
+        default='A',
+
     )
     gender = models.CharField(
         'Sexo',

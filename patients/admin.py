@@ -28,7 +28,8 @@ class PatientAdmin(admin.ModelAdmin):
         ('Dados do paciente', {'fields': [
             'name',
             'birth_date',
-            'age_in_hours',
+            'age',
+            'age_unit',
             'gender',
             'pregnant',
             'residence',
