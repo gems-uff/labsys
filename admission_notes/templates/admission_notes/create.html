@@ -58,10 +58,18 @@
       </table>
     </fieldset>
 
-    {% crispy secondary_symptoms_form %}
 
-    <input type="submit" name="save" value="Salvar" class="btn btn-primary" id="submit-id-save">
-    <input type="button" name="cancel" value="Cancelar" class="btn" id="button-id-cancel">
+    <p><a class="btn btn-primary" data-toggle="collapse" href="#collapse-symptoms" aria-expanded="false" aria-controls="collapse-symptoms">
+      Sintomas Secundários
+    </a></p>
+    <div class="collapse" id="collapse-symptoms">
+      {% crispy secondary_symptoms_form %}
+    </div>
+
+    <div class="form-group">
+      <input type="submit" name="save" value="Salvar" class="btn btn-success" id="submit-id-save">
+      <input type="button" name="cancel" value="Cancelar" class="btn btn-warning" id="button-id-cancel">
+    </div>
   </form>
 
 {% endblock body-content %}
