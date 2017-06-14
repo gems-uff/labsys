@@ -9,7 +9,7 @@ from django.forms import inlineformset_factory, formset_factory
 from .models import AdmissionNote
 from .forms import AdmissionNoteForm
 from symptoms.models import ObservedSymptom, Symptom
-from symptoms.forms import ObservedSymptomForm, ObservedSymptomFormSet
+from symptoms.forms import ObservedSymptomFormSet, SecondarySymptomsForm
 from patients.models import Patient, Locality
 from patients.forms import PatientForm, ResidenceForm
 
@@ -56,15 +56,28 @@ def get_initial_admission_note():
 def create_observed_symptoms(formset, admin_note):
     new_obs_symptoms = []
     for symptom_form in formset:
-        observed_symptom = ObservedSymptom(
-            observed=symptom_form.cleaned_data.get('observed'),
-            symptom=symptom_form.cleaned_data.get('symptom'),
-            details=symptom_form.cleaned_data.get('details'),
-            admission_note=admin_note,
-        )
-        new_obs_symptoms.append(observed_symptom)
+        # Only creates instances if symptom was not ignored
+        if symptom_form.cleaned_data.get('observed') is not None:
+            observed_symptom = ObservedSymptom(
+                observed=symptom_form.cleaned_data.get('observed'),
+                symptom=symptom_form.cleaned_data.get('symptom'),
+                details=symptom_form.cleaned_data.get('details'),
+                admission_note=admin_note,
+            )
+            new_obs_symptoms.append(observed_symptom)
 
     return new_obs_symptoms
+
+
+def create_secondary_symptoms(form, admin_note):
+    for obs_symptom in form.cleaned_data['symptoms']:
+        observed_symptom = ObservedSymptom(
+            observed=True,
+            symptom=obs_symptom,
+            details=form.cleaned_data['details'],
+            admission_note=admin_note,
+        )
+        observed_symptom.save()
 
 
 def create_admission_note(request):
@@ -86,11 +99,16 @@ def create_admission_note(request):
         initial=Symptom.get_primary_symptoms_dict(),
     )
 
+    secondary_symptoms_form = SecondarySymptomsForm(
+        request.POST or None, prefix='secondary_symptoms',
+    )
+
     forms = []
     forms.append(patient_form)
     forms.append(residence_form)
     forms.append(admission_note_form)
     forms.append(observed_symptom_formset)
+    forms.append(secondary_symptoms_form)
 
     if request.POST:
         if are_valid(forms):
@@ -105,6 +123,9 @@ def create_admission_note(request):
                     new_obs_symptoms = create_observed_symptoms(
                         observed_symptom_formset, admin_note)
                     ObservedSymptom.objects.bulk_create(new_obs_symptoms)
+
+                    create_secondary_symptoms(
+                        secondary_symptoms_form, admin_note)
 
                     # Notify our users
                     messages.success(request, "Registro criado com sucesso")
@@ -124,5 +145,6 @@ def create_admission_note(request):
             'residence_form': residence_form,
             'admission_note_form': admission_note_form,
             'observed_symptom_formset': observed_symptom_formset,
+            'secondary_symptoms_form': secondary_symptoms_form,
         }
     )
