@@ -48,8 +48,26 @@ def get_initial_admission_note():
         'state': 'rj',
         'city': 'niteroi',
         'admission_date': '20-12-2012',
-        'patient': Patient.objects.all().first(),
         'details': 'Teste de details'
+    }
+
+
+def get_initial_patient():
+    return {
+        'name': 'Nome de Teste dos Santos',
+        'birth_date': '19/12/1994',
+        'age': 12,
+        'age_unit': 'A',
+        'sex': 'M',
+        'pregnant': 6,
+    }
+
+
+def get_initial_residence():
+    return {
+        'state': 'RJ',
+        'city': 'Niteroi',
+        'neighborhood': 'Icarai',
     }
 
 
@@ -84,9 +102,11 @@ def create_admission_note(request):
 
     patient_form = PatientForm(
         request.POST or None, prefix='patient_form',
+        initial=get_initial_patient(),
     )
     residence_form = ResidenceForm(
         request.POST or None, prefix='residence_form',
+        initial=get_initial_residence(),
     )
 
     admission_note_form = AdmissionNoteForm(
