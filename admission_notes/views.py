@@ -58,16 +58,18 @@ def get_initial_patient():
         'birth_date': '19/12/1994',
         'age': 12,
         'age_unit': 'A',
-        'sex': 'M',
+        'gender': 'M',
         'pregnant': 6,
     }
 
 
 def get_initial_residence():
     return {
+        'country': 1,
         'state': 'RJ',
         'city': 'Niteroi',
         'neighborhood': 'Icarai',
+        'zone': 9,
     }
 
 
@@ -134,12 +136,9 @@ def create_admission_note(request):
         if are_valid(forms):
             try:
                 with transaction.atomic():
-                    patient = patient_form.save(commit=False)
-                    patient.residence = residence_form.save()
-                    patient.save()
-                    admin_note = admission_note_form.save(commit=False)
-                    admin_note.patient = patient
-                    admin_note.save()
+                    residence = residence_form.save()
+                    patient = patient_form.save(residence)
+                    admin_note = admission_note_form.save(patient)
                     new_obs_symptoms = create_observed_symptoms(
                         observed_symptom_formset, admin_note)
                     ObservedSymptom.objects.bulk_create(new_obs_symptoms)

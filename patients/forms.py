@@ -36,6 +36,11 @@ class PatientForm(forms.ModelForm):
 
         self.fields['birth_date'].input_formats = DATE_INPUT_FORMATS
 
+    def save(self, residence=None, commit=True):
+        self.instance.residence = residence
+        super(PatientForm, self).save(commit)
+        return self.instance
+
 
 class ResidenceForm(forms.ModelForm):
 

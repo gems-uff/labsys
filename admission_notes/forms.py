@@ -42,3 +42,8 @@ class AdmissionNoteForm(forms.ModelForm):
         )
 
         self.fields['admission_date'].input_formats = DATE_INPUT_FORMATS
+
+    def save(self, patient=None, commit=True):
+        self.instance.patient = patient
+        super(AdmissionNoteForm, self).save(commit)
+        return self.instance
