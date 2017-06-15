@@ -29,7 +29,7 @@ class SecondarySymptomsForm(forms.Form):
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.form_show_labels = False
-        self.helper.field_class = 'col-lg-4'
+        self.helper.field_class = 'col-sm-4'
 
         self.helper.layout = Layout(
             Fieldset(

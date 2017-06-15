@@ -19,8 +19,8 @@ class PatientForm(forms.ModelForm):
         super(PatientForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.label_class = 'col-lg-2'
-        self.helper.field_class = 'col-lg-6'
+        self.helper.label_class = 'col-sm-2'
+        self.helper.field_class = 'col-sm-6'
 
         self.helper.layout = Layout(
             Fieldset(
@@ -52,8 +52,8 @@ class ResidenceForm(forms.ModelForm):
         super(ResidenceForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.label_class = 'col-lg-2'
-        self.helper.field_class = 'col-lg-6'
+        self.helper.label_class = 'col-sm-2'
+        self.helper.field_class = 'col-sm-6'
 
         self.helper.layout = Layout(
             Fieldset(
