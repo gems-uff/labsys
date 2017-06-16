@@ -1,5 +1,6 @@
 {% extends 'labsys/base.html' %}
 {% load crispy_forms_tags %}
+{% load staticfiles %}
 
 {% block body-content %}
   {% if messages %}
@@ -22,7 +23,18 @@
     {% crispy patient_form %}
     {% crispy residence_form %}
 
-    <!-- Sintomas principais -->
+  <!-- Collected Samples -->
+  <fieldset>
+    <legend>Amostras coletadas</legend>
+    {{ collected_sample_formset.management_form }}
+    {% for sample_form in collected_sample_formset %}
+      <div class="sample-form form-group">
+        {{ sample_form.as_p}}
+      </div>
+    {% endfor %}
+  </fieldset>
+
+    <!-- Primary Symptoms -->
     <fieldset>
       <legend>Sintomas principais</legend>
       <table class="table">
@@ -59,6 +71,7 @@
     </fieldset>
 
 
+    <!-- Secondary Symptoms -->
     <p><a class="btn btn-primary" data-toggle="collapse" href="#collapse-symptoms" aria-expanded="false" aria-controls="collapse-symptoms">
       Sintomas Secundários
     </a></p>
@@ -71,5 +84,15 @@
       <input type="button" name="cancel" value="Cancelar" class="btn btn-warning" id="button-id-cancel">
     </div>
   </form>
+
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="{% static 'jquery.formset.js' %}"></script>
+  <script>
+      $('.sample-form').formset({
+          addText: 'nova amostra',
+          deleteText: 'remover'
+      });
+  </script>
 
 {% endblock body-content %}

@@ -36,6 +36,9 @@ class PatientForm(forms.ModelForm):
 
         self.fields['birth_date'].input_formats = DATE_INPUT_FORMATS
 
+    # TODO: think about edge case: patient is first saved with commit=False
+    # then it's called .save(), residence will be None again...
+    # Same happens with admission_note and collected_sample
     def save(self, residence=None, commit=True):
         self.instance.residence = residence
         super(PatientForm, self).save(commit)

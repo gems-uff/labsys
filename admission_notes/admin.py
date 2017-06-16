@@ -9,7 +9,7 @@ from .models import AdmissionNote
 
 class CollectedSampleInline(admin.StackedInline):
     model = CollectedSample
-    extra = 1
+    extra = 0
 
 
 class AdmissionNoteAdmin(admin.ModelAdmin):

@@ -24,7 +24,7 @@ class CollectedSample(models.Model):
         null=True,
         blank=True,
     )
-    collection_type = models.ForeignKey(
+    collection_method = models.ForeignKey(
         CollectionMethod,
         verbose_name='Método de coleta',
         on_delete=models.SET_NULL,

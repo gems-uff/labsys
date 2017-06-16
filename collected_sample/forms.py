@@ -6,7 +6,7 @@ from .models import CollectionMethod, CollectedSample
 
 
 class CollectedSampleForm(forms.ModelForm):
-    other_collection_type = forms.ModelChoiceField(
+    other_collection_method = forms.ModelChoiceField(
         label="Outro método de coleta",
         queryset=CollectionMethod.objects.filter(is_primary=False),
         required=False,
@@ -22,35 +22,33 @@ class CollectedSampleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CollectedSampleForm, self).__init__(*args, **kwargs)
-        self.fields['collection_type'].queryset = \
+        self.fields['collection_method'].queryset = \
             CollectionMethod.objects.filter(is_primary=True)
         self.fields['collection_method'].required = False
         self.fields['collection_date'].input_formats = DATE_INPUT_FORMATS
 
-    def save_fk(self, foreign_key=None):
-        # TODO: raise program (not user) error if foreign_key is None
-        collected_sample = super().save(commit=False)
-        collected_sample.admission_note = foreign_key
-        collected_sample = super().save()
-        return collected_sample
+    def save(self, admin_note=None, commit=True):
+        self.instance.admission_note = admin_note
+        super(CollectedSampleForm, self).save(commit)
+        return self.instance
 
     def clean(self):
         cleaned_data = super(CollectedSampleForm, self).clean()
-        collection_type = cleaned_data.get('collection_type')
-        other_collection_type = cleaned_data.get('other_collection_type')
+        collection_method = cleaned_data.get('collection_method')
+        other_collection_method = cleaned_data.get('other_collection_method')
 
-        if collection_type and other_collection_type:
+        if collection_method and other_collection_method:
             raise forms.ValidationError(
                 "Selecionar somente um método de coleta"
             )
 
-        if collection_type is None and other_collection_type is None:
+        if collection_method is None and other_collection_method is None:
             raise forms.ValidationError(
                 "Selecionar pelo menos um método de coleta"
             )
 
-        if other_collection_type and collection_type is None:
-            cleaned_data['collection_type'] = other_collection_type
+        if other_collection_method and collection_method is None:
+            cleaned_data['collection_method'] = other_collection_method
 
         return cleaned_data
 
@@ -66,19 +64,19 @@ class BaseCollectedSampleFormSet(BaseFormSet):
 
         for form in self.forms:
             if form.cleaned_data:
-                collection_type = form.cleaned_data['collection_type']
+                collection_method = form.cleaned_data['collection_method']
                 collection_date = form.cleaned_data['collection_date']
 
                 # Check all samples have both date and method
-                if collection_type and not collection_date:
+                if collection_method and not collection_date:
                     raise forms.ValidationError(
                         "Todas as amostras devem ter uma data de coleta",
                         code="missing_collection_date",
                     )
-                elif collection_date and not collection_type:
+                elif collection_date and not collection_method:
                     raise forms.ValidationError(
                         "Todas as amostras devem ter um método de coleta",
-                        code="missing_collection_type",
+                        code="missing_collection_method",
                     )
 
 

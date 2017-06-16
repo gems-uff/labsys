@@ -14,6 +14,7 @@ class ObservedSymptomInlineFormset(BaseInlineFormSet):
         #self.initial = Symptom.get_primary_symptoms_dict()
 
 
+# TODO: make the fieldset legend collapse instead of a button
 class SecondarySymptomsForm(forms.Form):
 
     symptoms = forms.ModelMultipleChoiceField(
