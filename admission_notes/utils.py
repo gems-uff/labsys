@@ -9,7 +9,7 @@ def are_forms_valid(forms):
     return True
 
 
-def get_admission_note(dict=False):
+def get_admission_note(dict=False, form=False):
     admission_note = {
         'id_request_gal': 'teste_gal',
         'id_lvrs_intern': '334/2017',
@@ -23,10 +23,12 @@ def get_admission_note(dict=False):
 
     if not dict:
         admission_note = AdmissionNote(**admission_note)
+    if form:
+        admission_note['admission_date'] = '20/12/2012'
     return admission_note
 
 
-def get_patient(dict=False):
+def get_patient(dict=False, form=False):
     patient = {
         'name': 'Nome de Teste dos Santos',
         'birth_date': '1994-12-12',
@@ -38,10 +40,12 @@ def get_patient(dict=False):
 
     if not dict:
         patient = Patient(**patient)
+    if form:
+        patient['birth_date'] = '12/12/1994'
     return patient
 
 
-def get_locality(dict=False):
+def get_locality(dict=False, form=False):
     locality = {
         'country': 1,
         'state': 'RJ',

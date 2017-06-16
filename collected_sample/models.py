@@ -21,15 +21,12 @@ class CollectionMethod(models.Model):
 class CollectedSample(models.Model):
     collection_date = models.DateField(
         'Data de coleta',
-        null=True,
-        blank=True,
     )
     collection_method = models.ForeignKey(
         CollectionMethod,
         verbose_name='Método de coleta',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
     )
     details = models.CharField(
         'Informações adicionais',

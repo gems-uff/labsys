@@ -36,6 +36,7 @@ class DetailView(generic.DetailView):
 def create_observed_symptoms(formset, admin_note):
     new_obs_symptoms = []
     for symptom_form in formset:
+        # TODO: transfer this logic to the model
         # Only creates instances if symptom was not ignored
         if symptom_form.cleaned_data.get('observed') is not None:
             observed_symptom = ObservedSymptom(
@@ -46,7 +47,7 @@ def create_observed_symptoms(formset, admin_note):
             )
             new_obs_symptoms.append(observed_symptom)
 
-    return new_obs_symptoms
+    ObservedSymptom.objects.bulk_create(new_obs_symptoms)
 
 
 def create_secondary_symptoms(form, admin_note):
@@ -61,33 +62,43 @@ def create_secondary_symptoms(form, admin_note):
 
 
 def create_collected_samples(formset, admin_note):
+    new_collected_samples = []
     for form in formset:
         collected_sample = CollectedSample(
             collection_method = form.cleaned_data.get('collection_method'),
             collection_date = form.cleaned_data.get('collection_date'),
+            details = form.cleaned_data.get('details'),
             admission_note=admin_note,
         )
-        collected_sample.save()
+        new_collected_samples.append(collected_sample)
+
+    CollectedSample.objects.bulk_create(new_collected_samples)
 
 
 def create_admission_note(request):
-    ### SETUP
+    #region Forms, Context and Template setup
     admission_note_form = AdmissionNoteForm(
         request.POST or None, prefix='admission_note',
-        initial=utils.get_admission_note(dict=True),)
+        initial=utils.get_admission_note(dict=True, form=True),
+    )
     patient_form = PatientForm(
         request.POST or None, prefix='patient_form',
-        initial=utils.get_patient(dict=True),)
+        initial=utils.get_patient(dict=True, form=True),
+    )
     residence_form = ResidenceForm(
         request.POST or None, prefix='residence_form',
-        initial=utils.get_residence(dict=True),)
+        initial=utils.get_locality(dict=True, form=True),
+    )
     observed_symptom_formset = ObservedSymptomFormSet(
         request.POST or None, prefix='observed_symptom',
-        initial=Symptom.get_primary_symptoms_dict(),)
+        initial=Symptom.get_primary_symptoms_dict(),
+    )
     secondary_symptoms_form = SecondarySymptomsForm(
-        request.POST or None, prefix='secondary_symptoms',)
+        request.POST or None, prefix='secondary_symptoms',
+    )
     collected_sample_formset = CollectedSampleFormSet(
-        request.POST or None, prefix='collected_sample')
+        request.POST or None, prefix='collected_samples',
+    )
 
     forms = [
         patient_form,
@@ -106,8 +117,9 @@ def create_admission_note(request):
         'collected_sample_formset': collected_sample_formset,
     }
     template = 'admission_notes/create.html'
+    #endregion
 
-    # LOGIC
+    #region Request handling
     if request.POST:
         if utils.are_forms_valid(forms):
             try:
@@ -115,15 +127,17 @@ def create_admission_note(request):
                     residence = residence_form.save()
                     patient = patient_form.save(residence)
                     admin_note = admission_note_form.save(patient)
-                    # TODO: check if saving the formset changes anything
-                    new_obs_symptoms = create_observed_symptoms(
-                        observed_symptom_formset, admin_note)
-                    ObservedSymptom.objects.bulk_create(new_obs_symptoms)
                     create_secondary_symptoms(
-                        secondary_symptoms_form, admin_note)
-                    collected_samples = create_collected_samples(
-                        collected_sample_formset, admin_note)
-
+                        secondary_symptoms_form, admin_note
+                    )
+                    # TODO: check if saving the formset changes anything
+                    create_observed_symptoms(
+                        observed_symptom_formset, admin_note
+                    )
+                    # TODO: allow to add multiple collected samples
+                    create_collected_samples(
+                        collected_sample_formset, admin_note
+                    )
                     # Notify our users
                     messages.success(request, "Registro criado com sucesso")
 
@@ -134,5 +148,5 @@ def create_admission_note(request):
 
         else:
             print(admission_note_form.errors)
-
+    #endregion
     return render(request, template, context)

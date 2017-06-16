@@ -74,6 +74,8 @@ class CollectedSampleFormTest(TestCase):
 
     def test_no_selected_collection_method(self):
         form = CollectedSampleForm({
+            'collection_method': '',
+            'other_collection_method': '',
             'collection_date': self.collection_date,
         })
         self.assertFalse(form.is_valid())

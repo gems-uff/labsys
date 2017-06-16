@@ -18,6 +18,7 @@ class CollectedSampleForm(forms.ModelForm):
             'collection_method',
             'other_collection_method',
             'collection_date',
+            'details',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -82,5 +83,6 @@ class BaseCollectedSampleFormSet(BaseFormSet):
 
 CollectedSampleFormSet = formset_factory(
     CollectedSampleForm,
-    formset=BaseCollectedSampleFormSet
+    # formset=BaseCollectedSampleFormSet,
+    extra=1,
 )
