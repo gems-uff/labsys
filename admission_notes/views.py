@@ -8,10 +8,12 @@ from django.forms import inlineformset_factory, formset_factory
 
 from .models import AdmissionNote
 from .forms import AdmissionNoteForm
+import admission_notes.utils as utils
 from symptoms.models import ObservedSymptom, Symptom
 from symptoms.forms import ObservedSymptomFormSet, SecondarySymptomsForm
-from patients.models import Patient, Locality
 from patients.forms import PatientForm, ResidenceForm
+from collected_sample.forms import CollectedSampleFormSet
+from collected_sample.models import CollectedSample
 
 
 class IndexView(generic.ListView):
@@ -29,48 +31,6 @@ class DetailView(generic.DetailView):
 
     def get_queryset(self):
         return AdmissionNote.objects.all()
-
-
-def are_valid(forms):
-    for form in forms:
-        if not form.is_valid():
-            return False
-    return True
-
-
-def get_initial_admission_note():
-
-    return {
-        'id_request_gal': 'teste_gal',
-        'id_lvrs_intern': '334/2017',
-        'requester': 'teste requestes',
-        'health_unit': 'teste health unit',
-        'state': 'rj',
-        'city': 'niteroi',
-        'admission_date': '20-12-2012',
-        'details': 'Teste de details'
-    }
-
-
-def get_initial_patient():
-    return {
-        'name': 'Nome de Teste dos Santos',
-        'birth_date': '19/12/1994',
-        'age': 12,
-        'age_unit': 'A',
-        'gender': 'M',
-        'pregnant': 6,
-    }
-
-
-def get_initial_residence():
-    return {
-        'country': 1,
-        'state': 'RJ',
-        'city': 'Niteroi',
-        'neighborhood': 'Icarai',
-        'zone': 9,
-    }
 
 
 def create_observed_symptoms(formset, admin_note):
@@ -100,51 +60,69 @@ def create_secondary_symptoms(form, admin_note):
         observed_symptom.save()
 
 
+def create_collected_samples(formset, admin_note):
+    for form in formset:
+        collected_sample = CollectedSample(
+            collection_method = form.cleaned_data.get('collection_method'),
+            collection_date = form.cleaned_data.get('collection_date'),
+            admission_note=admin_note,
+        )
+        collected_sample.save()
+
+
 def create_admission_note(request):
-
-    patient_form = PatientForm(
-        request.POST or None, prefix='patient_form',
-        initial=get_initial_patient(),
-    )
-    residence_form = ResidenceForm(
-        request.POST or None, prefix='residence_form',
-        initial=get_initial_residence(),
-    )
-
+    ### SETUP
     admission_note_form = AdmissionNoteForm(
         request.POST or None, prefix='admission_note',
-        initial=get_initial_admission_note(),
-    )
-
+        initial=utils.get_admission_note(dict=True),)
+    patient_form = PatientForm(
+        request.POST or None, prefix='patient_form',
+        initial=utils.get_patient(dict=True),)
+    residence_form = ResidenceForm(
+        request.POST or None, prefix='residence_form',
+        initial=utils.get_residence(dict=True),)
     observed_symptom_formset = ObservedSymptomFormSet(
         request.POST or None, prefix='observed_symptom',
-        initial=Symptom.get_primary_symptoms_dict(),
-    )
-
+        initial=Symptom.get_primary_symptoms_dict(),)
     secondary_symptoms_form = SecondarySymptomsForm(
-        request.POST or None, prefix='secondary_symptoms',
-    )
+        request.POST or None, prefix='secondary_symptoms',)
+    collected_sample_formset = CollectedSampleFormSet(
+        request.POST or None, prefix='collected_sample')
 
-    forms = []
-    forms.append(patient_form)
-    forms.append(residence_form)
-    forms.append(admission_note_form)
-    forms.append(observed_symptom_formset)
-    forms.append(secondary_symptoms_form)
+    forms = [
+        patient_form,
+        residence_form,
+        admission_note_form,
+        observed_symptom_formset,
+        secondary_symptoms_form,
+        collected_sample_formset,
+    ]
+    context = {
+        'admission_note_form': admission_note_form,
+        'patient_form': patient_form,
+        'residence_form': residence_form,
+        'observed_symptom_formset': observed_symptom_formset,
+        'secondary_symptoms_form': secondary_symptoms_form,
+        'collected_sample_formset': collected_sample_formset,
+    }
+    template = 'admission_notes/create.html'
 
+    # LOGIC
     if request.POST:
-        if are_valid(forms):
+        if utils.are_forms_valid(forms):
             try:
                 with transaction.atomic():
                     residence = residence_form.save()
                     patient = patient_form.save(residence)
                     admin_note = admission_note_form.save(patient)
+                    # TODO: check if saving the formset changes anything
                     new_obs_symptoms = create_observed_symptoms(
                         observed_symptom_formset, admin_note)
                     ObservedSymptom.objects.bulk_create(new_obs_symptoms)
-
                     create_secondary_symptoms(
                         secondary_symptoms_form, admin_note)
+                    collected_samples = create_collected_samples(
+                        collected_sample_formset, admin_note)
 
                     # Notify our users
                     messages.success(request, "Registro criado com sucesso")
@@ -157,13 +135,4 @@ def create_admission_note(request):
         else:
             print(admission_note_form.errors)
 
-
-    return render(request, 'admission_notes/create.html',
-        {
-            'patient_form': patient_form,
-            'residence_form': residence_form,
-            'admission_note_form': admission_note_form,
-            'observed_symptom_formset': observed_symptom_formset,
-            'secondary_symptoms_form': secondary_symptoms_form,
-        }
-    )
+    return render(request, template, context)
