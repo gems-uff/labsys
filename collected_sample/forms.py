@@ -1,6 +1,10 @@
 from django import forms
 from django.forms.formsets import formset_factory, BaseFormSet
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset, Submit, Button
+from crispy_forms.bootstrap import FormActions
+
 from labsys.settings.base import DATE_INPUT_FORMATS
 from .models import CollectionMethod, CollectedSample
 
@@ -27,6 +31,21 @@ class CollectedSampleForm(forms.ModelForm):
             CollectionMethod.objects.filter(is_primary=True)
         self.fields['collection_method'].required = False
         self.fields['collection_date'].input_formats = DATE_INPUT_FORMATS
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.label_class = 'col-sm-2'
+        self.helper.field_class = 'col-sm-6'
+
+        self.helper.layout = Layout(
+            Fieldset(
+                'Amostra',
+                'collection_method',
+                'other_collection_method',
+                'collection_date',
+                'details',
+            ),
+        )
 
     def save(self, admin_note=None, commit=True):
         self.instance.admission_note = admin_note
@@ -84,5 +103,5 @@ class BaseCollectedSampleFormSet(BaseFormSet):
 CollectedSampleFormSet = formset_factory(
     CollectedSampleForm,
     # formset=BaseCollectedSampleFormSet,
-    extra=1,
+    extra=2,
 )

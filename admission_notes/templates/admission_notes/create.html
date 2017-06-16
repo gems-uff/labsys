@@ -28,8 +28,8 @@
     <legend>Amostras coletadas</legend>
     {{ collected_sample_formset.management_form }}
     {% for sample_form in collected_sample_formset %}
-      <div class="sample-form form-group">
-        {{ sample_form.as_p}}
+      <div class="sample-form">
+        {% crispy sample_form %}
       </div>
     {% endfor %}
   </fieldset>
