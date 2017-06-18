@@ -70,6 +70,11 @@ class ISimpleDatedEventForm(forms.ModelForm):
         self.helper.label_class = 'col-sm-2'
         self.helper.field_class = 'col-sm-4'
 
+    def save(self, admin_note=None, commit=True):
+        self.instance.admission_note = admin_note
+        super(ISimpleDatedEventForm, self).save(commit)
+        return self.instance
+
 
 class FluVaccineForm(ISimpleDatedEventForm):
 
@@ -89,11 +94,6 @@ class FluVaccineForm(ISimpleDatedEventForm):
         self.fields['occurred'].label = 'Foi vacinado'
         self.fields['occurred'].help_text = 'Vacinado nos últimos 12 meses'
         self.fields['date'].label = 'Data de vacinação'
-
-    def save(self, admin_note=None, commit=True):
-        self.instance.admission_note = admin_note
-        super(FluVaccineForm, self).save(commit)
-        return self.instance
 
 
 class ClinicalEvolutionForm(ISimpleDatedEventForm):
