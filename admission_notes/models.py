@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 
+from labsys.custom import models as cmodels
 from patients.models import Patient
 
 
@@ -48,3 +49,40 @@ class AdmissionNote(models.Model):
 
     def __str__(self):
         return "Número interno: {}".format(self.id_lvrs_intern)
+
+
+class ISimpleDatedEvent(models.Model):
+    class Meta:
+        abstract = True
+
+    occurred = cmodels.YesNoIgnoredField()
+    date = models.DateField(
+        null=True,
+        blank=True,
+    )
+    admission_note = models.OneToOneField(
+        AdmissionNote,
+        on_delete=models.CASCADE,
+    )
+
+    def save(self, *args, **kwargs):
+        if self.occurred is None:
+            return
+        else:
+            super(ISimpleDatedEvent, self).save(*args, **kwargs)
+
+
+class FluVaccine(ISimpleDatedEvent):
+    pass
+
+
+class ClinicalEvolution(ISimpleDatedEvent):
+    pass
+
+
+class Hospitalization(ISimpleDatedEvent):
+    pass
+
+
+class UTIHospitalization(ISimpleDatedEvent):
+    pass

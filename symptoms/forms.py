@@ -7,13 +7,6 @@ from crispy_forms.layout import Layout, Fieldset, Div
 from .models import Symptom, ObservedSymptom
 
 
-class ObservedSymptomInlineFormset(BaseInlineFormSet):
-
-    def __init__(self, *args, **kwargs):
-        super(ObservedSymptomInlineFormset, self).__init__(*args, **kwargs)
-        #self.initial = Symptom.get_primary_symptoms_dict()
-
-
 # TODO: make the fieldset legend collapse instead of a button
 class SecondarySymptomsForm(forms.Form):
 
