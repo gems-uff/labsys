@@ -39,3 +39,33 @@ class CollectedSample(models.Model):
 
     def __str__(self):
         return "Amostra coletada em {}".format(self.collection_date)
+
+
+class RSVExam(models.Model):
+    details = models.CharField(
+        'Placeholder RSV',
+        max_length=255,
+        blank=True,
+    )
+    performed_inhouse = models.BooleanField(
+        'Realizado na FIOCRUZ/LVRS?',
+        default=True,
+    )
+    sample = models.ForeignKey(
+        CollectedSample,
+    )
+
+
+class RTPCRExam(models.Model):
+    details = models.CharField(
+        'Placeholder RTPCR',
+        max_length=255,
+        blank=True,
+    )
+    performed_inhouse = models.BooleanField(
+        'Realizado na FIOCRUZ/LVRS?',
+        default=True,
+    )
+    sample = models.ForeignKey(
+        CollectedSample,
+    )
