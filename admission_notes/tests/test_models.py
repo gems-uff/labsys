@@ -2,8 +2,9 @@ import datetime
 
 from django.test import TestCase
 
-from ..models import AdmissionNote, FluVaccine
-import admission_notes.utils as utils
+from admission_notes.models import AdmissionNote, FluVaccine
+from admission_notes.forms import FluVaccineForm
+from admission_notes import utils
 
 
 '''
@@ -32,7 +33,6 @@ class FluVaccineTest(TestCase):
         self.assertEqual(event.date, datetime.date(2016, 12 ,12))
         self.assertEqual(event.admission_note, self.admission_note)
 
-
     def test_ignored_event_is_not_created(self):
         FluVaccine.objects.create(
             occurred=None,
@@ -40,6 +40,41 @@ class FluVaccineTest(TestCase):
             admission_note=self.admission_note,
         )
         self.assertEqual(len(FluVaccine.objects.all()), 0)
+
+    def test_valid_vaccine_form(self):
+        form = FluVaccineForm({
+            'occurred': True,
+            'date': '12/12/2016',
+        })
+        self.assertEqual(form.is_valid(), True)
+
+    def test_invalid_date_vaccine_form(self):
+        form = FluVaccineForm({
+            'occurred': True,
+            'date': '12/130/2016',
+        })
+        self.assertEqual(form.is_valid(), False)
+
+    def test_create_model_from_form(self):
+        form = FluVaccineForm({
+            'occurred': True,
+            'date': '12/12/2016',
+        })
+        self.assertEqual(form.is_valid(), True)
+        flu_vaccine = form.save(self.admission_note)
+        flu_vaccine = FluVaccine.objects.filter(id=flu_vaccine.id).first()
+        self.assertEqual(flu_vaccine.occurred, True)
+        self.assertEqual(flu_vaccine.date, datetime.date(2016, 12, 12))
+        self.assertEqual(flu_vaccine.admission_note, self.admission_note)
+
+    def test_do_not_create_ignored_event_from_form(self):
+        form = FluVaccineForm({
+            'occurred': None,
+            'date': '12/12/2016',
+        })
+        flu_vaccine = form.save(self.admission_note)
+        flu_vaccine = FluVaccine.objects.filter(id=flu_vaccine.id).first()
+        self.assertEqual(flu_vaccine, None)
 
 
 '''
