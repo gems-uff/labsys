@@ -1,6 +1,6 @@
 from django.db import models
 
-from samples.custom import forms as cforms
+from labsys.custom import forms as cforms
 
 
 class YesNoIgnoredField(models.NullBooleanField):

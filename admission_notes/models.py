@@ -55,7 +55,7 @@ class ISimpleDatedEvent(models.Model):
     class Meta:
         abstract = True
 
-    occurred = cmodels.YesNoIgnoredField()
+    occurred = models.NullBooleanField()
     date = models.DateField(
         null=True,
         blank=True,

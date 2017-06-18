@@ -7,7 +7,13 @@ from django.contrib import messages
 from django.forms import inlineformset_factory, formset_factory
 
 from .models import AdmissionNote
-from .forms import AdmissionNoteForm
+from .forms import (
+    AdmissionNoteForm,
+    FluVaccineForm,
+    ClinicalEvolutionForm,
+    HospitalizationForm,
+    UTIHospitalizationForm,
+)
 import admission_notes.utils as utils
 from symptoms.models import ObservedSymptom, Symptom
 from symptoms.forms import ObservedSymptomFormSet, SecondarySymptomsForm
@@ -99,6 +105,18 @@ def create_admission_note(request):
     collected_sample_formset = CollectedSampleFormSet(
         request.POST or None, prefix='collected_samples',
     )
+    flu_vaccine_form = FluVaccineForm(
+        request.POST or None, prefix='flu_vaccine',
+    )
+    clinical_evolution_form = ClinicalEvolutionForm(
+        request.POST or None, prefix='clinical_evolution',
+    )
+    hospitalization_form = HospitalizationForm(
+        request.POST or None, prefix='hospitalization',
+    )
+    uti_hospitalization_form = UTIHospitalizationForm(
+        request.POST or None, prefix='uti_hospitalization'
+    )
 
     forms = [
         patient_form,
@@ -107,6 +125,10 @@ def create_admission_note(request):
         observed_symptom_formset,
         secondary_symptoms_form,
         collected_sample_formset,
+        flu_vaccine_form,
+        clinical_evolution_form,
+        hospitalization_form,
+        uti_hospitalization_form,
     ]
     context = {
         'admission_note_form': admission_note_form,
@@ -115,6 +137,10 @@ def create_admission_note(request):
         'observed_symptom_formset': observed_symptom_formset,
         'secondary_symptoms_form': secondary_symptoms_form,
         'collected_sample_formset': collected_sample_formset,
+        'flu_vaccine_form': flu_vaccine_form,
+        'clinical_evolution_form': clinical_evolution_form,
+        'hospitalization_form': hospitalization_form,
+        'uti_hospitalization_form': uti_hospitalization_form,
     }
     template = 'admission_notes/create.html'
     #endregion
@@ -131,13 +157,19 @@ def create_admission_note(request):
                         secondary_symptoms_form, admin_note
                     )
                     # TODO: check if saving the formset changes anything
+                    # instead of using bulky create
                     create_observed_symptoms(
                         observed_symptom_formset, admin_note
                     )
-                    # TODO: allow to add multiple collected samples
+                    # TODO: allow to add multiple collected samples (dynamic)
                     create_collected_samples(
                         collected_sample_formset, admin_note
                     )
+                    flu_vaccine_form.save(admin_note)
+                    clinical_evolution_form.save(admin_note)
+                    hospitalization_form.save(admin_note)
+                    uti_hospitalization_form.save(admin_note)
+
                     # Notify our users
                     messages.success(request, "Registro criado com sucesso")
 

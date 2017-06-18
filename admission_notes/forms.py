@@ -1,7 +1,7 @@
 from django import forms
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Submit, Button
+from crispy_forms.layout import Layout, Fieldset
 from crispy_forms.bootstrap import FormActions
 
 from .models import (
@@ -55,9 +55,23 @@ class AdmissionNoteForm(forms.ModelForm):
         super(AdmissionNoteForm, self).save(commit)
         return self.instance
 
-# region ISimpleDatedEvent Forms (should be inherited)
-# TODO: check how to do inheritance
-class FluVaccineForm(forms.ModelForm):
+
+class ISimpleDatedEventForm(forms.ModelForm):
+
+    class Meta:
+        model = ISimpleDatedEvent
+        exclude = ['admission_note']
+
+    def __init__(self, *args, **kwargs):
+        super(ISimpleDatedEventForm, self).__init__(*args, **kwargs)
+        self.fields['date'].input_formats = DATE_INPUT_FORMATS
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.label_class = 'col-sm-2'
+        self.helper.field_class = 'col-sm-4'
+
+
+class FluVaccineForm(ISimpleDatedEventForm):
 
     class Meta:
         model = FluVaccine
@@ -65,11 +79,6 @@ class FluVaccineForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FluVaccineForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_tag = False
-        self.helper.label_class = 'col-sm-2'
-        self.helper.field_class = 'col-sm-4'
-
         self.helper.layout = Layout(
             Fieldset(
                 'Tomou vacina contra a gripe?',
@@ -77,7 +86,9 @@ class FluVaccineForm(forms.ModelForm):
                 'date',
             ),
         )
-        self.fields['date'].input_formats = DATE_INPUT_FORMATS
+        self.fields['occurred'].label = 'Foi vacinado'
+        self.fields['occurred'].help_text = 'Vacinado nos últimos 12 meses'
+        self.fields['date'].label = 'Data de vacinação'
 
     def save(self, admin_note=None, commit=True):
         self.instance.admission_note = admin_note
@@ -85,7 +96,7 @@ class FluVaccineForm(forms.ModelForm):
         return self.instance
 
 
-class ClinicalEvolutionForm(FluVaccineForm):
+class ClinicalEvolutionForm(ISimpleDatedEventForm):
 
     class Meta:
         model = ClinicalEvolution
@@ -100,9 +111,11 @@ class ClinicalEvolutionForm(FluVaccineForm):
                 'date',
             ),
         )
+        self.fields['occurred'].label = 'Óbito'
+        self.fields['date'].label = 'Data de óbito'
 
 
-class HospitalizationForm(FluVaccineForm):
+class HospitalizationForm(ISimpleDatedEventForm):
 
     class Meta:
         model = Hospitalization
@@ -117,9 +130,11 @@ class HospitalizationForm(FluVaccineForm):
                 'date',
             ),
         )
+        self.fields['occurred'].label = 'Internado hospital'
+        self.fields['date'].label = 'Data de internação'
 
 
-class UTIHospitalizationForm(FluVaccineForm):
+class UTIHospitalizationForm(ISimpleDatedEventForm):
 
     class Meta:
         model = UTIHospitalization
@@ -134,4 +149,6 @@ class UTIHospitalizationForm(FluVaccineForm):
                 'date',
             ),
         )
+        self.fields['occurred'].label = 'Internado UTI'
+        self.fields['date'].label = 'Data de internação'
 

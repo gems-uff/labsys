@@ -23,16 +23,22 @@
     {% crispy patient_form %}
     {% crispy residence_form %}
 
-  <!-- Collected Samples -->
-  <fieldset>
-    <legend>Amostras coletadas</legend>
-    {{ collected_sample_formset.management_form }}
-    {% for sample_form in collected_sample_formset %}
-      <div class="sample-form">
-        {% crispy sample_form %}
-      </div>
-    {% endfor %}
-  </fieldset>
+    <!-- Simple dated events -->
+    {% crispy flu_vaccine_form %}
+    {% crispy clinical_evolution_form %}
+    {% crispy hospitalization_form %}
+    {% crispy uti_hospitalization_form %}
+
+    <!-- Collected Samples -->
+    <fieldset>
+      <legend>Amostras coletadas</legend>
+      {{ collected_sample_formset.management_form }}
+      {% for sample_form in collected_sample_formset %}
+        <div class="sample-form">
+          {% crispy sample_form %}
+        </div>
+      {% endfor %}
+    </fieldset>
 
     <!-- Primary Symptoms -->
     <fieldset>
