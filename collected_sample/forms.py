@@ -53,6 +53,7 @@ class CollectedSampleForm(forms.ModelForm):
         return self.instance
 
     def clean(self):
+        # TODO: is not being called
         cleaned_data = super(CollectedSampleForm, self).clean()
         collection_method = cleaned_data.get('collection_method')
         other_collection_method = cleaned_data.get('other_collection_method')
@@ -103,5 +104,5 @@ class BaseCollectedSampleFormSet(BaseFormSet):
 CollectedSampleFormSet = formset_factory(
     CollectedSampleForm,
     # formset=BaseCollectedSampleFormSet,
-    extra=2,
+    extra=3,
 )

@@ -70,13 +70,15 @@ def create_secondary_symptoms(form, admin_note):
 def create_collected_samples(formset, admin_note):
     new_collected_samples = []
     for form in formset:
-        collected_sample = CollectedSample(
-            collection_method = form.cleaned_data.get('collection_method'),
-            collection_date = form.cleaned_data.get('collection_date'),
-            details = form.cleaned_data.get('details'),
-            admission_note=admin_note,
-        )
-        new_collected_samples.append(collected_sample)
+        if form.cleaned_data:
+            print(form.cleaned_data)
+            collected_sample = CollectedSample(
+                collection_method = form.cleaned_data.get('collection_method'),
+                collection_date = form.cleaned_data.get('collection_date'),
+                details = form.cleaned_data.get('details'),
+                admission_note=admin_note,
+            )
+            new_collected_samples.append(collected_sample)
 
     CollectedSample.objects.bulk_create(new_collected_samples)
 
