@@ -26,7 +26,14 @@ CORE_APPS = [
 
 THIRD_PARTY_APPS = [
     'crispy_forms',
+    'rest_framework',
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication'
+    ],
+    'PAGE_SIZE': 10,
+}
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
@@ -129,11 +136,11 @@ USE_TZ = True
 # collecstatic: copies all files from staticfiles dirs to this folder
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 
-# Look up for a 'staticfiles' folder inside each INSTALLED_APP
-# Referred by {% staticfiles %}
+# Look up for a 'static' folder inside each INSTALLED_APP
+# Referred by {% static %}
 STATIC_URL = '/static/'
 
-# Additional staticfiles files dirs for collecstatic to lookup
+# Additional static files dirs for collecstatic to lookup
 STATICFILES_DIRS = [
     os.path.join(PROJECT_ROOT, 'static')
 ]
