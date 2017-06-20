@@ -48,7 +48,8 @@ class CollectedSampleForm(forms.ModelForm):
         )
 
     def save(self, admin_note=None, commit=True):
-        self.instance.admission_note = admin_note
+        if admin_note is not None:
+            self.instance.admission_note = admin_note
         super(CollectedSampleForm, self).save(commit)
         return self.instance
 

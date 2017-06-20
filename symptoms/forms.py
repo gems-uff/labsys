@@ -49,8 +49,8 @@ class ObservedSymptomForm(forms.ModelForm):
 
 
     def __init__(self, *args, **kwargs):
-        super(ObservedSymptomForm, self).__init__(*args, **kwargs)
         # TODO: receive symptom key in args
+        super(ObservedSymptomForm, self).__init__(*args, **kwargs)
 
 
 ObservedSymptomFormSet = formset_factory(

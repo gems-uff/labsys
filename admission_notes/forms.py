@@ -51,7 +51,8 @@ class AdmissionNoteForm(forms.ModelForm):
         self.fields['admission_date'].input_formats = DATE_INPUT_FORMATS
 
     def save(self, patient=None, commit=True):
-        self.instance.patient = patient
+        if patient is not None:
+            self.instance.patient = patient
         super(AdmissionNoteForm, self).save(commit)
         return self.instance
 
@@ -71,7 +72,8 @@ class ISimpleDatedEventForm(forms.ModelForm):
         self.helper.field_class = 'col-sm-4'
 
     def save(self, admin_note=None, commit=True):
-        self.instance.admission_note = admin_note
+        if admin_note is not None:
+            self.instance.admission_note = admin_note
         super(ISimpleDatedEventForm, self).save(commit)
         return self.instance
 

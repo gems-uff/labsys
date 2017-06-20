@@ -40,7 +40,8 @@ class PatientForm(forms.ModelForm):
     # then it's called .save(), residence will be None again...
     # Same happens with admission_note and collected_sample
     def save(self, residence=None, commit=True):
-        self.instance.residence = residence
+        if residence is not None:
+            self.instance.residence = residence
         super(PatientForm, self).save(commit)
         return self.instance
 
