@@ -78,12 +78,16 @@
 
 
     <!-- Secondary Symptoms -->
-    <p><a class="btn btn-primary" data-toggle="collapse" href="#collapse-symptoms" aria-expanded="false" aria-controls="collapse-symptoms">
-      Sintomas Secundários
-    </a></p>
-    <div class="collapse" id="collapse-symptoms">
-      {% crispy secondary_symptoms_form %}
-    </div>
+    <fieldset>
+      <legend>  
+        <a class="text-primary" data-toggle="collapse" href="#collapse-symptoms" aria-expanded="false" aria-controls="collapse-symptoms">
+          Sintomas Secundários
+        </a>
+      </legend>
+      <div class="collapse" id="collapse-symptoms">
+        {% crispy secondary_symptoms_form %}
+      </div>
+    </fieldset>
 
     <div class="form-group">
       <input type="submit" name="save" value="Salvar" class="btn btn-success" id="submit-id-save">

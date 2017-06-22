@@ -2,7 +2,7 @@ from django import forms
 from django.forms import formset_factory, BaseInlineFormSet
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Fieldset, Div
+from crispy_forms.layout import Layout, Field
 
 from .models import Symptom, ObservedSymptom
 
@@ -26,11 +26,8 @@ class SecondarySymptomsForm(forms.Form):
         self.helper.field_class = 'col-sm-4'
 
         self.helper.layout = Layout(
-            Fieldset(
-                'Sintomas secundários',
-                'symptoms',
-                'details',
-            ),
+            Field('symptoms'),
+            Field('details'),
         )
 
 
