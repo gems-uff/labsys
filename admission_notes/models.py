@@ -97,3 +97,84 @@ class Hospitalization(ISimpleDatedEvent):
 
 class UTIHospitalization(ISimpleDatedEvent):
     pass
+
+
+class Antiviral(models.Model):
+    title = models.CharField(
+        'Antiviral utilizado',
+        max_length=255,
+    )
+    is_primary = models.BooleanField(
+        default=False,
+    )
+
+    def __str__(self):
+        return self.title
+
+
+class AntiviralUse(models.Model):
+    occurred = models.NullBooleanField(
+        'Uso de Antiviral?',
+        default=None,
+    )
+    date = models.DateField(
+        'Data de uso',
+        help_text='Data do início do tratamento com antiviral',
+        null=True,
+        blank=True,
+    )
+    details = models.CharField(
+        'Informações adicionais',
+        max_length=255,
+        blank=True,
+    )
+    admission_note = models.OneToOneField(
+        AdmissionNote,
+        on_delete=models.CASCADE,
+    )
+    antiviral = models.ForeignKey(
+        Antiviral,
+        verbose_name='Antiviral utilizado',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+
+class XRay(models.Model):
+    title = models.CharField(
+        'Tipo de Raio X',
+        max_length=255,
+    )
+    is_primary = models.BooleanField(
+        default=False,
+    )
+
+    def __str__(self):
+        return self.title
+
+
+class XRayExam(models.Model):
+    occurred = models.NullBooleanField(
+        'Realizou exame de Raio-X?',
+        default=None,
+    )
+    date = models.DateField(
+        'Data de realização do exame',
+        null=True,
+        blank=True,
+    )
+    details = models.CharField(
+        'Informações adicionais',
+        max_length=255,
+        blank=True,
+    )
+    admission_note = models.OneToOneField(
+        AdmissionNote,
+        on_delete=models.CASCADE,
+    )
+    xray = models.ForeignKey(
+        XRay,
+        verbose_name='Tipo de exame realizado',
+        on_delete=models.SET_NULL,
+        null=True,
+    )

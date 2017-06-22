@@ -56,17 +56,17 @@
           {% for form in  observed_symptom_formset %}
             <tr>
               <td>
-                <div class="form-group col-lg-4 control-label">
+                <div class="form-group col-sm-4 control-label">
                   {{ form.symptom }}
                 </div>
               </td>
               <td>
-                <div class="form-group col-lg-2 radio-inline">
+                <div class="form-group col-sm-2 radio-inline">
                   {{ form.observed}}
                 </div>
               </td>
               <td>
-                <div class="form-group col-lg-6">
+                <div class="form-group col-sm-6">
                   {{ form.details}}
                 </div>
               </td>
@@ -79,7 +79,7 @@
 
     <!-- Secondary Symptoms -->
     <fieldset>
-      <legend>  
+      <legend>
         <a class="text-primary" data-toggle="collapse" href="#collapse-symptoms" aria-expanded="false" aria-controls="collapse-symptoms">
           Sintomas Secundários
         </a>
