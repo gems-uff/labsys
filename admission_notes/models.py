@@ -105,6 +105,7 @@ class Antiviral(models.Model):
         max_length=255,
     )
     is_primary = models.BooleanField(
+        'Antiviral primário?',
         default=False,
     )
 
@@ -146,6 +147,7 @@ class XRay(models.Model):
         max_length=255,
     )
     is_primary = models.BooleanField(
+        'Tipo primário?',
         default=False,
     )
 

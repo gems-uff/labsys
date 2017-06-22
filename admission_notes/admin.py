@@ -6,6 +6,7 @@ from symptoms.models import ObservedSymptom
 from .models import (
     AdmissionNote, FluVaccine, ClinicalEvolution,
     Hospitalization, UTIHospitalization,
+    XRay, XRayExam, Antiviral, AntiviralUse,
 )
 
 
@@ -30,6 +31,14 @@ class CollectedSampleInline(admin.StackedInline):
     extra = 0
 
 
+class AntiviralInline(admin.TabularInline):
+    model = AntiviralUse
+
+
+class XRayInline(admin.TabularInline):
+    model = XRayExam
+
+
 class ObservedSymptomInline(admin.TabularInline):
     model = ObservedSymptom
     extra = 0
@@ -43,6 +52,7 @@ class ObservedSymptomInline(admin.TabularInline):
     ]
 
 
+@admin.register(AdmissionNote)
 class AdmissionNoteAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Dados institucionais', {'fields': [
@@ -65,7 +75,26 @@ class AdmissionNoteAdmin(admin.ModelAdmin):
         ClinicalEvolutionInline,
         HospitalizationInline,
         UTIHospitalizationInline,
+        AntiviralInline,
+        XRayInline,
     ]
 
-admin.site.register(AdmissionNote, AdmissionNoteAdmin)
 
+@admin.register(XRay)
+class XRayAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('Cadastro de Raio-X', {'fields': [
+            'title',
+            'is_primary',
+        ]})
+    ]
+
+
+@admin.register(Antiviral)
+class AntiviralAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('Cadastro de Antivirais', {'fields': [
+            'title',
+            'is_primary',
+        ]})
+    ]
