@@ -40,6 +40,8 @@ class AdmissionNoteForm(forms.ModelForm):
                 'id_request_gal',
                 'id_lvrs_intern',
                 'admission_date',
+                'first_symptoms_date',
+                'semepi',
                 'requester',
                 'health_unit',
                 'state',
@@ -49,6 +51,7 @@ class AdmissionNoteForm(forms.ModelForm):
         )
 
         self.fields['admission_date'].input_formats = DATE_INPUT_FORMATS
+        self.fields['first_symptoms_date'].input_formats = DATE_INPUT_FORMATS
 
     def save(self, patient=None, commit=True):
         if patient is not None:

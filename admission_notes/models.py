@@ -1,4 +1,3 @@
-import datetime
 
 from django.db import models
 
@@ -39,6 +38,18 @@ class AdmissionNote(models.Model):
         help_text='quando a amostra chegou no LVRS',
         null=True,
         blank=True,
+    )
+    first_symptoms_date = models.DateField(
+        'Data dos primeiros sintomas',
+        null=True,
+        blank=True,
+    )
+    semepi = models.PositiveIntegerField(
+        'Semana epidemiológica',
+        help_text='Calendário epidemiológico disponível em: \
+            http://portalsinan.saude.gov.br/calendario-epidemiologico-2017',
+        blank=True,
+        null=True,
     )
     patient = models.ForeignKey(
         Patient,
