@@ -132,7 +132,7 @@ class AntiviralUse(models.Model):
         AdmissionNote,
         on_delete=models.CASCADE,
     )
-    antiviral = models.ForeignKey(
+    antiviral = models.OneToOneField(
         Antiviral,
         verbose_name='Antiviral utilizado',
         on_delete=models.SET_NULL,
@@ -172,7 +172,7 @@ class XRayExam(models.Model):
         AdmissionNote,
         on_delete=models.CASCADE,
     )
-    xray = models.ForeignKey(
+    xray = models.OneToOneField(
         XRay,
         verbose_name='Tipo de exame realizado',
         on_delete=models.SET_NULL,
