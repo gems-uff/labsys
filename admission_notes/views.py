@@ -13,6 +13,8 @@ from .forms import (
     ClinicalEvolutionForm,
     HospitalizationForm,
     UTIHospitalizationForm,
+    AntiviralUseForm,
+    XRayExamForm,
 )
 import admission_notes.utils as utils
 from symptoms.models import ObservedSymptom, Symptom
@@ -119,6 +121,12 @@ def create_admission_note(request):
     uti_hospitalization_form = UTIHospitalizationForm(
         request.POST or None, prefix='uti_hospitalization'
     )
+    antiviral_form = AntiviralUseForm(
+        request.POST or None, prefix='antiviral_form',
+    )
+    xray_form = XRayExamForm(
+        request.POST or None, prefix='xray_form',
+    )
 
     forms = [
         patient_form,
@@ -131,8 +139,11 @@ def create_admission_note(request):
         clinical_evolution_form,
         hospitalization_form,
         uti_hospitalization_form,
+        antiviral_form,
+        xray_form,
     ]
     context = {
+        'forms': forms,
         'admission_note_form': admission_note_form,
         'patient_form': patient_form,
         'residence_form': residence_form,
@@ -143,6 +154,8 @@ def create_admission_note(request):
         'clinical_evolution_form': clinical_evolution_form,
         'hospitalization_form': hospitalization_form,
         'uti_hospitalization_form': uti_hospitalization_form,
+        'antiviral_form': antiviral_form,
+        'xray_form': xray_form,
     }
     template = 'admission_notes/create.html'
     #endregion
@@ -163,7 +176,6 @@ def create_admission_note(request):
                     create_observed_symptoms(
                         observed_symptom_formset, admin_note
                     )
-                    # TODO: allow to add multiple collected samples (dynamic)
                     create_collected_samples(
                         collected_sample_formset, admin_note
                     )
@@ -171,6 +183,8 @@ def create_admission_note(request):
                     clinical_evolution_form.save(admin_note)
                     hospitalization_form.save(admin_note)
                     uti_hospitalization_form.save(admin_note)
+                    antiviral_form.save(admin_note)
+                    xray_form.save(admin_note)
 
                     # Notify our users
                     messages.success(request, "Registro criado com sucesso")
@@ -179,8 +193,8 @@ def create_admission_note(request):
                         reverse('admission_notes:index'))
             except IntegrityError:  # Transaction failed
                 messages.error(request, "Erro ao salvar o registro")
-
         else:
-            print(admission_note_form.errors)
+            messages.error(request, "Por favor, corrigir campos abaixo")
+
     #endregion
     return render(request, template, context)

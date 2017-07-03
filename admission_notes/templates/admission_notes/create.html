@@ -3,19 +3,11 @@
 {% load staticfiles %}
 
 {% block body-content %}
+
   {% if messages %}
     {% for message in messages %}
-      <p>{{ message }}</p>
+      <p class="alert-danger">{{ message }}</p>
     {% endfor %}
-  {% endif %}
-
-  {% if admission_note_form.errors %}
-    <div class="error errorlist">
-      {{ admission_note_form.errors }}
-      {{ patient_form.errors }}
-      {{ residence_form.errrors }}
-      {{ observed_symptom_formset.errors }}
-    </div>
   {% endif %}
 
   <form action="{% url 'admission_notes:create' %}" method="post" class="form-horizontal">
@@ -28,6 +20,8 @@
     {% crispy clinical_evolution_form %}
     {% crispy hospitalization_form %}
     {% crispy uti_hospitalization_form %}
+    {% crispy antiviral_form %}
+    {% crispy xray_form %}
 
     <!-- Collected Samples -->
     <fieldset>
