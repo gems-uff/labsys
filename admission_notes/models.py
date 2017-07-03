@@ -99,24 +99,19 @@ class UTIHospitalization(ISimpleDatedEvent):
     pass
 
 
-class Antiviral(models.Model):
-    title = models.CharField(
-        'Antiviral utilizado',
-        max_length=255,
-    )
-    is_primary = models.BooleanField(
-        'Antiviral primário?',
-        default=False,
-    )
-
-    def __str__(self):
-        return self.title
-
 
 class AntiviralUse(models.Model):
-    occurred = models.NullBooleanField(
-        'Uso de Antiviral?',
-        default=None,
+    antiviral = models.IntegerField(
+        verbose_name='Selecione',
+        help_text='Caso \"outro\", informar',
+        choices=(
+            (1, "1 - Não usou"),
+            (2, "2 - Oseltamivir"),
+            (3, "3 - Zanamivir"),
+            (4, "4 - Outro, especifique"),
+            (9, "9 - Ignorado"),
+        ),
+        default=9,
     )
     date = models.DateField(
         'Data de uso',
@@ -126,6 +121,7 @@ class AntiviralUse(models.Model):
     )
     details = models.CharField(
         'Informações adicionais',
+        help_text='Ex.: outro antiviral',
         max_length=255,
         blank=True,
     )
@@ -133,32 +129,22 @@ class AntiviralUse(models.Model):
         AdmissionNote,
         on_delete=models.CASCADE,
     )
-    antiviral = models.OneToOneField(
-        Antiviral,
-        verbose_name='Antiviral utilizado',
-        on_delete=models.SET_NULL,
-        null=True,
-    )
-
-
-class XRay(models.Model):
-    title = models.CharField(
-        'Tipo de Raio X',
-        max_length=255,
-    )
-    is_primary = models.BooleanField(
-        'Tipo primário?',
-        default=False,
-    )
-
-    def __str__(self):
-        return self.title
 
 
 class XRayExam(models.Model):
-    occurred = models.NullBooleanField(
-        'Realizou exame de Raio-X?',
-        default=None,
+    xray = models.IntegerField(
+        verbose_name='Selecione',
+        help_text='mais sugestiva para diagnóstico de SRAG',
+        choices=(
+            (1, "1 - Normal"),
+            (2, "2 - Infiltrado intersticial"),
+            (3, "3 - Consolidação"),
+            (4, "4 - Misto"),
+            (5, "5 - Outro, especifique"),
+            (6, "6 - Não realizado"),
+            (9, "9 - Ignorado"),
+        ),
+        default=9,
     )
     date = models.DateField(
         'Data de realização do exame',
@@ -167,16 +153,11 @@ class XRayExam(models.Model):
     )
     details = models.CharField(
         'Informações adicionais',
+        help_text='Ex.: outro tipo de Raio-X',
         max_length=255,
         blank=True,
     )
     admission_note = models.OneToOneField(
         AdmissionNote,
         on_delete=models.CASCADE,
-    )
-    xray = models.OneToOneField(
-        XRay,
-        verbose_name='Tipo de exame realizado',
-        on_delete=models.SET_NULL,
-        null=True,
     )

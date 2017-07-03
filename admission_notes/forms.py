@@ -11,6 +11,7 @@ from .models import (
     ClinicalEvolution,
     Hospitalization,
     UTIHospitalization,
+    XRayExam, AntiviralUse,
 )
 
 from labsys.settings.base import DATE_INPUT_FORMATS
@@ -157,3 +158,72 @@ class UTIHospitalizationForm(ISimpleDatedEventForm):
         self.fields['occurred'].label = 'Internado UTI'
         self.fields['date'].label = 'Data de internação'
 
+
+class XRayExamForm(forms.ModelForm):
+
+    class Meta:
+        model = XRayExam
+        fields = [
+            'xray',
+            'date',
+            'details',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(XRayExamForm, self).__init__(*args, **kwargs)
+        self.fields['date'].input_formats = DATE_INPUT_FORMATS
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.label_class = 'col-sm-2'
+        self.helper.field_class = 'col-sm-6'
+
+        self.helper.layout = Layout(
+            Fieldset(
+                'Raio X de Tórax',
+                'xray',
+                'date',
+                'details',
+            ),
+        )
+
+    def save(self, admin_note=None, commit=True):
+        if admin_note is not None:
+            self.instance.admission_note = admin_note
+        super(XRayExamForm, self).save(commit)
+        return self.instance
+
+
+class AntiviralUseForm(forms.ModelForm):
+
+    class Meta:
+        model = AntiviralUse
+        fields = [
+            'antiviral',
+            'date',
+            'details',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(AntiviralUseForm, self).__init__(*args, **kwargs)
+        self.fields['date'].input_formats = DATE_INPUT_FORMATS
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.label_class = 'col-sm-2'
+        self.helper.field_class = 'col-sm-6'
+
+        self.helper.layout = Layout(
+            Fieldset(
+                'Uso de Antiviral?',
+                'antiviral',
+                'date',
+                'details',
+            ),
+        )
+
+    def save(self, admin_note=None, commit=True):
+        if admin_note is not None:
+            self.instance.admission_note = admin_note
+        super(AntiviralUseForm, self).save(commit)
+        return self.instance
