@@ -114,7 +114,7 @@ class AntiviralUse(models.Model):
         default=9,
     )
     date = models.DateField(
-        'Data de uso',
+        'Data do início do tratamento',
         help_text='Data do início do tratamento com antiviral',
         null=True,
         blank=True,

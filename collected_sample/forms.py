@@ -6,7 +6,7 @@ from crispy_forms.layout import Layout, Fieldset, Submit, Button
 from crispy_forms.bootstrap import FormActions
 
 from labsys.settings.base import DATE_INPUT_FORMATS
-from .models import CollectionMethod, CollectedSample
+from .models import CollectionMethod, CollectedSample, RTPCR_CDC
 
 
 class CollectedSampleForm(forms.ModelForm):
@@ -107,3 +107,43 @@ CollectedSampleFormSet = formset_factory(
     # formset=BaseCollectedSampleFormSet,
     extra=3,
 )
+
+
+class RTPCR_CDC_Form(forms.ModelForm):
+
+    class Meta:
+        model = RTPCR_CDC
+        fields = [
+            'flu_type',
+            'flu_subtype',
+            'details',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(RTPCR_CDC_Form, self).__init__(*args, **kwargs)
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.label_class = 'col-sm-2'
+        self.helper.field_class = 'col-sm-6'
+
+        self.helper.layout = Layout(
+            Fieldset(
+                'Resultado RTPCR-CDC',
+                'flu_type',
+                'flu_subtype',
+                'details',
+            ),
+        )
+
+    def save(self, sample=None, commit=True):
+        if sample is not None:
+            self.instance.sample = sample
+        super(RTPCR_CDC_Form, self).save(commit)
+        return self.instance
+
+    def clean(self):
+        cleaned_data = super(RTPCR_CDC_Form, self).clean()
+        # TODO: add validations (type & subtype)
+
+        return cleaned_data
