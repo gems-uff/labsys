@@ -136,3 +136,6 @@ venv
 
 # PyCharm
 .idea/
+
+# Visual Paradigm
+*.vpp.bak*
