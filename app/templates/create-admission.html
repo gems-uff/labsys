@@ -85,8 +85,9 @@
     <!-- Samples -->
     <fieldset>
       <legend>Amostras</legend>
-      {% for formfield in form.samples.entries %}
-        {{ formfield }}
+      {% for sample_form in form.samples.entries %}
+        {{ sample_form }}
+        {{ sample_form.cdc_form }}
       {% endfor %}
     </fieldset>
     <div class="form-group">

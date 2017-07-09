@@ -64,6 +64,8 @@ class CdcForm(FlaskForm):
     def __init__(self, **kwargs):
         super(CdcForm, self).__init__(csrf_enabled=False, **kwargs)
 
+    details = StringField('Info adicional')
+
 
 class SampleForm(FlaskForm):
     def __init__(self, **kwargs):
@@ -80,6 +82,7 @@ class SampleForm(FlaskForm):
         coerce=int,
         # Pass choices in the view: dynamic, see docs
     )
+    cdc_exam = FormField(CdcForm)
 
 
 class AdmissionForm(FlaskForm):

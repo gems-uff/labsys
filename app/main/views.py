@@ -2,7 +2,7 @@ from flask import render_template, session, redirect, url_for, current_app
 from .. import db
 from ..models import (
     User, Patient, Admission, Vaccine, Symptom, ObservedSymptom, Method,
-    Sample,
+    Sample, CdcExam
 )
 from . import main
 from .forms import NameForm, AdmissionForm, SymptomForm
@@ -69,10 +69,14 @@ def create_admission():
 
             # Samples
             for sample_form in form.samples:
-                Sample(
+                sample = Sample(
                     collection_date=sample_form.data['collection_date'],
                     method_id=sample_form.data['method'],
                     admission=admission,
+                )
+                CdcExam(
+                    details=sample_form.cdc_exam.data['details'],
+                    sample=sample,
                 )
 
             db.session.add(admission)

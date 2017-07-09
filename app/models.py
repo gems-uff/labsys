@@ -96,8 +96,7 @@ class Method(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     primary = db.Column(db.Boolean)
-    samples = db.relationship(
-        'Sample', backref='method', lazy='dynamic')
+    samples = db.relationship('Sample', backref='method', lazy='dynamic')
 
     def __repr__(self):
         return '<Method[{}]: {}>'.format(self.id, self.name)
@@ -109,6 +108,7 @@ class Sample(db.Model):
     collection_date = db.Column(db.Date())
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
+    cdc_exams = db.relationship('CdcExam', backref='sample', lazy='dynamic')
 
     def __repr__(self):
         return '<Sample[{}]: {}>'.format(self.id, self.collection_date)
@@ -116,4 +116,9 @@ class Sample(db.Model):
 
 class CdcExam(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    details = db.Column(db.String(255))
+    sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
+
+    def __repr__(self):
+        return '<CdcExam[{}]: {}>'.format(self.id, self.details)
 
