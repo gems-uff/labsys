@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Flasky{% endblock %}
+
+{% block page_content %}
+  {% if form.errors %}
+    <ul class="errors">
+        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+            {% for error in field_errors %}
+                <li>{{ form[field_name].label }}: {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+{% endif %}
+  <form class="form" method="post">
+    {{ form.hidden_tag() }}
+    <!-- Admission -->
+    <fieldset class="form-group">
+      <legend><h2>Admissão</h2></legend>
+      <div class="form-group">
+        {{ form.id_lvrs_intern.label }}{{ form.id_lvrs_intern }}
+      </div>
+    </fieldset>
+    <!-- Patient -->
+    <fieldset>
+      <legend>{{ form.patient.label }}</legend>
+      <div class="form-group">
+        {{ form.patient }}
+      </div>
+    </fieldset>
+    <!-- Vaccine -->
+    <fieldset>
+      <legend>{{ form.vaccine.label }}</legend>
+      {{ form.vaccine }}
+    </fieldset>
+    <!-- Symptoms -->
+    <fieldset>
+      <legend>{{ form.symptoms.label }}</legend>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Sintoma</th>
+            <th>Observado</th>
+            <th>Detalhes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for formfield in form.symptoms.entries %}
+            <tr>
+              {{ formfield.symptom_id }}
+              <td>{{ formfield.observed.label }}</td>
+              <td>
+                {% for subfield in formfield.observed %}
+                  {{ subfield }}{{ subfield.label }}
+                {% endfor %}
+              </td>
+              <td>{{ formfield.details }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
+    <!-- Secondary Symptoms -->
+    <fieldset>
+      <legend>{{ form.sec_symptoms.label }}</legend>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Sintoma</th>
+            <th>Detalhes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for formfield in form.sec_symptoms.entries %}
+            <tr>
+              {{ formfield.symptom_id }}
+              <td>{{ formfield.observed }} {{ formfield.observed.label }}</td>
+              <td>{{ formfield.details }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
+    <!-- Samples -->
+    <fieldset>
+      <legend>Amostras</legend>
+      {% for formfield in form.samples.entries %}
+        {{ formfield }}
+      {% endfor %}
+    </fieldset>
+    <div class="form-group">
+      <input class="btn btn-success" type="submit" value="Criar">
+    </div>
+  </form>
+{% endblock %}
