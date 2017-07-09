@@ -50,7 +50,6 @@ def create_admission():
 
             # Observed Symptoms
             for symptom_form in form.symptoms:
-                #TODO: symptom_form.data.observed
                 if symptom_form.data['observed'] is not NONE:
                     ObservedSymptom(
                         observed=bool(symptom_form.data['observed']),
