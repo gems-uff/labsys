@@ -26,6 +26,11 @@ class VaccineForm(FlaskForm):
         default=9,
         coerce=int,
     )
+    date = DateField(
+        'Data da última dose',
+        format='%d/%m/%Y',
+        validators=[Optional()]
+    )
 
 
 class SymptomForm(FlaskForm):
