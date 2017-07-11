@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "utils/_forms_rendering.html" as frender %}
+
+{% block title %}Flasky{% endblock %}
+
+{% block page_content %}
+  {{ frender.render_simple_errors(form) }}
+  <form class="form" method="post">
+    {{ form.hidden_tag() }}
+    {{ wtf.form_errors(form, hiddens="only") }}
+    <!-- Admission -->
+    <fieldset class="form-group">
+      <legend style="font-size: 32px;">Admissão</legend>
+      {{ wtf.form_field(form.id_lvrs_intern) }}
+    </fieldset>
+    <!-- Patient -->
+    {{ frender.render_patient(form.patient) }}
+    <!-- Vaccine -->
+    {{ frender.render_vaccine(form.vaccine) }}
+    <!-- Symptoms -->
+    {{ frender.render_symptoms(form.symptoms) }}
+    <!-- Secondary Symptoms -->
+    {{ frender.render_secondary_symptoms(form.sec_symptoms) }}
+    <!-- Samples -->
+    {{ frender.render_samples(form.samples) }}
+
+    {{ wtf.form_field(form.submit) }}
+  </form>
+{% endblock %}

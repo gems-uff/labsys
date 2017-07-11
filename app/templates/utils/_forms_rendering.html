@@ -1,0 +1,97 @@
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% macro render_simple_errors(form) -%}
+  {% if form.errors %}
+    <ul class="errors">
+      {% for field_name, field_errors in form.errors|dictsort if field_errors %}
+        {% for error in field_errors %}
+          <li>{{ form[field_name].label }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  {% endif %}
+{%- endmacro %}
+
+{% macro render_radio_inline_field(field) -%}
+  <div class="form-group">
+    {{ field.label }}
+    <div class="form-group">
+      {% for subfield in field%}
+        <label class="radio-inline control-label">
+          {{ subfield(class='radio-inline') }}{{ subfield.label.text }}
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+{%- endmacro %}
+
+{% macro render_patient(form) -%}
+  <fieldset>
+    <legend>{{ form.label }}</legend>
+    {{ form.hidden_tag() }}
+    {% for subfield in form %}
+      {% if subfield.type != "CSRFTokenField" %}
+        {{ wtf.form_field(subfield) }}
+      {% endif %}
+    {% endfor %}
+  </fieldset>
+{%- endmacro %}
+
+{% macro render_vaccine(form) -%}
+  <fieldset>
+    <legend>{{ form.label.text }}</legend>
+    {{ render_radio_inline_field(form.applied) }}
+    {{ wtf.form_field(form.date, placeholder="dd/MM/yyyy") }}
+  </fieldset>
+{%- endmacro %}
+
+{% macro render_symptoms(form) -%}
+  <fieldset>
+    <legend>{{ form.label }}</legend>
+    {% for subform in form.entries %}
+      <div class="form-inline">
+        <div class="form-group">
+          {{ subform.observed.label }}:&nbsp;&nbsp;
+          {{ wtf.form_field(subform.observed) }}&nbsp;&nbsp;
+        </div>
+        <div class="form-group">
+          {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
+        </div>
+      </div>
+      <hr />
+    {% endfor %}
+  </fieldset>
+{%- endmacro %}
+
+{% macro render_secondary_symptoms(form) -%}
+  <fieldset>
+    <legend>{{ form.label }}</legend>
+    {% for subform in form.entries %}
+      {{ subform.hidden_tag() }}
+      <div class="form-inline">
+        <div class="form-group">
+          <label class="checkbox-inline">
+            {{ subform.observed }}
+            {{ subform.observed.label.text }}&nbsp;&nbsp;
+          </label>
+        </div>
+        <div class="form-group">
+          {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
+        </div>
+      </div>
+      <hr />
+    {% endfor %}
+  </fieldset>
+{%- endmacro %}
+
+{% macro render_samples(form) -%}
+  <fieldset>
+    <legend>{{ form.label }}</legend>
+    {% for sample_form in form.entries %}
+      {% for field in sample_form %}
+        {{ wtf.form_field(field) }}
+      {% endfor %}
+    {% endfor %}
+  </fieldset>
+{%- endmacro %}
