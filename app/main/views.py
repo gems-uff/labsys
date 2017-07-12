@@ -15,6 +15,8 @@ def get_method_choices():
 NONE = 9
 TRUE = 1
 FALSE = 0
+
+
 @main.route('/admissions/create', methods=['GET', 'POST'])
 def create_admission():
     form = AdmissionForm(
@@ -32,10 +34,8 @@ def create_admission():
         admission = Admission.query.filter_by(
             id_lvrs_intern=form.id_lvrs_intern.data).first()
         if admission is None:
-            # Patient
             patient = Patient(name=form.patient.data['name'])
 
-            #Admission
             admission = Admission(
                 id_lvrs_intern=form.id_lvrs_intern.data,
                 patient=patient,
@@ -49,7 +49,6 @@ def create_admission():
                     admission=admission,
                 )
 
-            # Observed Symptoms
             for symptom_form in form.symptoms:
                 if symptom_form.data['observed'] is not NONE:
                     ObservedSymptom(
@@ -58,7 +57,7 @@ def create_admission():
                         symptom_id=symptom_form.data['symptom_id'],
                         admission=admission,
                     )
-            # Secondary Symptoms
+
             for sec_symptom_form in form.sec_symptoms:
                 if sec_symptom_form.data['observed'] is True:
                     ObservedSymptom(
@@ -68,7 +67,6 @@ def create_admission():
                         admission=admission,
                     )
 
-            # Samples
             for sample_form in form.samples:
                 sample = Sample(
                     collection_date=sample_form.data['collection_date'],

@@ -44,7 +44,6 @@ class Admission(db.Model):
     samples = db.relationship(
         'Sample', backref='admission', lazy='dynamic')
 
-
     def __repr__(self):
         return '<Admission[{}]: {}>'.format(self.id, self.id_lvrs_intern)
 
