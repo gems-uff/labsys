@@ -44,7 +44,6 @@ class Admission(db.Model):
     samples = db.relationship(
         'Sample', backref='admission', lazy='dynamic')
 
-
     def __repr__(self):
         return '<Admission[{}]: {}>'.format(self.id, self.id_lvrs_intern)
 
@@ -69,11 +68,11 @@ class Symptom(db.Model):
 
     @classmethod
     def get_primary_symptoms(cls):
-        return cls.query.filter(cls.primary==True).all()
+        return cls.query.filter(cls.primary is True).all()
 
     @classmethod
     def get_secondary_symptoms(cls):
-        return cls.query.filter(cls.primary==False).all()
+        return cls.query.filter(cls.primary is False).all()
 
     def __repr__(self):
         return '<Symptom[{}]: {}>'.format(self.id, self.name)
