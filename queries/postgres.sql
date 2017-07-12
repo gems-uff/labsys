@@ -13,3 +13,5 @@ INSERT INTO public.methods(id, name, "primary") VALUES
 
 INSERT INTO public.alembic_version(version_num) VALUES
 (77adb3584ff6);
+
+UPDATE public.alembic_version SET version_num = 'f34963ddd425';
