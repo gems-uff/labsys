@@ -50,6 +50,7 @@
   <fieldset>
     <legend>{{ form.label }}</legend>
     {% for subform in form.entries %}
+      {{ subform.hidden_tag() }}
       <div class="form-inline">
         <div class="form-group">
           {{ subform.observed.label }}:&nbsp;&nbsp;
