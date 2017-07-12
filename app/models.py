@@ -80,7 +80,7 @@ class Hospitalization(db.Model):
 
 
 class UTIHospitalization(db.Model):
-    __tablename__ = 'uti_hospitalization'
+    __tablename__ = 'uti_hospitalizations'
     id = db.Column(db.Integer, primary_key=True)
     occurred = db.Column(db.Boolean, nullable=True)
     date = db.Column(db.Date())

@@ -36,7 +36,7 @@ def upgrade():
                             ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('uti_hospitalization',
+    op.create_table('uti_hospitalizations',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('occurred', sa.Boolean(), nullable=True),
     sa.Column('date', sa.Date(), nullable=True),
