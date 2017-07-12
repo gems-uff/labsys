@@ -139,4 +139,4 @@ __pycache__
 
 # Visual Paradigm
 *.vpp.bak*
-*.vpp.lock
+*.vpp.lck

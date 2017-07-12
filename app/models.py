@@ -38,7 +38,17 @@ class Admission(db.Model):
     id_lvrs_intern = db.Column(db.String(32), unique=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     vaccine = db.relationship(
-        'Vaccine', backref='admission', uselist=False)
+        'Vaccine', backref='admission', uselist=False,
+        cascade='all, delete-orphan')
+    hospitalization = db.relationship(
+        'Hospitalization', backref='admission', uselist=False,
+        cascade='all, delete-orphan')
+    uti_hospitalization = db.relationship(
+        'UTIHospitalization', backref='admission', uselist=False,
+        cascade='all, delete-orphan')
+    clinical_evolution = db.relationship(
+        'ClinicalEvolution', backref='admission', uselist=False,
+        cascade='all, delete-orphan')
     symptoms = db.relationship(
         'ObservedSymptom', backref='admission', lazy='dynamic')
     samples = db.relationship(
@@ -57,6 +67,38 @@ class Vaccine(db.Model):
 
     def __repr__(self):
         return '<Vaccine[{}]: {}>'.format(self.id, self.applied)
+
+class Hospitalization(db.Model):
+    __tablename__ = 'hospitalizations'
+    id = db.Column(db.Integer, primary_key=True)
+    occurred = db.Column(db.Boolean, nullable=True)
+    date = db.Column(db.Date())
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
+
+    def __repr__(self):
+        return '<Hospitalization[{}]: {}>'.format(self.id, self.occurred)
+
+
+class UTIHospitalization(db.Model):
+    __tablename__ = 'uti_hospitalization'
+    id = db.Column(db.Integer, primary_key=True)
+    occurred = db.Column(db.Boolean, nullable=True)
+    date = db.Column(db.Date())
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
+
+    def __repr__(self):
+        return '<UTI Hospitalization[{}]: {}>'.format(self.id, self.occurred)
+
+
+class ClinicalEvolution(db.Model):
+    __tablename__ = 'clinical_evolutions'
+    id = db.Column(db.Integer, primary_key=True)
+    death = db.Column(db.Boolean, nullable=True)
+    date = db.Column(db.Date())
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
+
+    def __repr__(self):
+        return '<ClinicalEvolution[{}]: {}>'.format(self.id, self.death)
 
 
 class Symptom(db.Model):

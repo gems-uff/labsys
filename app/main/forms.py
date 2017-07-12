@@ -44,6 +44,23 @@ class VaccineForm(DatedEventForm):
         )
 
 
+class HospitalizationForm(DatedEventForm):
+    def __init__(self, **kwargs):
+        super(HospitalizationForm, self).__init__()
+
+
+class UTIHospitalizationForm(DatedEventForm):
+    def __init__(self, **kwargs):
+        super(UTIHospitalizationForm, self).__init__()
+
+
+class ClinicalEvolutionForm(DatedEventForm):
+    def __init__(self, **kwargs):
+        super(ClinicalEvolutionForm, self).__init__(
+            occurred_label='Evoluiu para óbito',
+        )
+
+
 class SymptomForm(FlaskForm):
     name = StringField('Sintoma')
     primary = BooleanField('Primario?')
@@ -107,6 +124,9 @@ class AdmissionForm(FlaskForm):
         DataRequired()])
     patient = FormField(PatientForm)
     vaccine = FormField(VaccineForm)
+    hospitalization = FormField(HospitalizationForm)
+    uti_hospitalization = FormField(UTIHospitalizationForm)
+    clinical_evolution = FormField(ClinicalEvolutionForm)
     symptoms = FieldList(FormField(ObservedSymptomForm))
     sec_symptoms = FieldList(FormField(SecondarySymptomForm))
     samples = FieldList(FormField(SampleForm), min_entries=1)

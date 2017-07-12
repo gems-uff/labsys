@@ -1,8 +1,12 @@
 from flask import render_template, session, redirect, url_for, current_app
 from .. import db
 from ..models import (
-    User, Patient, Admission, Vaccine, Symptom, ObservedSymptom, Method,
-    Sample, CdcExam
+    User,
+    Admission,
+    Patient,
+    Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
+    Symptom, ObservedSymptom,
+    Sample, Method, CdcExam,
 )
 from . import main
 from .forms import NameForm, AdmissionForm, SymptomForm
@@ -41,11 +45,31 @@ def create_admission():
                 patient=patient,
             )
 
-            # Vaccine
             if form.vaccine.data['occurred'] is not NONE:
                 Vaccine(
                     applied=bool(form.vaccine.data['occurred']),
                     last_dose_date=form.vaccine.data['date'],
+                    admission=admission,
+                )
+
+            if form.hospitalization.data['occurred'] is not NONE:
+                Hospitalization(
+                    occurred=bool(form.hospitalization.data['occurred']),
+                    date=form.hospitalization.data['date'],
+                    admission=admission,
+                )
+
+            if form.uti_hospitalization.data['occurred'] is not NONE:
+                UTIHospitalization(
+                    occurred=bool(form.uti_hospitalization.data['occurred']),
+                    date=form.uti_hospitalization.data['date'],
+                    admission=admission,
+                )
+
+            if form.clinical_evolution.data['occurred'] is not NONE:
+                ClinicalEvolution(
+                    death=bool(form.clinical_evolution.data['occurred']),
+                    date=form.vaccine.data['date'],
                     admission=admission,
                 )
 

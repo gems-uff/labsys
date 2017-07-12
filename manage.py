@@ -3,7 +3,7 @@ import os
 from app import create_app, db
 from app.models import (
     User, Role, Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample,
-    Patient, CdcExam
+    Patient, CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
 )
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
@@ -23,6 +23,9 @@ admin.add_views(
     ModelView(Admission, db.session),
     ModelView(Patient, db.session),
     ModelView(Vaccine, db.session),
+    ModelView(Hospitalization, db.session),
+    ModelView(UTIHospitalization, db.session),
+    ModelView(ClinicalEvolution, db.session),
     ModelView(Symptom, db.session),
     ModelView(ObservedSymptom, db.session),
     ModelView(Method, db.session),
