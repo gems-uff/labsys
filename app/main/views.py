@@ -42,9 +42,10 @@ def create_admission():
             )
 
             # Vaccine
-            if form.vaccine.data['applied'] is not NONE:
+            if form.vaccine.data['occurred'] is not NONE:
                 Vaccine(
-                    applied=bool(form.vaccine.data['applied']),
+                    applied=bool(form.vaccine.data['occurred']),
+                    last_dose_date=form.vaccine.data['date'],
                     admission=admission,
                 )
 

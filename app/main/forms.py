@@ -16,21 +16,32 @@ class PatientForm(FlaskForm):
 
 
 YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
-class VaccineForm(FlaskForm):
+class DatedEventForm(FlaskForm):
     def __init__(self, **kwargs):
-        super(VaccineForm, self).__init__(csrf_enabled=False, **kwargs)
+        super(DatedEventForm, self).__init__(
+            csrf_enabled=False, **kwargs)
+        self.occurred.label.text = kwargs.pop('occurred_label', 'Ocorreu')
+        self.date.label.text = kwargs.pop('date_label', 'Data')
 
-    applied = RadioField(
-        label='Aplicada',
+    occurred = RadioField(
+        label='Ocorreu',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
         coerce=int,
     )
     date = DateField(
-        'Data da última dose',
+        label='Data',
         format='%d/%m/%Y',
         validators=[Optional()]
     )
+
+
+class VaccineForm(DatedEventForm):
+    def __init__(self, **kwargs):
+        super(VaccineForm, self).__init__(
+            occurred_label='Aplicada',
+            date_label='Data da última dose',
+        )
 
 
 class SymptomForm(FlaskForm):
@@ -56,7 +67,8 @@ class ObservedSymptomForm(FlaskForm):
 
 class SecondarySymptomForm(FlaskForm):
     def __init__(self, **kwargs):
-        super(SecondarySymptomForm, self).__init__(csrf_enabled=False, **kwargs)
+        super(SecondarySymptomForm, self).__init__(
+            csrf_enabled=False, **kwargs)
         self.observed.label = Label(
             self.observed.id, kwargs.pop('symptom_name', 'Undefined'))
 
@@ -80,7 +92,7 @@ class SampleForm(FlaskForm):
     collection_date = DateField(
         'Data de coleta',
         format='%d/%m/%Y',
-        validators=[Optional()]
+        validators=[DataRequired()]
     )
     method = SelectField(
         'Método de coleta',

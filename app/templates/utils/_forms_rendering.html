@@ -38,10 +38,10 @@
   </fieldset>
 {%- endmacro %}
 
-{% macro render_vaccine(form) -%}
+{% macro render_dated_event(form) -%}
   <fieldset>
     <legend>{{ form.label.text }}</legend>
-    {{ render_radio_inline_field(form.applied) }}
+    {{ render_radio_inline_field(form.occurred) }}
     {{ wtf.form_field(form.date, placeholder="dd/MM/yyyy") }}
   </fieldset>
 {%- endmacro %}

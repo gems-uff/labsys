@@ -53,6 +53,7 @@ class Vaccine(db.Model):
     __tablename__ = 'vaccines'
     id = db.Column(db.Integer, primary_key=True)
     applied = db.Column(db.Boolean, nullable=True)
+    last_dose_date = db.Column(db.Date())
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
 
     def __repr__(self):
