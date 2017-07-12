@@ -132,7 +132,7 @@ __pycache__
 *.sqlite
 
 # Virtual environment
-venv
+.envs/
 
 # PyCharm
 .idea/
