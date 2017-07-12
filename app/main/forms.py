@@ -41,23 +41,29 @@ class VaccineForm(DatedEventForm):
         super(VaccineForm, self).__init__(
             occurred_label='Aplicada',
             date_label='Data da última dose',
+            prefix='vaccine',
         )
 
 
 class HospitalizationForm(DatedEventForm):
     def __init__(self, **kwargs):
-        super(HospitalizationForm, self).__init__()
+        super(HospitalizationForm, self).__init__(
+            prefix='hospitalization',
+        )
 
 
 class UTIHospitalizationForm(DatedEventForm):
     def __init__(self, **kwargs):
-        super(UTIHospitalizationForm, self).__init__()
+        super(UTIHospitalizationForm, self).__init__(
+            prefix='uti_hospitalization',
+        )
 
 
 class ClinicalEvolutionForm(DatedEventForm):
     def __init__(self, **kwargs):
         super(ClinicalEvolutionForm, self).__init__(
             occurred_label='Evoluiu para óbito',
+            prefix='clinical_evolution',
         )
 
 
