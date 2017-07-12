@@ -56,7 +56,8 @@ class ObservedSymptomForm(FlaskForm):
 
 class SecondarySymptomForm(FlaskForm):
     def __init__(self, **kwargs):
-        super(SecondarySymptomForm, self).__init__(csrf_enabled=False, **kwargs)
+        super(SecondarySymptomForm, self).__init__(
+            csrf_enabled=False, **kwargs)
         self.observed.label = Label(
             self.observed.id, kwargs.pop('symptom_name', 'Undefined'))
 
@@ -80,7 +81,7 @@ class SampleForm(FlaskForm):
     collection_date = DateField(
         'Data de coleta',
         format='%d/%m/%Y',
-        validators=[Optional()]
+        validators=[DataRequired()]
     )
     method = SelectField(
         'Método de coleta',

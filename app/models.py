@@ -68,11 +68,11 @@ class Symptom(db.Model):
 
     @classmethod
     def get_primary_symptoms(cls):
-        return cls.query.filter(cls.primary is True).all()
+        return cls.query.filter(cls.primary==True).all()
 
     @classmethod
     def get_secondary_symptoms(cls):
-        return cls.query.filter(cls.primary is False).all()
+        return cls.query.filter(cls.primary==False).all()
 
     def __repr__(self):
         return '<Symptom[{}]: {}>'.format(self.id, self.name)
