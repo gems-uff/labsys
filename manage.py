@@ -4,7 +4,7 @@ from app import create_app, db
 from app.models import (
     User, Role, Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample,
     Patient, CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Country, Region, State, City, Residence,
+    Country, Region, State, City, Address,
 )
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
@@ -35,7 +35,7 @@ admin.add_views(
     ModelView(Region, db.session),
     ModelView(State, db.session),
     ModelView(City, db.session),
-    ModelView(Residence, db.session),
+    ModelView(Address, db.session),
 )
 # endregion
 
@@ -57,6 +57,13 @@ def test():
     import unittest
     tests = unittest.TestLoader().discover('tests')
     unittest.TextTestRunner(verbosity=2).run(tests)
+
+
+@manager.command
+def load_initial_data():
+    """Load initial models data"""
+    import app.data_loader as dl
+    dl.load_data(db)
 
 
 if __name__ == '__main__':
