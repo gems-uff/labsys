@@ -48,6 +48,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('region_id', sa.Integer(), nullable=True),
     sa.Column('name', sa.String(length=64), nullable=True),
+    sa.Column('uf_code', sa.String(length=2), nullable=True),
     sa.Column('ibge_code', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['region_id'], ['regions.id'], ),
     sa.PrimaryKeyConstraint('id')

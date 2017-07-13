@@ -175,10 +175,10 @@ class Country(db.Model):
 
 
     def __repr__(self):
-        return '<Country[{}/{}]>'.format(self.name_en_us, self.initials)
+        return '<Country[{}/{}]>'.format(self.name_en_us, self.abbreviation)
 
     def __str__(self):
-        return '{}/{}'.format(self.name_pt_br, self.initials)
+        return '{}/{}'.format(self.name_pt_br, self.abbreviation)
 
 
 class Region(db.Model):
@@ -195,7 +195,7 @@ class State(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     region_id = db.Column(db.Integer, db.ForeignKey('regions.id'))
     name = db.Column(db.String(64))
-    uf_code = db.column(db.String(2))
+    uf_code = db.Column(db.String(2))
     ibge_code = db.Column(db.Integer)
     cities = db.relationship('City', backref='city', lazy='dynamic')
 
