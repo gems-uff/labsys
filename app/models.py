@@ -69,6 +69,7 @@ class Vaccine(db.Model):
     def __repr__(self):
         return '<Vaccine[{}]: {}>'.format(self.id, self.applied)
 
+
 class Hospitalization(db.Model):
     __tablename__ = 'hospitalizations'
     id = db.Column(db.Integer, primary_key=True)
@@ -174,6 +175,7 @@ class Country(db.Model):
     abbreviation = db.Column(db.String(2))
     bacen_code = db.Column(db.Integer)
     regions = db.relationship('Region', backref='country', lazy='dynamic')
+    addresses = db.relationship('Address', backref='country', lazy='dynamic')
 
     def __repr__(self):
         return '<Country[{}/{}]>'.format(self.name_en_us, self.abbreviation)
@@ -205,6 +207,7 @@ class State(db.Model):
     uf_code = db.Column(db.String(2))
     ibge_code = db.Column(db.Integer)
     cities = db.relationship('City', backref='state', lazy='dynamic')
+    addresses = db.relationship('Address', backref='state', lazy='dynamic')
 
     def __repr__(self):
         return '<State[{}/{}]>'.format(self.name, self.uf_code)
@@ -219,22 +222,25 @@ class City(db.Model):
     state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
     ibge_code = db.Column(db.Integer)
     name = db.Column(db.String(128))
+    addresses = db.relationship('Address', backref='city', lazy='dynamic')
 
     def __repr__(self):
         return '<City[{}/{}]>'.format(
-            self.name, self.state.uf_code if self.state is not None else 'None')
+            self.name,
+            self.state.uf_code if self.state is not None else 'None')
 
     def __str__(self):
         return '{}/{}'.format(
-            self.name, self.state.uf_code if self.state is not None else 'None')
+            self.name,
+            self.state.uf_code if self.state is not None else 'None')
 
 
 class Address(db.Model):
     __tablename__ = 'addresses'
     id = db.Column(db.Integer, primary_key=True)
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
-    country = db.Column(db.Integer, db.ForeignKey('countries.id'))
-    state = db.Column(db.Integer, db.ForeignKey('states.id'))
-    city = db.Column(db.Integer, db.ForeignKey('cities.id'))
+    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
+    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
     neighborhood = db.Column(db.String(255))
     details = db.Column(db.String(255))

@@ -54,15 +54,15 @@ def upgrade():
     op.create_table('addresses',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('patient_id', sa.Integer(), nullable=True),
-    sa.Column('country', sa.Integer(), nullable=True),
-    sa.Column('state', sa.Integer(), nullable=True),
-    sa.Column('city', sa.Integer(), nullable=True),
+    sa.Column('country_id', sa.Integer(), nullable=True),
+    sa.Column('state_id', sa.Integer(), nullable=True),
+    sa.Column('city_id', sa.Integer(), nullable=True),
     sa.Column('neighborhood', sa.String(length=255), nullable=True),
     sa.Column('details', sa.String(length=255), nullable=True),
-    sa.ForeignKeyConstraint(['city'], ['cities.id'], ),
-    sa.ForeignKeyConstraint(['country'], ['countries.id'], ),
+    sa.ForeignKeyConstraint(['city_id'], ['cities.id'], ),
+    sa.ForeignKeyConstraint(['country_id'], ['countries.id'], ),
     sa.ForeignKeyConstraint(['patient_id'], ['patients.id'], ),
-    sa.ForeignKeyConstraint(['state'], ['states.id'], ),
+    sa.ForeignKeyConstraint(['state_id'], ['states.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
