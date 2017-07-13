@@ -51,8 +51,7 @@ class Admission(db.Model):
         cascade='all, delete-orphan')
     symptoms = db.relationship(
         'ObservedSymptom', backref='admission', lazy='dynamic')
-    samples = db.relationship(
-        'Sample', backref='admission', lazy='dynamic')
+    samples = db.relationship('Sample', backref='admission', lazy='dynamic')
 
     def __repr__(self):
         return '<Admission[{}]: {}>'.format(self.id, self.id_lvrs_intern)
@@ -163,4 +162,61 @@ class CdcExam(db.Model):
 
     def __repr__(self):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)
+
+
+class Country(db.Model):
+    __tablename__ = 'countries'
+    id = db.Column(db.Integer, primary_key=True)
+    name_en_us = db.Column(db.String(255))
+    name_pt_br = db.Column(db.String(255))
+    abbreviation = db.Column(db.String(2))
+    bacen_code = db.Column(db.Integer)
+    regions = db.relationship('Region', backref='region', lazy='dynamic')
+
+
+    def __repr__(self):
+        return '<Country[{}/{}]>'.format(self.name_en_us, self.initials)
+
+    def __str__(self):
+        return '{}/{}'.format(self.name_pt_br, self.initials)
+
+
+class Region(db.Model):
+    __tablename__ = 'regions'
+    id = db.Column(db.Integer, primary_key=True)
+    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
+    name = db.Column(db.String(16))
+    region_code = db.Column(db.Integer)
+    states = db.relationship('State', backref='region', lazy='dynamic')
+
+
+class State(db.Model):
+    __tablename__ = 'states'
+    id = db.Column(db.Integer, primary_key=True)
+    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'))
+    name = db.Column(db.String(64))
+    uf_code = db.column(db.String(2))
+    ibge_code = db.Column(db.Integer)
+    cities = db.relationship('City', backref='city', lazy='dynamic')
+
+
+class City(db.Model):
+    __tablename__ = 'cities'
+    id = db.Column(db.Integer, primary_key=True)
+    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
+    ibge_code = db.Column(db.Integer)
+    name = db.Column(db.String(128))
+
+
+class Residence(db.Model):
+    __tablename__ = 'addresses'
+    id = db.Column(db.Integer, primary_key=True)
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
+    # TODO: normalize?
+    country = db.Column(db.String(255))
+    uf_code = db.Column(db.String(2))
+    city = db.Column(db.String(128))
+    neighborhood = db.Column(db.String(255))
+
+
 

@@ -126,8 +126,7 @@ class SampleForm(FlaskForm):
 
 
 class AdmissionForm(FlaskForm):
-    id_lvrs_intern = StringField('Número interno', validators=[
-        DataRequired()])
+    id_lvrs_intern = StringField('Número interno', validators=[DataRequired()])
     patient = FormField(PatientForm)
     vaccine = FormField(VaccineForm)
     hospitalization = FormField(HospitalizationForm)
