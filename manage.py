@@ -20,22 +20,23 @@ admin = Admin(app, name='labsys', template_mode='bootstrap3')
 # region Add ModelView
 admin.add_views(
     ModelView(User, db.session),
-    ModelView(Role, db.session),
     ModelView(Admission, db.session),
     ModelView(Patient, db.session),
+    ModelView(Address, db.session),
+    ModelView(Sample, db.session),
+    ModelView(CdcExam, db.session),
     ModelView(Vaccine, db.session),
     ModelView(Hospitalization, db.session),
     ModelView(UTIHospitalization, db.session),
     ModelView(ClinicalEvolution, db.session),
-    ModelView(Symptom, db.session),
     ModelView(ObservedSymptom, db.session),
     ModelView(Method, db.session),
-    ModelView(Sample, db.session),
+    ModelView(Symptom, db.session),
     ModelView(Country, db.session),
     ModelView(Region, db.session),
     ModelView(State, db.session),
     ModelView(City, db.session),
-    ModelView(Address, db.session),
+    ModelView(Role, db.session),
 )
 # endregion
 
