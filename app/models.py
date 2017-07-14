@@ -54,12 +54,12 @@ class Patient(db.Model):
 class Address(db.Model):
     __tablename__ = 'addresses'
     id = db.Column(db.Integer, primary_key=True)
-    # TODO: is it correct?
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
     state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
     neighborhood = db.Column(db.String(255))
+    zone = db.Column(db.Integer)
     details = db.Column(db.String(255))
 
     def __repr__(self):

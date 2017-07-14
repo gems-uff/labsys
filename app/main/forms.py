@@ -12,7 +12,7 @@ class NameForm(FlaskForm):
 
 
 class PatientForm(FlaskForm):
-    name = StringField('Nome do paciente', validators=[InputRequired()])
+    name = StringField('Nome do paciente')
     birth_date = DateField('Data de nascimento', format='%d/%m/%Y',
                            validators=[Optional()])
     age = IntegerField('Idade', validators=[Optional()])
@@ -28,25 +28,25 @@ class PatientForm(FlaskForm):
         default='I',
         coerce=str,
     )
-    country = SelectField(
+    country_id = SelectField(
         label='País de residência',
         choices=((1, 'Brasil'), (2, 'Argentina'), (9, 'Outro')),
         default=1,
         coerce=int,
     )
-    state = SelectField(
+    state_id = SelectField(
         label='UF (Estado)',
         choices=((1, 'RJ'), (2, 'ES'), (9, 'Outro')),
         default=3,
         coerce=int,
     )
-    city = SelectField(
+    city_id = SelectField(
         label='Cidade',
         choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (9, 'Outra')),
         default=3,
         coerce=int,
     )
-    neighborhood = StringField('Bairro', validators=[Optional()])
+    neighborhood = StringField('Bairro')
     # zone = RadioField(
     zone = SelectField(
         label='Zona',
@@ -55,6 +55,7 @@ class PatientForm(FlaskForm):
         default=9,
         coerce=int,
     )
+    residence_details = StringField('Info adicional Residência')
 
 
 
@@ -175,13 +176,13 @@ class SampleForm(FlaskForm):
 class AdmissionForm(FlaskForm):
     id_lvrs_intern = StringField('Número interno',
                                  validators=[InputRequired()])
-    state = SelectField(
+    state_id = SelectField(
         label='UF de registro do caso',
         choices=((1, 'RJ'), (2, 'ES'), (3, 'Outro')),
         default=3,
         coerce=int,
     )
-    city = SelectField(
+    city_id = SelectField(
         label='Município de registro do caso',
         choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (3, 'Outra')),
         default=3,

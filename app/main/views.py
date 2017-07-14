@@ -3,7 +3,7 @@ from .. import db
 from ..models import (
     User,
     Admission,
-    Patient,
+    Patient, Address,
     Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
     Symptom, ObservedSymptom,
     Sample, Method, CdcExam,
@@ -38,10 +38,30 @@ def create_admission():
         admission = Admission.query.filter_by(
             id_lvrs_intern=form.id_lvrs_intern.data).first()
         if admission is None:
-            patient = Patient(name=form.patient.data['name'])
+            patient = Patient(
+                name=form.patient.data['name'],
+                birth_date=form.patient.data['birth_date'],
+                age=form.patient.data['age'],
+                age_unit=form.patient.data['age_unit'],
+                gender=form.patient.data['gender'],
+            )
+            patient_residence = Address(
+                patient=patient,
+                country=form.patient.data['country_id'],
+                state=form.patient.data['state_id'],
+                city=form.patient.data['city_id'],
+                neighborhood=form.patient.data['neighborhood'],
+                zone=form.patient.data['zone'],
+                details=form.patient.data['residence_details'],
+            )
 
             admission = Admission(
                 id_lvrs_intern=form.id_lvrs_intern.data,
+                state=form.state_id.data,
+                city=form.city_id.data,
+                health_unit=form.health_unit.data,
+                requesting_institution=form.requesting_institution.data,
+                details=form.details.data,
                 patient=patient,
             )
 
