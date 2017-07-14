@@ -96,13 +96,16 @@
   <fieldset>
     <legend>{{ form.label.text }}</legend>
     {% for sample_form in form.entries %}
-      {% for field in sample_form %}
-        {% if field.type == "DateField" %}
-          {{ wtf.form_field(field, placeholder="dd/MM/yyyy") }}
-        {% else %}
-          {{ wtf.form_field(field) }}
-        {% endif %}
-      {% endfor %}
+        {{ sample_form.label }}
+        {{ wtf.form_field(sample_form.collection_date, placeholder="dd/MM/yyyy") }}
+        {{ wtf.form_field(sample_form.method) }}
+        <fieldset style="margin-left: 40px;">
+          <legend>{{ sample_form.cdc_exam.label.text }}</legend>
+          {{ wtf.form_field(sample_form.cdc_exam.flu_type) }}
+          {{ wtf.form_field(sample_form.cdc_exam.flu_subtype) }}
+          {{ wtf.form_field(sample_form.cdc_exam.dominant_ct) }}
+          {{ wtf.form_field(sample_form.cdc_exam.details) }}
+        </fieldset>
     {% endfor %}
   </fieldset>
 {%- endmacro %}

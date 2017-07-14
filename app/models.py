@@ -197,6 +197,9 @@ class Sample(db.Model):
 
 class CdcExam(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    flu_type = db.Column(db.String(16))
+    flu_subtype = db.Column(db.String(16))
+    dominant_ct = db.Column(db.Integer)
     details = db.Column(db.String(255))
     sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
 

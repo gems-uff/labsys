@@ -118,6 +118,9 @@ def create_admission():
                     admission=admission,
                 )
                 CdcExam(
+                    flu_type=sample_form.cdc_exam.data['flu_type'],
+                    flu_subtype=sample_form.cdc_exam.data['flu_subtype'],
+                    dominant_ct=sample_form.cdc_exam.data['dominant_ct'],
                     details=sample_form.cdc_exam.data['details'],
                     sample=sample,
                 )

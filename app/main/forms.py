@@ -58,8 +58,6 @@ class PatientForm(FlaskForm):
     residence_details = StringField('Info adicional Residência')
 
 
-
-
 YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
 class DatedEventForm(FlaskForm):
 
@@ -152,13 +150,33 @@ class CdcForm(FlaskForm):
     def __init__(self, **kwargs):
         super(CdcForm, self).__init__(csrf_enabled=False, **kwargs)
 
-    details = StringField('Info adicional')
+    flu_type = SelectField(
+        'Tipagem',
+        # TODO: model flu/subtype
+        choices=(('A', 'A'), ('B', 'B'),
+                 ('Inconclusive', 'Inconclusivo'),
+                 ('Não Realizado', 'Não Realizado'),
+                 ('Ignorado', 'Ignorado')),
+        default='Ignorado',
+        coerce=str,
+    )
+    flu_subtype = SelectField(
+        'Subtipo OU Linhagem',
+        choices=(('H1', 'H1'), ('H3', 'H3'),
+                 ('Victoria', 'Victoria'), ('Yamagata', 'Yamagata'),
+                 ('Não Subtipado', 'Não SubtipADO'),
+                 ('Não Subtipável', 'Não SubtipÁVEL'),
+                 ('Ignorado', 'Ignorado')),
+        default='Ignorado',
+        coerce=str,
+    )
+    dominant_ct = IntegerField('CT (principal)')
+    details = StringField('Informações adicionais')
 
 
 class SampleForm(FlaskForm):
     def __init__(self, **kwargs):
         super(SampleForm, self).__init__(csrf_enabled=False, **kwargs)
-        #self.method.choices=kwargs.pop('method_choices', [(0, 'Invalid')])
 
     collection_date = DateField(
         'Data de coleta',
@@ -170,7 +188,7 @@ class SampleForm(FlaskForm):
         coerce=int,
         # Pass choices in the view: dynamic, see docs
     )
-    cdc_exam = FormField(CdcForm)
+    cdc_exam = FormField(label='Resultado Exame CDC', form_class=CdcForm)
 
 
 class AdmissionForm(FlaskForm):
@@ -191,12 +209,20 @@ class AdmissionForm(FlaskForm):
     health_unit = StringField('Unidade de Saúde')
     requesting_institution = StringField('Instituição Solicitante')
     details = StringField('Informação adicional')
-    patient = FormField(PatientForm)
-    vaccine = FormField(VaccineForm)
-    hospitalization = FormField(HospitalizationForm)
-    uti_hospitalization = FormField(UTIHospitalizationForm)
-    clinical_evolution = FormField(ClinicalEvolutionForm)
-    symptoms = FieldList(FormField(ObservedSymptomForm))
-    sec_symptoms = FieldList(FormField(SecondarySymptomForm))
-    samples = FieldList(FormField(SampleForm), min_entries=1)
+    patient = FormField(PatientForm, label='Dados do Paciente')
+    vaccine = FormField(VaccineForm, label='Vacina contra Gripe')
+    hospitalization = FormField(HospitalizationForm,
+                                label='Internação Hospitalar')
+    uti_hospitalization = FormField(UTIHospitalizationForm,
+                                    label='Internação UTI')
+    clinical_evolution = FormField(ClinicalEvolutionForm,
+                                   label='Evolução Clínica')
+    symptoms = FieldList(FormField(ObservedSymptomForm),
+                         label='Sintomas Primários')
+    sec_symptoms = FieldList(FormField(SecondarySymptomForm),
+                             label='Sintomas Secundários')
+    # TODO: #1 must be dynamic
+    samples = FieldList(FormField(label='Amostra #1', form_class=SampleForm),
+                        label='Amostras',
+                        min_entries=1)
     submit = SubmitField('Criar')
