@@ -4,6 +4,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 
+role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 bootstrap = Bootstrap()
 moment = Moment()
 db = SQLAlchemy()
