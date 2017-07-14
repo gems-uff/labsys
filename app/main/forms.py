@@ -17,9 +17,12 @@ class PatientForm(FlaskForm):
 
 YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
 class DatedEventForm(FlaskForm):
+
+    class Meta:
+        csrf = False
+
     def __init__(self, **kwargs):
-        super(DatedEventForm, self).__init__(
-            csrf_enabled=False, **kwargs)
+        super(DatedEventForm, self).__init__(**kwargs)
         self.occurred.label.text = kwargs.pop('occurred_label', 'Ocorreu')
         self.date.label.text = kwargs.pop('date_label', 'Data')
 
@@ -126,7 +129,8 @@ class SampleForm(FlaskForm):
 
 
 class AdmissionForm(FlaskForm):
-    id_lvrs_intern = StringField('Número interno', validators=[DataRequired()])
+    id_lvrs_intern = StringField('Número interno', validators=[
+DataRequired()])
     patient = FormField(PatientForm)
     vaccine = FormField(VaccineForm)
     hospitalization = FormField(HospitalizationForm)
