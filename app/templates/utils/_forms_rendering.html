@@ -34,6 +34,8 @@
       {% if subfield.type != "CSRFTokenField" %}
         {% if subfield.type == "RadioField" %}
           {{ render_radio_inline_field(subfield) }}
+        {% elif subfield.type == "DateField" %}
+          {{ wtf.form_field(subfield, placeholder="dd/MM/yyyy") }}
         {% else %}
           {{ wtf.form_field(subfield) }}
         {% endif %}
@@ -52,7 +54,7 @@
 
 {% macro render_symptoms(form) -%}
   <fieldset>
-    <legend>{{ form.label }}</legend>
+    <legend>{{ form.label.text }}</legend>
     {% for subform in form.entries %}
       {{ subform.hidden_tag() }}
       <div class="form-inline">
@@ -71,7 +73,7 @@
 
 {% macro render_secondary_symptoms(form) -%}
   <fieldset>
-    <legend>{{ form.label }}</legend>
+    <legend>{{ form.label.text }}</legend>
     {% for subform in form.entries %}
       {{ subform.hidden_tag() }}
       <div class="form-inline">
@@ -92,7 +94,7 @@
 
 {% macro render_samples(form) -%}
   <fieldset>
-    <legend>{{ form.label }}</legend>
+    <legend>{{ form.label.text }}</legend>
     {% for sample_form in form.entries %}
       {% for field in sample_form %}
         {% if field.type == "DateField" %}
@@ -102,5 +104,17 @@
         {% endif %}
       {% endfor %}
     {% endfor %}
+  </fieldset>
+{%- endmacro %}
+
+{% macro render_admission(form) -%}
+  <fieldset>
+    <legend>Admissão</legend>
+    {{ wtf.form_field(form.id_lvrs_intern) }}
+    {{ wtf.form_field(form.state) }}
+    {{ wtf.form_field(form.city) }}
+    {{ wtf.form_field(form.health_unit) }}
+    {{ wtf.form_field(form.requesting_institution) }}
+    {{ wtf.form_field(form.details) }}
   </fieldset>
 {%- endmacro %}

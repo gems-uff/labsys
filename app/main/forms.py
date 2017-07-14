@@ -13,7 +13,8 @@ class NameForm(FlaskForm):
 
 class PatientForm(FlaskForm):
     name = StringField('Nome do paciente', validators=[InputRequired()])
-    birth_date = DateField('Data de nascimento', format='%d/%m/%Y')
+    birth_date = DateField('Data de nascimento', format='%d/%m/%Y',
+                           validators=[Optional()])
     age = IntegerField('Idade', validators=[Optional()])
     age_unit = RadioField(
         label='Tipo idade',
@@ -174,6 +175,21 @@ class SampleForm(FlaskForm):
 class AdmissionForm(FlaskForm):
     id_lvrs_intern = StringField('Número interno',
                                  validators=[InputRequired()])
+    state = SelectField(
+        label='UF de registro do caso',
+        choices=((1, 'RJ'), (2, 'ES'), (3, 'Outro')),
+        default=3,
+        coerce=int,
+    )
+    city = SelectField(
+        label='Município de registro do caso',
+        choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (3, 'Outra')),
+        default=3,
+        coerce=int,
+    )
+    health_unit = StringField('Unidade de Saúde')
+    requesting_institution = StringField('Instituição Solicitante')
+    details = StringField('Informação adicional')
     patient = FormField(PatientForm)
     vaccine = FormField(VaccineForm)
     hospitalization = FormField(HospitalizationForm)

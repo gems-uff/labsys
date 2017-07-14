@@ -10,9 +10,7 @@
     {{ form.hidden_tag() }}
     {{ wtf.form_errors(form, hiddens="only") }}
     <!-- Admission -->
-    <fieldset class="form-group">
-      <legend style="font-size: 32px;">Admissão</legend>
-      {{ wtf.form_field(form.id_lvrs_intern) }}
+    {{ frender.render_admission(form) }}
     </fieldset>
     <!-- Patient -->
     {{ frender.render_patient(form.patient) }}
