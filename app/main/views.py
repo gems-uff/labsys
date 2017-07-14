@@ -53,13 +53,12 @@ def create_admission():
                 city_id=form.patient.data['city_id'],
                 neighborhood=form.patient.data['neighborhood'],
                 zone=form.patient.data['zone'],
-                details=form.patient.data['residence_details'],
             )
 
             admission = Admission(
                 id_lvrs_intern=form.id_lvrs_intern.data,
-                first_symptom_date=form.first_symptoms_date,
-                semepi_symptom=form.semepi_symptom,
+                first_symptoms_date=form.first_symptoms_date.data,
+                semepi_symptom=form.semepi_symptom.data,
                 state_id=form.state_id.data,
                 city_id=form.city_id.data,
                 health_unit=form.health_unit.data,
