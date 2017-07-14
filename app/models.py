@@ -62,11 +62,19 @@ class Address(db.Model):
     neighborhood = db.Column(db.String(255))
     details = db.Column(db.String(255))
 
+    def __repr__(self):
+        return '<Address[{}]: Pat{}>'.format(self.id, self.patient_id)
+
 
 class Admission(db.Model):
     __tablename__ = 'admissions'
     id = db.Column(db.Integer, primary_key=True)
     id_lvrs_intern = db.Column(db.String(32), unique=True)
+    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
+    health_unit = db.Column(db.String(128))
+    requesting_institution = db.Column(db.String(128))
+    details = db.Column(db.String(255))
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     vaccine = db.relationship(
         'Vaccine', backref='admission', uselist=False,
@@ -237,6 +245,7 @@ class State(db.Model):
     ibge_code = db.Column(db.Integer)
     cities = db.relationship('City', backref='state', lazy='dynamic')
     addresses = db.relationship('Address', backref='state', lazy='dynamic')
+    admissions = db.relationship('Admission', backref='state', lazy='dynamic')
 
     def __repr__(self):
         return '<State[{}/{}]>'.format(self.name, self.uf_code)
@@ -252,6 +261,7 @@ class City(db.Model):
     ibge_code = db.Column(db.Integer)
     name = db.Column(db.String(128))
     addresses = db.relationship('Address', backref='city', lazy='dynamic')
+    admissions = db.relationship('Admission', backref='city', lazy='dynamic')
 
     def __repr__(self):
         return '<City[{}/{}]>'.format(
