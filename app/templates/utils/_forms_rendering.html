@@ -28,7 +28,7 @@
 
 {% macro render_patient(form) -%}
   <fieldset>
-    <legend>{{ form.label }}</legend>
+    <legend>{{ form.label.text }}</legend>
     {{ form.hidden_tag() }}
     {% for subfield in form %}
       {% if subfield.type != "CSRFTokenField" %}
@@ -95,7 +95,11 @@
     <legend>{{ form.label }}</legend>
     {% for sample_form in form.entries %}
       {% for field in sample_form %}
-        {{ wtf.form_field(field) }}
+        {% if field.type == "DateField" %}
+          {{ wtf.form_field(field, placeholder="dd/MM/yyyy") }}
+        {% else %}
+          {{ wtf.form_field(field) }}
+        {% endif %}
       {% endfor %}
     {% endfor %}
   </fieldset>
