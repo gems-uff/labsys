@@ -18,41 +18,41 @@ class PatientForm(FlaskForm):
     age = IntegerField('Idade', validators=[Optional()])
     age_unit = RadioField(
         label='Tipo idade',
-        choices=((1, 'Anos'), (2, 'Meses'), (3, 'Dias'), (4, 'Horas')),
-        default=1,
-        coerce=int,
+        choices=(('Y', 'Anos'), ('M', 'Meses'), ('D', 'Dias'), ('H', 'Horas')),
+        default='Y',
+        coerce=str,
     )
     gender = RadioField(
         label='Sexo',
-        choices=((1, 'Masculino'), (2, 'Feminino'), (9, 'Ignorado')),
-        default=9,
-        coerce=int,
+        choices=(('M', 'Masculino'), ('F', 'Feminino'), ('I', 'Ignorado')),
+        default='I',
+        coerce=str,
     )
     country = SelectField(
         label='País de residência',
-        choices=((1, 'Brasil'), (2, 'Argentina'), (3, 'Outro')),
+        choices=((1, 'Brasil'), (2, 'Argentina'), (9, 'Outro')),
         default=1,
         coerce=int,
     )
     state = SelectField(
         label='UF (Estado)',
-        choices=((1, 'RJ'), (2, 'ES'), (3, 'Outro')),
+        choices=((1, 'RJ'), (2, 'ES'), (9, 'Outro')),
         default=3,
         coerce=int,
     )
     city = SelectField(
         label='Cidade',
-        choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (3, 'Outra')),
+        choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (9, 'Outra')),
         default=3,
         coerce=int,
     )
     neighborhood = StringField('Bairro', validators=[Optional()])
-    # TODO: change to RadioField =)
+    # zone = RadioField(
     zone = SelectField(
         label='Zona',
-        choices=((1, 'Urbana'), (2, 'Rural'), (3, 'Periurbana'),
-                 (4, 'Ignorado')),
-        default=4,
+        choices=(
+            (1, 'Urbana'), (2, 'Rural'), (3, 'Periurbana'), (9, 'Ignorado')),
+        default=9,
         coerce=int,
     )
 

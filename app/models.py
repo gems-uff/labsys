@@ -39,13 +39,28 @@ class Patient(db.Model):
     __tablename__ = 'patients'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
+    birth_date = db.Column(db.Date)
+    age = db.Column(db.Integer)
+    age_unit = db.Column(db.String(1))
+    gender = db.Column(db.String(1))
+    residence = db.relationship('Address', backref='patient', uselist=False)
     admissions = db.relationship(
         'Admission', backref='patient', lazy='dynamic')
-    residence = db.relationship(
-        'Address', backref='patient', uselist=False,)
 
     def __repr__(self):
         return '<Patient[{}]: {}>'.format(self.id, self.name)
+
+
+class Address(db.Model):
+    __tablename__ = 'addresses'
+    id = db.Column(db.Integer, primary_key=True)
+    # TODO: is it correct?
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
+    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
+    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
+    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
+    neighborhood = db.Column(db.String(255))
+    details = db.Column(db.String(255))
 
 
 class Admission(db.Model):
@@ -247,15 +262,3 @@ class City(db.Model):
         return '{}/{}'.format(
             self.name,
             self.state.uf_code if self.state is not None else 'None')
-
-
-class Address(db.Model):
-    __tablename__ = 'addresses'
-    id = db.Column(db.Integer, primary_key=True)
-    # TODO: remove this, Address is not directly related to patient
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
-    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
-    neighborhood = db.Column(db.String(255))
-    details = db.Column(db.String(255))
