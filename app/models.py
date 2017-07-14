@@ -252,6 +252,7 @@ class City(db.Model):
 class Address(db.Model):
     __tablename__ = 'addresses'
     id = db.Column(db.Integer, primary_key=True)
+    # TODO: remove this, Address is not directly related to patient
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
     state_id = db.Column(db.Integer, db.ForeignKey('states.id'))

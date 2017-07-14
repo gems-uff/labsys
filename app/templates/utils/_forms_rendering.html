@@ -32,7 +32,11 @@
     {{ form.hidden_tag() }}
     {% for subfield in form %}
       {% if subfield.type != "CSRFTokenField" %}
-        {{ wtf.form_field(subfield) }}
+        {% if subfield.type == "RadioField" %}
+          {{ render_radio_inline_field(subfield) }}
+        {% else %}
+          {{ wtf.form_field(subfield) }}
+        {% endif %}
       {% endif %}
     {% endfor %}
   </fieldset>
