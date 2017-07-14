@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, SubmitField, FormField, FormField, RadioField, HiddenField,
-    FieldList, BooleanField, Label, DateField, SelectField, IntegerField
+    FieldList, BooleanField, Label, DateField, SelectField, IntegerField,
+    FloatField,
 )
 from wtforms.validators import InputRequired, Optional
 
@@ -55,7 +56,6 @@ class PatientForm(FlaskForm):
         default=9,
         coerce=int,
     )
-    residence_details = StringField('Info adicional Residência')
 
 
 YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
@@ -170,7 +170,7 @@ class CdcForm(FlaskForm):
         default='Ignorado',
         coerce=str,
     )
-    dominant_ct = IntegerField('CT (principal)')
+    dominant_ct = FloatField('CT (principal)', validators=[Optional()])
     details = StringField('Informações adicionais')
 
 
@@ -183,6 +183,13 @@ class SampleForm(FlaskForm):
         format='%d/%m/%Y',
         validators=[InputRequired()]
     )
+    semepi = IntegerField('Semana Epidemiológica (Coleta)',
+                          validators=[Optional()])
+    admission_date = DateField(
+        'Data de Entrada no LVRS',
+        format='%d/%m/%Y',
+        validators=[InputRequired()]
+    )
     method = SelectField(
         'Método de coleta',
         coerce=int,
@@ -192,8 +199,12 @@ class SampleForm(FlaskForm):
 
 
 class AdmissionForm(FlaskForm):
-    id_lvrs_intern = StringField('Número interno',
+    id_lvrs_intern = StringField('Número Interno',
                                  validators=[InputRequired()])
+    first_symptoms_date = DateField('Data dos Primeiros Sintomas',
+                                    validators=[Optional()])
+    semepi_symptom = IntegerField('Semana Epidemiológica (Sintomas)',
+                                  validators=[Optional()])
     state_id = SelectField(
         label='UF de registro do caso',
         choices=((1, 'RJ'), (2, 'ES'), (9, 'Outro')),
@@ -208,7 +219,7 @@ class AdmissionForm(FlaskForm):
     )
     health_unit = StringField('Unidade de Saúde')
     requesting_institution = StringField('Instituição Solicitante')
-    details = StringField('Informação adicional')
+    details = StringField('Informações Adicionais')
     patient = FormField(PatientForm, label='Dados do Paciente')
     vaccine = FormField(VaccineForm, label='Vacina contra Gripe')
     hospitalization = FormField(HospitalizationForm,

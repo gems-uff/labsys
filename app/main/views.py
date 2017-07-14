@@ -21,6 +21,7 @@ TRUE = 1
 FALSE = 0
 
 
+@main.route('/', methods=['GET', 'POST'])
 @main.route('/admissions/create', methods=['GET', 'POST'])
 def create_admission():
     form = AdmissionForm(
@@ -57,6 +58,8 @@ def create_admission():
 
             admission = Admission(
                 id_lvrs_intern=form.id_lvrs_intern.data,
+                first_symptom_date=form.first_symptoms_date,
+                semepi_symptom=form.semepi_symptom,
                 state_id=form.state_id.data,
                 city_id=form.city_id.data,
                 health_unit=form.health_unit.data,
@@ -113,7 +116,9 @@ def create_admission():
 
             for sample_form in form.samples:
                 sample = Sample(
+                    admission_date=sample_form.data['admission_date'],
                     collection_date=sample_form.data['collection_date'],
+                    semepi=sample_form.data['semepi'],
                     method_id=sample_form.data['method'],
                     admission=admission,
                 )

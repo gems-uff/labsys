@@ -70,6 +70,8 @@ class Admission(db.Model):
     __tablename__ = 'admissions'
     id = db.Column(db.Integer, primary_key=True)
     id_lvrs_intern = db.Column(db.String(32), unique=True)
+    first_symptoms_date = db.Column(db.Date)
+    semepi_symptom = db.Column(db.Integer)
     state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
     city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
     health_unit = db.Column(db.String(128))
@@ -186,7 +188,9 @@ class Method(db.Model):
 class Sample(db.Model):
     __tablename__ = 'samples'
     id = db.Column(db.Integer, primary_key=True)
+    admission_date = db.Column(db.Date())
     collection_date = db.Column(db.Date())
+    semepi = db.Column(db.Integer)
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     cdc_exams = db.relationship('CdcExam', backref='sample', lazy='dynamic')

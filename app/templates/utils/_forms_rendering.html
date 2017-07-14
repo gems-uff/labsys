@@ -98,8 +98,10 @@
     {% for sample_form in form.entries %}
         {{ sample_form.label }}
         {{ wtf.form_field(sample_form.collection_date, placeholder="dd/MM/yyyy") }}
+        {{ wtf.form_field(sample_form.semepi) }}
+        {{ wtf.form_field(sample_form.admission_date, placeholder="dd/MM/yyyy") }}
         {{ wtf.form_field(sample_form.method) }}
-        <fieldset style="margin-left: 40px;">
+        <fieldset>
           <legend>{{ sample_form.cdc_exam.label.text }}</legend>
           {{ wtf.form_field(sample_form.cdc_exam.flu_type) }}
           {{ wtf.form_field(sample_form.cdc_exam.flu_subtype) }}
@@ -114,6 +116,8 @@
   <fieldset>
     <legend>Admissão</legend>
     {{ wtf.form_field(form.id_lvrs_intern) }}
+    {{ wtf.form_field(form.first_symptoms_date) }}
+    {{ wtf.form_field(form.semepi_symptom) }}
     {{ wtf.form_field(form.requesting_institution) }}
     {{ wtf.form_field(form.health_unit) }}
     {{ wtf.form_field(form.state_id) }}
