@@ -111,10 +111,10 @@
   <fieldset>
     <legend>Admissão</legend>
     {{ wtf.form_field(form.id_lvrs_intern) }}
+    {{ wtf.form_field(form.requesting_institution) }}
+    {{ wtf.form_field(form.health_unit) }}
     {{ wtf.form_field(form.state_id) }}
     {{ wtf.form_field(form.city_id) }}
-    {{ wtf.form_field(form.health_unit) }}
-    {{ wtf.form_field(form.requesting_institution) }}
     {{ wtf.form_field(form.details) }}
   </fieldset>
 {%- endmacro %}

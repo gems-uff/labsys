@@ -47,9 +47,9 @@ def create_admission():
             )
             patient_residence = Address(
                 patient=patient,
-                country=form.patient.data['country_id'],
-                state=form.patient.data['state_id'],
-                city=form.patient.data['city_id'],
+                country_id=form.patient.data['country_id'],
+                state_id=form.patient.data['state_id'],
+                city_id=form.patient.data['city_id'],
                 neighborhood=form.patient.data['neighborhood'],
                 zone=form.patient.data['zone'],
                 details=form.patient.data['residence_details'],
@@ -57,8 +57,8 @@ def create_admission():
 
             admission = Admission(
                 id_lvrs_intern=form.id_lvrs_intern.data,
-                state=form.state_id.data,
-                city=form.city_id.data,
+                state_id=form.state_id.data,
+                city_id=form.city_id.data,
                 health_unit=form.health_unit.data,
                 requesting_institution=form.requesting_institution.data,
                 details=form.details.data,

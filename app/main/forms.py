@@ -178,14 +178,14 @@ class AdmissionForm(FlaskForm):
                                  validators=[InputRequired()])
     state_id = SelectField(
         label='UF de registro do caso',
-        choices=((1, 'RJ'), (2, 'ES'), (3, 'Outro')),
-        default=3,
+        choices=((1, 'RJ'), (2, 'ES'), (9, 'Outro')),
+        default=9,
         coerce=int,
     )
     city_id = SelectField(
         label='Município de registro do caso',
-        choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (3, 'Outra')),
-        default=3,
+        choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (9, 'Outra')),
+        default=9,
         coerce=int,
     )
     health_unit = StringField('Unidade de Saúde')
