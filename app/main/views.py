@@ -48,19 +48,23 @@ def create_admission():
             )
             patient_residence = Address(
                 patient=patient,
-                country_id=form.patient.data['country_id'],
-                state_id=form.patient.data['state_id'],
-                city_id=form.patient.data['city_id'],
+                country_id = form.patient.data['country_id']
+                    if form.patient.data['country_id'] is not -1 else None,
+                state_id=form.patient.data['state_id']
+                    if form.patient.data['state_id'] is not -1 else None,
+                city_id=form.patient.data['city_id']
+                    if form.patient.data['city_id'] is not -1 else None,
                 neighborhood=form.patient.data['neighborhood'],
                 zone=form.patient.data['zone'],
             )
-
             admission = Admission(
                 id_lvrs_intern=form.id_lvrs_intern.data,
                 first_symptoms_date=form.first_symptoms_date.data,
                 semepi_symptom=form.semepi_symptom.data,
-                state_id=form.state_id.data,
-                city_id=form.city_id.data,
+                state_id=form.state_id.data
+                    if form.state_id.data is not -1 else None,
+                city_id=form.city_id.data
+                    if form.city_id.data is not -1 else None,
                 health_unit=form.health_unit.data,
                 requesting_institution=form.requesting_institution.data,
                 details=form.details.data,

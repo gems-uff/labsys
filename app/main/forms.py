@@ -6,6 +6,8 @@ from wtforms import (
 )
 from wtforms.validators import InputRequired, Optional
 
+import app.custom_fields as cfields
+
 
 class NameForm(FlaskForm):
     name = StringField('Qual é o seu nome?', validators=[InputRequired()])
@@ -29,27 +31,11 @@ class PatientForm(FlaskForm):
         default='I',
         coerce=str,
     )
-    country_id = SelectField(
-        label='País de residência',
-        choices=((1, 'Brasil'), (2, 'Argentina'), (9, 'Outro')),
-        default=1,
-        coerce=int,
-    )
-    state_id = SelectField(
-        label='UF (Estado)',
-        choices=((1, 'RJ'), (2, 'ES'), (9, 'Outro')),
-        default=3,
-        coerce=int,
-    )
-    city_id = SelectField(
-        label='Cidade',
-        choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (9, 'Outra')),
-        default=3,
-        coerce=int,
-    )
+    country_id = cfields.CountrySelectField(label='País de residência')
+    state_id = cfields.StateSelectField(label='UF (Estado)')
+    city_id = cfields.CitySelectField(label='Município')
     neighborhood = StringField('Bairro')
-    # zone = RadioField(
-    zone = SelectField(
+    zone = RadioField(
         label='Zona',
         choices=(
             (1, 'Urbana'), (2, 'Rural'), (3, 'Periurbana'), (9, 'Ignorado')),
@@ -202,21 +188,12 @@ class AdmissionForm(FlaskForm):
     id_lvrs_intern = StringField('Número Interno',
                                  validators=[InputRequired()])
     first_symptoms_date = DateField('Data dos Primeiros Sintomas',
+                                    format='%d/%m/%Y',
                                     validators=[Optional()])
     semepi_symptom = IntegerField('Semana Epidemiológica (Sintomas)',
                                   validators=[Optional()])
-    state_id = SelectField(
-        label='UF de registro do caso',
-        choices=((1, 'RJ'), (2, 'ES'), (9, 'Outro')),
-        default=9,
-        coerce=int,
-    )
-    city_id = SelectField(
-        label='Município de registro do caso',
-        choices=((1, 'Rio de Janeiro'), (2, 'Niterói'), (9, 'Outra')),
-        default=9,
-        coerce=int,
-    )
+    state_id = cfields.StateSelectField('UF de Registro do Caso')
+    city_id = cfields.CitySelectField('Município de registro do caso')
     health_unit = StringField('Unidade de Saúde')
     requesting_institution = StringField('Instituição Solicitante')
     details = StringField('Informações Adicionais')
