@@ -1,6 +1,5 @@
 -r ./base.txt
 
-alembic==0.8.10
 click==6.7
 ipython==6.1.0
 ipython-genutils==0.2.0
