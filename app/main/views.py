@@ -1,4 +1,6 @@
-from flask import render_template, session, redirect, url_for, current_app
+from flask import (
+    render_template, session, redirect, url_for, current_app, flash,
+)
 from flask_login import login_required
 
 from .. import db
@@ -147,7 +149,8 @@ def create_admission():
                 )
 
             db.session.add(admission)
+            flash('Admissão criada com sucesso!')
         else:
-            print('DUPLICATE ADMISSION FLASH')
+            flash('Número Interno já cadastrado!')
         return redirect(url_for('.create_admission'))
     return render_template('create-admission.html', form=form,)
