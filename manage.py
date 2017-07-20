@@ -67,5 +67,17 @@ def load_initial_data():
     dl.load_data(db)
 
 
+@manager.command
+def deploy():
+    """Run deployment tasks"""
+    from flask_migrate import upgrade
+    # from app.models import ...
+
+    upgrade()
+
+    # each model responsible for inserting itself?
+
+
+
 if __name__ == '__main__':
     manager.run()
