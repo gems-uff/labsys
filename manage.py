@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 from app import create_app, db
+import app.models as models
 from app.models import (
     User, Role, Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample,
     Patient, CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
@@ -20,6 +21,7 @@ admin = Admin(app, name='labsys', template_mode='bootstrap3')
 # region Add ModelView
 admin.add_views(
     ModelView(User, db.session),
+    ModelView(Role, db.session),
     ModelView(Admission, db.session),
     ModelView(Patient, db.session),
     ModelView(Address, db.session),
@@ -36,7 +38,6 @@ admin.add_views(
     ModelView(Region, db.session),
     ModelView(State, db.session),
     ModelView(City, db.session),
-    ModelView(Role, db.session),
 )
 # endregion
 
@@ -45,6 +46,7 @@ def make_shell_context():
     return dict(
         app=app,
         db=db,
+        m=models,
     )
 
 

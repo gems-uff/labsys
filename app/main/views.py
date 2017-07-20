@@ -1,4 +1,6 @@
 from flask import render_template, session, redirect, url_for, current_app
+from flask_login import login_required
+
 from .. import db
 from ..models import (
     User,
@@ -19,6 +21,17 @@ def get_method_choices():
 NONE = 9
 TRUE = 1
 FALSE = 0
+
+
+@main.route('/secret')
+@login_required
+def secret():
+    return 'Only authenticated users are allowed!'
+
+
+@main.route('/index')
+def index():
+    return render_template('index.html')
 
 
 @main.route('/', methods=['GET', 'POST'])
