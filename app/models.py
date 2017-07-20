@@ -1,5 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask import current_app
 
 from . import db
 from . import login_manager
@@ -27,7 +29,24 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    confirmed = db.Column(db.Boolean, default=False)
 
+    def generate_confirmation_token(self, expiration_seconds=3600):
+        serializer = Serializer(current_app.config['SECRET_KEY'])
+        return serializer.dumps({'confirm': self.id})
+
+    def confirm(self, token):
+        serializer = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = serializer.loads(token)
+        except:
+            return False
+        if data.get('confirm') != self.id:
+            return False
+        self.confirmed = True
+        db.session.add(self)
+        return True
+    
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
