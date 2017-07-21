@@ -1,7 +1,7 @@
 from flask import(
     render_template, redirect, request, url_for, flash, current_app,
 )
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
 from ..models import User
 from .. import db
@@ -38,8 +38,22 @@ def register():
                     username=form.username.data,
                     password=form.password.data)
         db.session.add(user)
-        send_email(current_app.config['LABSYS_ADMIN'],
-                   'New User', 'mail/new_user', user=user)
-        flash('Agora você pode realizar o Log In.')
-        return redirect(url_for('auth.login'))
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        send_email(user.email, 'Confirm Your Account',
+                   'auth/email/confirm', user=user, token=token)
+        flash('Uma mensagem de confirmação foi enviado para seu email.')
+        return redirect(url_for('main.index'))
     return render_template('auth/register.html', form=form)
+
+
+@auth.route('/confirm/<token>')
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        return redirect(url_for('main.index'))
+    if current_user.confirm(token):
+        flash('Conta verificada. Obrigado!')
+    else:
+        flash('O link de confirmação não é válido ou expirou.')
+    return redirect(url_for('main.index'))
