@@ -74,11 +74,8 @@ def load_initial_data():
 def deploy():
     """Run deployment tasks"""
     from flask_migrate import upgrade
-    # from app.models import ...
-
     upgrade()
-
-    # each model responsible for inserting itself?
+    load_initial_data()
 
 
 

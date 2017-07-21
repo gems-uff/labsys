@@ -241,9 +241,9 @@ class CdcExam(db.Model):
 class Country(db.Model):
     __tablename__ = 'countries'
     id = db.Column(db.Integer, primary_key=True)
-    name_en_us = db.Column(db.String(255))
     name_pt_br = db.Column(db.String(255))
     abbreviation = db.Column(db.String(2))
+    name_en_us = db.Column(db.String(255))
     bacen_code = db.Column(db.Integer)
     regions = db.relationship('Region', backref='country', lazy='dynamic')
     addresses = db.relationship('Address', backref='country', lazy='dynamic')

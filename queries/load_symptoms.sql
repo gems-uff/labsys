@@ -13,6 +13,3 @@ INSERT INTO public.symptoms(id, name, "primary") VALUES
     (10, 'Azia', FALSE),
     (11, 'Desmaios', FALSE),
     (12, 'Outro (especificar)', FALSE);
-
-
-
