@@ -1,8 +1,11 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import(
+    render_template, redirect, request, url_for, flash, current_app,
+)
 from flask_login import login_user, logout_user, login_required
 
 from ..models import User
 from .. import db
+from ..email import send_email
 from . import auth
 from .forms import LoginForm, RegistrationForm
 
@@ -35,6 +38,8 @@ def register():
                     username=form.username.data,
                     password=form.password.data)
         db.session.add(user)
+        send_email(current_app.config['LABSYS_ADMIN'],
+                   'New User', 'mail/new_user', user=user)
         flash('Agora você pode realizar o Log In.')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)

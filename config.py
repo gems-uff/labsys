@@ -13,6 +13,9 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    LABSYS_ADMIN = os.environ.get('LABSYS_ADMIN')
+    LABSYS_MAIL_SUBJECT_PREFIX = '[LabSys]'
+    LABSYS_MAIL_SENDER = 'LabSys Admin <gabrielcrsaldanha@gmail.com>'
 
     @staticmethod
     def init_app(app):

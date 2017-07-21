@@ -6,7 +6,6 @@ from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-from flask_mail import Mail
 
 import app.models as models
 from app.models import (
@@ -19,7 +18,6 @@ app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
 migrate = Migrate(app, db)
 admin = Admin(app, name='labsys', template_mode='bootstrap3')
-mail = Mail(app)
 
 # region Add ModelView
 admin.add_views(
