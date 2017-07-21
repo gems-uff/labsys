@@ -40,7 +40,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
-        send_email(user.email, 'Confirm Your Account',
+        send_email(user.email, 'Confirme sua conta',
                    'auth/email/confirm', user=user, token=token)
         flash('Uma mensagem de confirmação foi enviado para seu email.')
         return redirect(url_for('main.index'))
@@ -56,4 +56,30 @@ def confirm(token):
         flash('Conta verificada. Obrigado!')
     else:
         flash('O link de confirmação não é válido ou expirou.')
+    return redirect(url_for('main.index'))
+
+
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated() \
+            and not current_user.confirmed \
+            and request.endpoint[:5] != 'auth.' \
+            and request.endpoint != 'static':
+        return redirect(url_for('auth.unconfirmed'))
+
+
+@auth.route('/unconfirmed')
+def unconfirmed():
+    if current_user.is_anonymous() or current_user.confirmed:
+        return redirect(url_for('main.index'))
+    return render_template('auth/unconfirmed.html')
+
+
+@auth.route('/confirm')
+@login_required
+def resend_confirmation():
+    token = current_user.generate_confirmation_token()
+    send_email(current_user.email, 'Confirme sua conta',
+               'auth/email/confirm', user=current_user, token=token)
+    flash('Uma nova mensagem de confirmação foi enviada ao seu email.')
     return redirect(url_for('main.index'))
