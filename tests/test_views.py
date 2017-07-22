@@ -25,7 +25,7 @@ class TestCreateAdmissionView(unittest.TestCase):
         db.session.add(a)
         db.session.commit()
         data = {
-            'id_lvrs_intern': 1,
+            'id_lvrs_intern': '1',
             'samples-0-collection_date': '12/12/2012',
             'samples-0-admission_date': '13/12/2012',
         }
@@ -34,3 +34,5 @@ class TestCreateAdmissionView(unittest.TestCase):
             url_for('main.create_admission'), data=data, follow_redirects=True)
         self.assertTrue(
             duplicate_id_lvrs_intern in response.get_data(as_text=True))
+        self.assertTrue(
+            len(Admission.query.filter_by(id_lvrs_intern='1').all()), 1)
