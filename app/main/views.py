@@ -1,5 +1,5 @@
 from flask import (
-    render_template, session, redirect, url_for, current_app, flash,
+    render_template, session, redirect, url_for, current_app, flash, request,
 )
 from flask_login import login_required
 
@@ -14,10 +14,6 @@ from ..models import (
 )
 from . import main
 from .forms import NameForm, AdmissionForm, SymptomForm
-
-
-def get_method_choices():
-    return [(m.id, m.name) for m in Method.query.all()]
 
 
 NONE = 9
@@ -45,9 +41,6 @@ def create_admission():
         sec_symptoms=[{'symptom_id': s.id, 'symptom_name': s.name}
                       for s in Symptom.get_secondary_symptoms()],
     )
-    # Set sample method choices (error if not set, move to constructor later)
-    for sample_form in form.samples.entries:
-        sample_form.method.choices = get_method_choices()
 
     # POST and valid
     if form.validate_on_submit():
@@ -137,7 +130,8 @@ def create_admission():
                     admission_date=sample_form.data['admission_date'],
                     collection_date=sample_form.data['collection_date'],
                     semepi=sample_form.data['semepi'],
-                    method_id=sample_form.data['method'],
+                    method_id=sample_form.data['method']
+                        if sample_form.data['method'] is not -1 else None,
                     admission=admission,
                 )
                 CdcExam(
@@ -153,4 +147,5 @@ def create_admission():
         else:
             flash('Número Interno já cadastrado!')
         return redirect(url_for('.create_admission'))
+
     return render_template('create-admission.html', form=form,)

@@ -176,11 +176,7 @@ class SampleForm(FlaskForm):
         format='%d/%m/%Y',
         validators=[InputRequired()]
     )
-    method = SelectField(
-        'Método de coleta',
-        coerce=int,
-        # Pass choices in the view: dynamic, see docs
-    )
+    method = cfields.MethodSelectField()
     cdc_exam = FormField(label='Resultado Exame CDC', form_class=CdcForm)
 
 
