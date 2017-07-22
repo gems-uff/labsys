@@ -1,4 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
@@ -46,7 +47,7 @@ class User(UserMixin, db.Model):
         self.confirmed = True
         db.session.add(self)
         return True
-    
+
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -119,7 +120,7 @@ class Admission(db.Model):
         cascade='all, delete-orphan')
     symptoms = db.relationship(
         'ObservedSymptom', backref='admission', lazy='dynamic')
-    samples = db.relationship('Sample', backref='admission', lazy='dynamic')
+    samples = db.relationship('Sample', backref='_admission', lazy='dynamic')
 
     def __repr__(self):
         return '<Admission[{}]: {}>'.format(self.id, self.id_lvrs_intern)
@@ -213,14 +214,36 @@ class Method(db.Model):
 
 
 class Sample(db.Model):
+
     __tablename__ = 'samples'
     id = db.Column(db.Integer, primary_key=True)
     admission_date = db.Column(db.Date())
     collection_date = db.Column(db.Date())
     semepi = db.Column(db.Integer)
+    _ordering = db.Column(db.Integer)
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     cdc_exams = db.relationship('CdcExam', backref='sample', lazy='dynamic')
+
+    @hybrid_property
+    def admission(self):
+        return self._admission
+
+    @admission.setter
+    def admission(self, admission):
+        self._admission = admission
+        if self._admission is not None:
+            self.ordering = len(self._admission.samples.all())
+        else:
+            self.ordering = -1
+
+    @hybrid_property
+    def ordering(self):
+        return self._ordering
+
+    @ordering.setter
+    def ordering(self, ordering):
+        self._ordering = ordering
 
     def __repr__(self):
         return '<Sample[{}]: {}>'.format(self.id, self.collection_date)
