@@ -1,5 +1,6 @@
 from flask import (
     render_template, session, redirect, url_for, current_app, flash, request,
+    abort,
 )
 from flask_login import login_required
 
@@ -27,12 +28,39 @@ def secret():
     return 'Only authenticated users are allowed!'
 
 
-@main.route('/index')
+@main.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
 
-@main.route('/', methods=['GET', 'POST'])
+@main.route('/admissions', methods=['GET'])
+def list_admissions():
+    admissions = Admission.query.all()
+    return render_template('list-admissions.html', admissions=admissions)
+
+
+@main.route('/admissions/<int:id>/detail')
+@main.route('/admissions/<int:id>/edit', methods=['GET'])
+@main.route('/admissions/<int:id>', methods=['GET'])
+def detail_admission(id):
+    admission = Admission.query.get(id)
+    if admission is None:
+        abort(404)
+    return ('Detail/Edit not implemented yet.')
+    #form = AdmissionForm(obj=admission)
+    #return render_template('create-admission.html', form=form,)
+
+
+@main.route('/admissions/<int:id>/delete', methods=['GET'])
+def delete_admission(id):
+    admission = Admission.query.get(id)
+    if admission is None:
+        flash('Admissão com esse id não existe.')
+        abort(404)
+    return ('Delete not implemented yet.')
+    #return(redirect(url_for('.index')))
+
+
 @main.route('/admissions/create', methods=['GET', 'POST'])
 def create_admission():
     form = AdmissionForm(
@@ -54,6 +82,7 @@ def create_admission():
                 age_unit=form.patient.data['age_unit'],
                 gender=form.patient.data['gender'],
             )
+
             patient_residence = Address(
                 patient=patient,
                 country_id = form.patient.data['country_id']

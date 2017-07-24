@@ -22,7 +22,8 @@
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-          <li><a href="{{ url_for('main.create_admission') }}">Adicionar Admissão</a></li>
+          <li><a href="{{ url_for('main.create_admission') }}">Adicionar</a></li>
+          <li><a href="{{ url_for('main.list_admissions') }}">Listagem</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           {% if current_user.is_authenticated %}
