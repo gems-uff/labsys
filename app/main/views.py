@@ -93,7 +93,9 @@ def create_admission():
                     if form.patient.data['city_id'] is not -1 else None,
                 neighborhood=form.patient.data['neighborhood'],
                 zone=form.patient.data['zone'],
+                details=form.patient.data['residence_details']
             )
+
             admission = Admission(
                 id_lvrs_intern=form.id_lvrs_intern.data,
                 first_symptoms_date=form.first_symptoms_date.data,

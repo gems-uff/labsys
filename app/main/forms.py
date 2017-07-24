@@ -42,6 +42,7 @@ class PatientForm(FlaskForm):
         default=9,
         coerce=int,
     )
+    residence_details = StringField('Detalhes da residência')
 
 
 YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
