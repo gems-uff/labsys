@@ -41,10 +41,10 @@ def list_admissions():
     return render_template('list-admissions.html', admissions=admissions)
 
 
-@main.route('/admissions/<int:id>/detail', methods=['GET'])
-@main.route('/admissions/<int:id>/edit', methods=['GET'])
-@main.route('/admissions/<int:id>', methods=['GET'])
-def detail_admission(id):
+@main.route('/admissions/<int:id>/detail', methods=['GET', 'POST'])
+@main.route('/admissions/<int:id>/edit', methods=['GET', 'POST'])
+@main.route('/admissions/<int:id>', methods=['GET', 'POST'])
+def edit_admission(id):
     admission = Admission.query.get_or_404(id)
 
     symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
@@ -143,10 +143,10 @@ def create_admission():
                 patient=patient,
             )
 
-            if form.vaccine.data['occurred'] is not NONE:
+            if form.vaccine.data['applied'] is not NONE:
                 Vaccine(
-                    applied=bool(form.vaccine.data['occurred']),
-                    last_dose_date=form.vaccine.data['date'],
+                    applied=bool(form.vaccine.data['applied']),
+                    last_dose_date=form.vaccine.data['last_dose_date'],
                     admission=admission,
                 )
 
@@ -164,9 +164,9 @@ def create_admission():
                     admission=admission,
                 )
 
-            if form.clinical_evolution.data['occurred'] is not NONE:
+            if form.clinical_evolution.data['death'] is not NONE:
                 ClinicalEvolution(
-                    death=bool(form.clinical_evolution.data['occurred']),
+                    death=bool(form.clinical_evolution.data['death']),
                     date=form.vaccine.data['date'],
                     admission=admission,
                 )
@@ -194,8 +194,8 @@ def create_admission():
                     admission_date=sample_form.data['admission_date'],
                     collection_date=sample_form.data['collection_date'],
                     semepi=sample_form.data['semepi'],
-                    method_id=sample_form.data['method']
-                        if sample_form.data['method'] is not -1 else None,
+                    method_id=sample_form.data['method_id']
+                        if sample_form.data['method_id'] is not -1 else None,
                     admission=admission,
                 )
                 CdcExam(
