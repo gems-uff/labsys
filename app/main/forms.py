@@ -7,6 +7,7 @@ from wtforms import (
 from wtforms.validators import InputRequired, Optional
 
 import app.custom_fields as cfields
+import app.models as models
 
 
 class NameForm(FlaskForm):
@@ -204,12 +205,11 @@ class AdmissionForm(FlaskForm):
                                     label='Internação UTI')
     clinical_evolution = FormField(ClinicalEvolutionForm,
                                    label='Evolução Clínica')
-    symptoms = FieldList(FormField(ObservedSymptomForm),
-                         label='Sintomas Primários')
+    symptoms = FieldList(FormField(ObservedSymptomForm))
     sec_symptoms = FieldList(FormField(SecondarySymptomForm),
                              label='Sintomas Secundários')
     # TODO: #1 must be dynamic
-    samples = FieldList(FormField(label='Amostra #1', form_class=SampleForm),
+    samples = FieldList(FormField(label='Amostra', form_class=SampleForm),
                         label='Amostras',
                         min_entries=1)
     submit = SubmitField('Criar')

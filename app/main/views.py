@@ -39,16 +39,49 @@ def list_admissions():
     return render_template('list-admissions.html', admissions=admissions)
 
 
-@main.route('/admissions/<int:id>/detail')
+@main.route('/admissions/<int:id>/detail', methods=['GET'])
 @main.route('/admissions/<int:id>/edit', methods=['GET'])
 @main.route('/admissions/<int:id>', methods=['GET'])
 def detail_admission(id):
     admission = Admission.query.get(id)
     if admission is None:
         abort(404)
-    return ('Detail/Edit not implemented yet.')
-    #form = AdmissionForm(obj=admission)
-    #return render_template('create-admission.html', form=form,)
+
+    symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
+                for s in Symptom.get_primary_symptoms()]
+    sec_symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
+                    for s in Symptom.get_secondary_symptoms()]
+
+    for obs_symptom in admission.symptoms:
+        for symptom in symptoms:
+            if symptom['symptom_id'] == obs_symptom.symptom.id:
+                symptom['observed'] = obs_symptom.observed
+                symptom['details'] = obs_symptom.details
+        for sec_symptom in sec_symptoms:
+            if sec_symptom['symptom_id'] == obs_symptom.symptom.id:
+                sec_symptom['observed'] = obs_symptom.observed
+                sec_symptom['details'] = obs_symptom.details
+
+
+    form = AdmissionForm(
+        id_lvrs_intern=admission.id_lvrs_intern,
+        first_symptoms_date=admission.first_symptoms_date,
+        semepi_symptom=admission.semepi_symptom,
+        state_id=admission.state_id,
+        city_id=admission.city_id,
+        health_unit=admission.health_unit,
+        requesting_institution=admission.requesting_institution,
+        details=admission.details,
+        patient=admission.patient,
+        vaccine=admission.vaccine,
+        hospitalization=admission.hospitalization,
+        uti_hospitalization=admission.uti_hospitalization,
+        clinical_evolution=admission.clinical_evolution,
+        symptoms=symptoms,
+        sec_symptoms=sec_symptoms,
+    )
+
+    return render_template('create-admission.html', form=form,)
 
 
 @main.route('/admissions/<int:id>/delete', methods=['GET'])

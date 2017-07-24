@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import asc
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
@@ -180,11 +181,13 @@ class Symptom(db.Model):
 
     @classmethod
     def get_primary_symptoms(cls):
-        return cls.query.filter(cls.primary==True).all()
+        return cls.query.filter(
+            cls.primary==True).order_by(asc(Symptom.id)).all()
 
     @classmethod
     def get_secondary_symptoms(cls):
-        return cls.query.filter(cls.primary==False).all()
+        return cls.query.filter(
+            cls.primary==False).order_by(asc(Symptom.id)).all()
 
     def __repr__(self):
         return '<Symptom[{}]: {}>'.format(self.id, self.name)
