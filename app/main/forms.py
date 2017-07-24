@@ -55,58 +55,78 @@ class PatientForm(FlaskForm):
 
 
 YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
-class DatedEventForm(FlaskForm):
+
+
+class VaccineForm(FlaskForm):
 
     class Meta:
         csrf = False
 
-    def __init__(self, **kwargs):
-        super(DatedEventForm, self).__init__(**kwargs)
-        self.occurred.label.text = kwargs.pop('occurred_label', 'Ocorreu')
-        self.date.label.text = kwargs.pop('date_label', 'Data')
-
-    occurred = RadioField(
-        label='Ocorreu',
+    applied = RadioField(
+        label='Aplicação',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
         coerce=int,
     )
-    date = DateField(
-        label='Data',
+    last_dose_date = DateField(
+        label='Data da última dose',
         format='%d/%m/%Y',
         validators=[Optional()]
     )
 
 
-class VaccineForm(DatedEventForm):
-    def __init__(self, **kwargs):
-        super(VaccineForm, self).__init__(
-            occurred_label='Aplicada',
-            date_label='Data da última dose',
-            prefix='vaccine',
-        )
+class HospitalizationForm(FlaskForm):
+
+    class Meta:
+        csrf = False
+
+    occurred = RadioField(
+        label='Ocorreu internação?',
+        choices=YES_NO_IGNORED_CHOICES,
+        default=9,
+        coerce=int,
+    )
+    date = DateField(
+        label='Data de internação (entrada)',
+        format='%d/%m/%Y',
+        validators=[Optional()]
+    )
 
 
-class HospitalizationForm(DatedEventForm):
-    def __init__(self, **kwargs):
-        super(HospitalizationForm, self).__init__(
-            prefix='hospitalization',
-        )
+class UTIHospitalizationForm(FlaskForm):
+
+    class Meta:
+        csrf = False
+
+    occurred = RadioField(
+        label='Foi internado em UTI?',
+        choices=YES_NO_IGNORED_CHOICES,
+        default=9,
+        coerce=int,
+    )
+    date = DateField(
+        label='Data de internação (entrada)',
+        format='%d/%m/%Y',
+        validators=[Optional()]
+    )
 
 
-class UTIHospitalizationForm(DatedEventForm):
-    def __init__(self, **kwargs):
-        super(UTIHospitalizationForm, self).__init__(
-            prefix='uti_hospitalization',
-        )
+class ClinicalEvolutionForm(FlaskForm):
 
+    class Meta:
+        csrf = False
 
-class ClinicalEvolutionForm(DatedEventForm):
-    def __init__(self, **kwargs):
-        super(ClinicalEvolutionForm, self).__init__(
-            occurred_label='Evoluiu para óbito',
-            prefix='clinical_evolution',
-        )
+    death = RadioField(
+        label='Evoluiu para óbito?',
+        choices=YES_NO_IGNORED_CHOICES,
+        default=9,
+        coerce=int,
+    )
+    date = DateField(
+        label='Data do óbito',
+        format='%d/%m/%Y',
+        validators=[Optional()]
+    )
 
 
 class ObservedSymptomForm(FlaskForm):
@@ -180,7 +200,7 @@ class SampleForm(FlaskForm):
         format='%d/%m/%Y',
         validators=[InputRequired()]
     )
-    method = cfields.MethodSelectField()
+    method_id = cfields.MethodSelectField()
     cdc_exam = FormField(label='Resultado Exame CDC', form_class=CdcForm)
 
 

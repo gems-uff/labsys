@@ -21,7 +21,9 @@
     {% for admission in admissions %}
       <tr>
         <td>{{ admission.id_lvrs_intern }}</td>
-        <td>{{ admission.samples[0].collection_date.strftime('%d/%m/%Y') }}</td>
+        {% if admission.samples %}
+          <td>{{ admission.samples[0].collection_date.strftime('%d/%m/%Y') }}</td>
+        {% endif %}
         <td><a href="{{ url_for('main.detail_admission', id=admission.id) }}">Editar</a></td>
         <td><a href="{{ url_for('main.delete_admission', id=admission.id) }}">Deletar</a></td>
       </tr>

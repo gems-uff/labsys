@@ -47,8 +47,13 @@
 {% macro render_dated_event(form) -%}
   <fieldset>
     <legend>{{ form.label.text }}</legend>
-    {{ render_radio_inline_field(form.occurred) }}
-    {{ wtf.form_field(form.date, placeholder="dd/MM/yyyy") }}
+    {% for subfield in form %}
+      {% if subfield.type == "RadioField" %}
+        {{ render_radio_inline_field(subfield) }}
+      {% else %}
+        {{ wtf.form_field(subfield, placeholder="dd/MM/yyyy") }}
+      {% endif %}
+    {% endfor %}
   </fieldset>
 {%- endmacro %}
 
@@ -100,7 +105,7 @@
         {{ wtf.form_field(sample_form.collection_date, placeholder="dd/MM/yyyy") }}
         {{ wtf.form_field(sample_form.semepi) }}
         {{ wtf.form_field(sample_form.admission_date, placeholder="dd/MM/yyyy") }}
-        {{ wtf.form_field(sample_form.method) }}
+        {{ wtf.form_field(sample_form.method_id) }}
         <fieldset>
           <legend>{{ sample_form.cdc_exam.label.text }}</legend>
           {{ wtf.form_field(sample_form.cdc_exam.flu_type) }}

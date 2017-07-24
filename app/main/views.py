@@ -1,3 +1,5 @@
+import datetime
+
 from flask import (
     render_template, session, redirect, url_for, current_app, flash, request,
     abort,
@@ -14,7 +16,7 @@ from ..models import (
     Sample, Method, CdcExam,
 )
 from . import main
-from .forms import NameForm, AdmissionForm
+from .forms import NameForm, AdmissionForm, VaccineForm
 
 
 NONE = 9
@@ -43,9 +45,7 @@ def list_admissions():
 @main.route('/admissions/<int:id>/edit', methods=['GET'])
 @main.route('/admissions/<int:id>', methods=['GET'])
 def detail_admission(id):
-    admission = Admission.query.get(id)
-    if admission is None:
-        abort(404)
+    admission = Admission.query.get_or_404(id)
 
     symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
                 for s in Symptom.get_primary_symptoms()]
@@ -79,6 +79,7 @@ def detail_admission(id):
         clinical_evolution=admission.clinical_evolution,
         symptoms=symptoms,
         sec_symptoms=sec_symptoms,
+        samples=admission.samples,
     )
 
     return render_template('create-admission.html', form=form,)
@@ -91,7 +92,6 @@ def delete_admission(id):
         flash('Admissão com esse id não existe.')
         abort(404)
     return ('Delete not implemented yet.')
-    #return(redirect(url_for('.index')))
 
 
 @main.route('/admissions/create', methods=['GET', 'POST'])

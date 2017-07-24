@@ -226,7 +226,7 @@ class Sample(db.Model):
     _ordering = db.Column(db.Integer)
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
-    cdc_exams = db.relationship('CdcExam', backref='sample', lazy='dynamic')
+    cdc_exam = db.relationship('CdcExam', backref='sample', uselist=False)
 
     @hybrid_property
     def admission(self):
