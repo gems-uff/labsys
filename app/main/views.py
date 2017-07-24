@@ -14,7 +14,7 @@ from ..models import (
     Sample, Method, CdcExam,
 )
 from . import main
-from .forms import NameForm, AdmissionForm, SymptomForm
+from .forms import NameForm, AdmissionForm
 
 
 NONE = 9
@@ -85,15 +85,15 @@ def create_admission():
 
             patient_residence = Address(
                 patient=patient,
-                country_id = form.patient.data['country_id']
-                    if form.patient.data['country_id'] is not -1 else None,
-                state_id=form.patient.data['state_id']
-                    if form.patient.data['state_id'] is not -1 else None,
-                city_id=form.patient.data['city_id']
-                    if form.patient.data['city_id'] is not -1 else None,
-                neighborhood=form.patient.data['neighborhood'],
-                zone=form.patient.data['zone'],
-                details=form.patient.data['residence_details']
+                country_id = form.patient.residence.data['country_id']
+                    if form.patient.residence.data['country_id'] is not -1 else None,
+                state_id=form.patient.residence.data['state_id']
+                    if form.patient.residence.data['state_id'] is not -1 else None,
+                city_id=form.patient.residence.data['city_id']
+                    if form.patient.residence.data['city_id'] is not -1 else None,
+                neighborhood=form.patient.residence.data['neighborhood'],
+                zone=form.patient.residence.data['zone'],
+                details=form.patient.residence.data['details']
             )
 
             admission = Admission(

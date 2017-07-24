@@ -14,6 +14,25 @@ class NameForm(FlaskForm):
     submit = SubmitField('Enviar')
 
 
+class ResidenceForm(FlaskForm):
+
+    class Meta:
+        csrf = False
+
+    country_id = cfields.CountrySelectField(label='País de residência')
+    state_id = cfields.StateSelectField(label='UF (Estado)')
+    city_id = cfields.CitySelectField(label='Município')
+    neighborhood = StringField('Bairro')
+    zone = RadioField(
+        label='Zona',
+        choices=(
+            (1, 'Urbana'), (2, 'Rural'), (3, 'Periurbana'), (9, 'Ignorado')),
+        default=9,
+        coerce=int,
+    )
+    details = StringField('Detalhes da residência')
+
+
 class PatientForm(FlaskForm):
     name = StringField('Nome do paciente')
     birth_date = DateField('Data de nascimento', format='%d/%m/%Y',
@@ -31,18 +50,7 @@ class PatientForm(FlaskForm):
         default='I',
         coerce=str,
     )
-    country_id = cfields.CountrySelectField(label='País de residência')
-    state_id = cfields.StateSelectField(label='UF (Estado)')
-    city_id = cfields.CitySelectField(label='Município')
-    neighborhood = StringField('Bairro')
-    zone = RadioField(
-        label='Zona',
-        choices=(
-            (1, 'Urbana'), (2, 'Rural'), (3, 'Periurbana'), (9, 'Ignorado')),
-        default=9,
-        coerce=int,
-    )
-    residence_details = StringField('Detalhes da residência')
+    residence = FormField(ResidenceForm, label='Residência')
 
 
 YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
@@ -98,12 +106,6 @@ class ClinicalEvolutionForm(DatedEventForm):
             occurred_label='Evoluiu para óbito',
             prefix='clinical_evolution',
         )
-
-
-class SymptomForm(FlaskForm):
-    name = StringField('Sintoma')
-    primary = BooleanField('Primario?')
-    submit = SubmitField('Criar')
 
 
 class ObservedSymptomForm(FlaskForm):
