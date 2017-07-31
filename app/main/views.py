@@ -196,15 +196,15 @@ def edit_admission(id):
                         db.session.add(os)
 
             index = 0
-            for sample_form in form.samples:
+            for sample_form in form.samples.entries:
                 sample = admission.samples[index]
-                sample.admission_date = sample_form.data['admission_date']
-                sample.collection_date = sample_form.data['collection_date']
-                sample.semepi = sample_form.data['semepi']
-                sample.method_id = sample_form.data['method_id'] \
-                    if sample_form.data['method_id'] is not -1 else None
-                #if sample_form.cdc_exam is not None:
-                    #sample_form.cdc_exam.form.populate_obj(sample.cdc_exam)
+                if sample is not None:
+                    sample.admission_date = sample_form.data['admission_date']
+                    sample.collection_date = sample_form.data['collection_date']
+                    sample.semepi = sample_form.data['semepi']
+                    sample.method_id = sample_form.data['method_id'] if sample_form.data['method_id'] is not -1 else None
+                    sample_form.cdc_exam.form.populate_obj(sample.cdc_exam)
+
                 index += 1
 
             db.session.add(admission)
