@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import (
     StringField, SubmitField, FormField, FormField, RadioField, HiddenField,
     FieldList, BooleanField, Label, DateField, SelectField, IntegerField,
-    FloatField,
+    FloatField, widgets,
 )
 from wtforms.validators import InputRequired, Optional
 
@@ -135,7 +135,7 @@ class ObservedSymptomForm(FlaskForm):
         self.observed.label = Label(
             self.observed.id, kwargs.pop('symptom_name', 'Undefined'))
 
-    symptom_id = HiddenField()
+    symptom_id = IntegerField(widget=widgets.HiddenInput())
     observed = RadioField(
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
@@ -151,7 +151,7 @@ class SecondarySymptomForm(FlaskForm):
         self.observed.label = Label(
             self.observed.id, kwargs.pop('symptom_name', 'Undefined'))
 
-    symptom_id = HiddenField()
+    symptom_id = IntegerField(widget=widgets.HiddenInput())
     observed = BooleanField()
     details = StringField()
 
