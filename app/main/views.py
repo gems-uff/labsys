@@ -30,7 +30,6 @@ def index():
 
 
 @main.route('/admissions', methods=['GET'])
-@login_required
 def list_admissions():
     admissions = Admission.query.all()
     return render_template('list-admissions.html', admissions=admissions)
@@ -48,7 +47,6 @@ def symptom_in_admission_symptoms(symptom_id, admission):
 @main.route('/admissions/<int:id>/detail', methods=['GET', 'POST'])
 @main.route('/admissions/<int:id>/edit', methods=['GET', 'POST'])
 @main.route('/admissions/<int:id>', methods=['GET', 'POST'])
-@login_required
 def edit_admission(id):
     admission = Admission.query.get_or_404(id)
 
@@ -211,7 +209,6 @@ def edit_admission(id):
 
 
 @main.route('/admissions/<int:id>/delete', methods=['GET'])
-@login_required
 def delete_admission(id):
     admission = Admission.query.get(id)
     if admission is None:
@@ -221,7 +218,6 @@ def delete_admission(id):
 
 
 @main.route('/admissions/create', methods=['GET', 'POST'])
-@login_required
 def create_admission():
     form = AdmissionForm(
         symptoms=[{'symptom_id': s.id, 'symptom_name': s.name}
