@@ -5,6 +5,7 @@ from app import create_app, db
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_admin import Admin
+from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 
 import app.models as models
@@ -13,33 +14,36 @@ from app.models import (
     Patient, CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
     Country, Region, State, City, Address,
 )
+from app.auth.views import ProtectedModelView
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
 migrate = Migrate(app, db)
 admin = Admin(app, name='labsys', template_mode='bootstrap3')
 
+
 # region Add ModelView
 admin.add_views(
-    ModelView(User, db.session),
-    ModelView(Role, db.session),
-    ModelView(Admission, db.session),
-    ModelView(Patient, db.session),
-    ModelView(Address, db.session),
-    ModelView(Sample, db.session),
-    ModelView(CdcExam, db.session),
-    ModelView(Vaccine, db.session),
-    ModelView(Hospitalization, db.session),
-    ModelView(UTIHospitalization, db.session),
-    ModelView(ClinicalEvolution, db.session),
-    ModelView(ObservedSymptom, db.session),
-    ModelView(Method, db.session),
-    ModelView(Symptom, db.session),
-    ModelView(Country, db.session),
-    ModelView(Region, db.session),
-    ModelView(State, db.session),
-    ModelView(City, db.session),
+    ProtectedModelView(User, db.session),
+    ProtectedModelView(Role, db.session),
+    ProtectedModelView(Admission, db.session),
+    ProtectedModelView(Patient, db.session),
+    ProtectedModelView(Address, db.session),
+    ProtectedModelView(Sample, db.session),
+    ProtectedModelView(CdcExam, db.session),
+    ProtectedModelView(Vaccine, db.session),
+    ProtectedModelView(Hospitalization, db.session),
+    ProtectedModelView(UTIHospitalization, db.session),
+    ProtectedModelView(ClinicalEvolution, db.session),
+    ProtectedModelView(ObservedSymptom, db.session),
+    ProtectedModelView(Method, db.session),
+    ProtectedModelView(Symptom, db.session),
+    ProtectedModelView(Country, db.session),
+    ProtectedModelView(Region, db.session),
+    ProtectedModelView(State, db.session),
+    ProtectedModelView(City, db.session),
 )
+admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion
 
 

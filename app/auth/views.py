@@ -2,6 +2,7 @@ from flask import(
     render_template, redirect, request, url_for, flash, current_app,
 )
 from flask_login import login_user, logout_user, login_required, current_user
+from flask_admin.contrib.sqla import ModelView
 
 from ..models import User
 from .. import db
@@ -31,6 +32,8 @@ def logout():
 
 
 @auth.route('/register', methods=['GET', 'POST'])
+# TODO: temporary
+@login_required
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -83,3 +86,15 @@ def resend_confirmation():
                'auth/email/confirm', user=current_user, token=token)
     flash('Uma nova mensagem de confirmação foi enviada ao seu email.')
     return redirect(url_for('main.index'))
+
+
+class ProtectedModelView(ModelView):
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
