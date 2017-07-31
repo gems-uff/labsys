@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}LVRS - LabSys{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1>
+      Listagem de Admissões
+    </h1>
+</div>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th width="15%">Número Interno</th>
+      <th width="40%">Data de Coleta</th>
+      <th width="5%">Visualizar</th>
+      <th width="5%">Deletar</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for admission in admissions %}
+      <tr>
+        <td>{{ admission.id_lvrs_intern }}</td>
+        {% if admission.samples %}
+          <td>{{ admission.samples[0].collection_date.strftime('%d/%m/%Y') }}</td>
+        {% endif %}
+        <td><a href="{{ url_for('main.edit_admission', id=admission.id) }}">Editar</a></td>
+        <td><a href="{{ url_for('main.delete_admission', id=admission.id) }}">Deletar</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

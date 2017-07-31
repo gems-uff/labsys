@@ -5,6 +5,7 @@ from app import create_app, db
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from flask_admin import Admin
+from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 
 import app.models as models
@@ -13,16 +14,18 @@ from app.models import (
     Patient, CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
     Country, Region, State, City, Address,
 )
+from app.auth.views import ProtectedModelView
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
 migrate = Migrate(app, db)
 admin = Admin(app, name='labsys', template_mode='bootstrap3')
 
+
 # region Add ModelView
 admin.add_views(
-    ModelView(User, db.session),
-    ModelView(Role, db.session),
+    ProtectedModelView(User, db.session),
+    ProtectedModelView(Role, db.session),
     ModelView(Admission, db.session),
     ModelView(Patient, db.session),
     ModelView(Address, db.session),
@@ -40,6 +43,7 @@ admin.add_views(
     ModelView(State, db.session),
     ModelView(City, db.session),
 )
+admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion
 
 

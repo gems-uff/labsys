@@ -1,5 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import asc
 from flask_login import UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import asc
@@ -182,11 +183,13 @@ class Symptom(db.Model):
 
     @classmethod
     def get_primary_symptoms(cls):
-        return cls.query.filter(cls.primary==True).order_by(asc(cls.id))
+        return cls.query.filter(
+            cls.primary==True).order_by(asc(Symptom.id)).all()
 
     @classmethod
     def get_secondary_symptoms(cls):
-        return cls.query.filter(cls.primary==False).order_by(asc(cls.id))
+        return cls.query.filter(
+            cls.primary==False).order_by(asc(Symptom.id)).all()
 
     def __repr__(self):
         return '<Symptom[{}]: {}>'.format(self.id, self.name)
@@ -225,7 +228,7 @@ class Sample(db.Model):
     _ordering = db.Column(db.Integer)
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
-    cdc_exams = db.relationship('CdcExam', backref='sample', lazy='dynamic')
+    cdc_exam = db.relationship('CdcExam', backref='sample', uselist=False)
 
     @hybrid_property
     def admission(self):

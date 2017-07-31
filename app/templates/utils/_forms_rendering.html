@@ -47,8 +47,13 @@
 {% macro render_dated_event(form) -%}
   <fieldset>
     <legend>{{ form.label.text }}</legend>
-    {{ render_radio_inline_field(form.occurred) }}
-    {{ wtf.form_field(form.date, placeholder="dd/MM/yyyy") }}
+    {% for subfield in form %}
+      {% if subfield.type == "RadioField" %}
+        {{ render_radio_inline_field(subfield) }}
+      {% else %}
+        {{ wtf.form_field(subfield, placeholder="dd/MM/yyyy") }}
+      {% endif %}
+    {% endfor %}
   </fieldset>
 {%- endmacro %}
 
@@ -96,18 +101,19 @@
   <fieldset>
     <legend>{{ form.label.text }}</legend>
     {% for sample_form in form.entries %}
-        {{ sample_form.label }}
-        {{ wtf.form_field(sample_form.collection_date, placeholder="dd/MM/yyyy") }}
-        {{ wtf.form_field(sample_form.semepi) }}
-        {{ wtf.form_field(sample_form.admission_date, placeholder="dd/MM/yyyy") }}
-        {{ wtf.form_field(sample_form.method) }}
-        <fieldset>
-          <legend>{{ sample_form.cdc_exam.label.text }}</legend>
-          {{ wtf.form_field(sample_form.cdc_exam.flu_type) }}
-          {{ wtf.form_field(sample_form.cdc_exam.flu_subtype) }}
-          {{ wtf.form_field(sample_form.cdc_exam.dominant_ct) }}
-          {{ wtf.form_field(sample_form.cdc_exam.details) }}
-        </fieldset>
+      <h4 class="text-muted">{{ sample_form.label }} #{{ loop.index }}</h4>
+      {{ wtf.form_field(sample_form.collection_date, placeholder="dd/MM/yyyy") }}
+      {{ wtf.form_field(sample_form.semepi) }}
+      {{ wtf.form_field(sample_form.admission_date, placeholder="dd/MM/yyyy") }}
+      {{ wtf.form_field(sample_form.method_id) }}
+      <fieldset>
+        <legend class="text-muted">{{ sample_form.cdc_exam.label.text }}</legend>
+        {{ wtf.form_field(sample_form.cdc_exam.flu_type) }}
+        {{ wtf.form_field(sample_form.cdc_exam.flu_subtype) }}
+        {{ wtf.form_field(sample_form.cdc_exam.dominant_ct) }}
+        {{ wtf.form_field(sample_form.cdc_exam.details) }}
+      </fieldset>
+      <hr />
     {% endfor %}
   </fieldset>
 {%- endmacro %}

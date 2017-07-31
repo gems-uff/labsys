@@ -47,3 +47,16 @@ class TestCreateAdmissionView(unittest.TestCase):
                          datetime.date(2012, 12, 12))
         self.assertEqual(admission.samples.first().admission_date,
                          datetime.date(2012, 12, 13))
+
+    def test_admissions_listing(self):
+        id_lvrs_intern = '0001/2017'
+        collection_date = datetime.date(2017, 12, 22)
+        a = Admission(id_lvrs_intern=id_lvrs_intern)
+        s1 = Sample(collection_date=collection_date, admission=a)
+        db.session.add(a)
+        db.session.commit()
+        response = self.client.get(url_for('main.list_admissions'))
+        data = response.get_data(as_text=True)
+        self.assertTrue(response.status_code == 200)
+        self.assertIn('0001/2017', data)
+        self.assertIn('22/12/2017', data)
