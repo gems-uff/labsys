@@ -12,7 +12,7 @@ from ..models import (
     Transaction, Reactive
 )
 from . import inventory
-from .forms import AddTransactionForm
+from .forms import AddTransactionForm, SubTransactionForm
 
 
 @inventory.route('/', methods=['GET'])
@@ -30,9 +30,9 @@ def list_transactions():
     return render_template('inventory/list-transactions.html')
 
 
-@inventory.route('/transactions/add-reactive', methods=['GET', 'POST'])
-def add_reactive():
-    form = AddTransactionForm()
+@inventory.route('/transactions/<string:method>', methods=['GET', 'POST'])
+def create_transaction(method):
+    form = AddTransactionForm() if method == 'add' else SubTransactionForm()
     form.reactive_id.choices = [
         (r.id, r.name) for r in Reactive.get_reactives()]
     if form.validate_on_submit():
@@ -44,13 +44,8 @@ def add_reactive():
         )
         db.session.add(transaction)
         db.session.commit()
-        flash('Reativo adicionado com sucesso.')
-        return redirect(url_for('.add_reactive'))
+        flash('Transação cadastrada com sucesso.')
+        return redirect(url_for('.create_transaction', method=method))
 
     return render_template(
-        'inventory/add-reactive.html', form=form)
-
-
-@inventory.route('/transactions/subtract-reactive')
-def subtract_reactive():
-    return 'Not implemented yet'
+        'inventory/create-transaction.html', form=form, method=method)

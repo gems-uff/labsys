@@ -401,6 +401,12 @@ class Reactive(db.Model):
     def get_reactives(cls):
         return cls.query.order_by(asc(Reactive.id)).all()
 
+    def __repr__(self):
+        return '<Reactive[{}]>'.format(self.name)
+
+    def __str__(self):
+        return '<Reactive[{}]>'.format(self.name)
+
 
 class Transaction(db.Model):
     __tablename__ = 'transactions'
