@@ -8,13 +8,14 @@ from flask_login import login_required
 
 from .. import db
 from ..models import (
-    User,
+    User, Permission,
     Admission,
     Patient, Address,
     Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
     Symptom, ObservedSymptom,
     Sample, Method, CdcExam,
 )
+from app.decorators import admin_required, permission_required
 from . import main
 from .forms import NameForm, AdmissionForm, VaccineForm
 
@@ -29,24 +30,71 @@ def index():
     return render_template('index.html')
 
 
+
 @main.route('/admissions', methods=['GET'])
+@login_required
+@permission_required(Permission.VIEW)
 def list_admissions():
     admissions = Admission.query.all()
     return render_template('list-admissions.html', admissions=admissions)
 
+
 def symptom_in_admission_symptoms(symptom_id, admission):
     found = None
-
     for obs_symptom in admission.symptoms.all():
         print(obs_symptom.symptom_id)
         if obs_symptom.symptom_id == symptom_id:
             return obs_symptom
-
     return found
 
 @main.route('/admissions/<int:id>/detail', methods=['GET', 'POST'])
-@main.route('/admissions/<int:id>/edit', methods=['GET', 'POST'])
 @main.route('/admissions/<int:id>', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.VIEW)
+def detail_admission(id):
+    admission = Admission.query.get_or_404(id)
+
+    symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
+                for s in Symptom.get_primary_symptoms()]
+    sec_symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
+                    for s in Symptom.get_secondary_symptoms()]
+
+    for obs_symptom in admission.symptoms:
+        for symptom in symptoms:
+            if symptom['symptom_id'] == obs_symptom.symptom.id:
+                symptom['observed'] = obs_symptom.observed
+                symptom['details'] = obs_symptom.details
+        for sec_symptom in sec_symptoms:
+            if sec_symptom['symptom_id'] == obs_symptom.symptom.id:
+                sec_symptom['observed'] = obs_symptom.observed
+                sec_symptom['details'] = obs_symptom.details
+
+    form = AdmissionForm(
+        id_lvrs_intern=admission.id_lvrs_intern,
+        first_symptoms_date=admission.first_symptoms_date,
+        semepi_symptom=admission.semepi_symptom,
+        state_id=admission.state_id,
+        city_id=admission.city_id,
+        health_unit=admission.health_unit,
+        requesting_institution=admission.requesting_institution,
+        details=admission.details,
+        patient=admission.patient,
+        vaccine=admission.vaccine,
+        hospitalization=admission.hospitalization,
+        uti_hospitalization=admission.uti_hospitalization,
+        clinical_evolution=admission.clinical_evolution,
+        symptoms=symptoms,#admission.symptoms.query.filter_by(primary=True),
+        sec_symptoms=sec_symptoms,#admission.symptoms.query.filter_by(primary=False),
+        samples=admission.samples,
+    )
+    # TODO: if has permission to edit, link to edit view
+
+    return render_template('create-admission.html', form=form, edit=False)
+
+
+@main.route('/admissions/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
 def edit_admission(id):
     admission = Admission.query.get_or_404(id)
 
@@ -209,6 +257,8 @@ def edit_admission(id):
 
 
 @main.route('/admissions/<int:id>/delete', methods=['GET'])
+@login_required
+@permission_required(Permission.DELETE)
 def delete_admission(id):
     admission = Admission.query.get(id)
     if admission is None:
@@ -218,6 +268,8 @@ def delete_admission(id):
 
 
 @main.route('/admissions/create', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.CREATE)
 def create_admission():
     form = AdmissionForm(
         symptoms=[{'symptom_id': s.id, 'symptom_name': s.name}
