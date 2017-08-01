@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}LVRS - Gerenciamento de Reativos{% endblock %}
+
+{% block page_content %}
+  <ul>
+    <li><a href="{{ url_for('inventory.add_reactive') }}">Registrar recebimento de reativo</a></li>
+    <li><a href="{{ url_for('inventory.subtract_reactive') }}">Registrar consumo de reativo</a></li>
+  </ul>
+{% endblock %}

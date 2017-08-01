@@ -58,8 +58,10 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     confirmed = db.Column(db.Boolean, default=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    transactions = db.relationship(
+        'Transaction', backref='user', lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -385,3 +387,30 @@ class City(db.Model):
         return '{}/{}'.format(
             self.name,
             self.state.uf_code if self.state is not None else 'None')
+
+
+class Reactive(db.Model):
+    __tablename__ = 'reactives'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128))
+    amount = db.Column(db.Integer)
+    transactions = db.relationship(
+        'Transaction', backref='reactive', lazy='dynamic')
+
+    @classmethod
+    def get_reactives(cls):
+        return cls.query.order_by(asc(Reactive.id)).all()
+
+
+class Transaction(db.Model):
+    __tablename__ = 'transactions'
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_date = db.Column(db.Date)
+    amount = db.Column(db.Integer)
+    reactive_id = db.Column(db.Integer, db.ForeignKey('reactives.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __init__(self, **kwargs):
+        super(Transaction, self).__init__(**kwargs)
+        reactive = Reactive.query.get(self.reactive_id)
+        reactive.amount += self.amount

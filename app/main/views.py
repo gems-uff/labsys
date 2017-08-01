@@ -83,8 +83,8 @@ def detail_admission(id):
         hospitalization=admission.hospitalization,
         uti_hospitalization=admission.uti_hospitalization,
         clinical_evolution=admission.clinical_evolution,
-        symptoms=symptoms,#admission.symptoms.query.filter_by(primary=True),
-        sec_symptoms=sec_symptoms,#admission.symptoms.query.filter_by(primary=False),
+        symptoms=symptoms,
+        sec_symptoms=sec_symptoms,
         samples=admission.samples,
     )
     # TODO: if has permission to edit, link to edit view
