@@ -20,9 +20,9 @@ def index():
     return render_template('inventory/index.html')
 
 
-@inventory.route('/reactives', methods=['GET'])
-def list_reactives():
-    return render_template('inventory/list-reactives.html')
+@inventory.route('/products', methods=['GET'])
+def list_products():
+    return render_template('inventory/list-products.html')
 
 
 @inventory.route('/transactions', methods=['GET'])
@@ -33,15 +33,13 @@ def list_transactions():
 @inventory.route('/transactions/<string:method>', methods=['GET', 'POST'])
 def create_transaction(method):
     form = AddTransactionForm() if method == 'add' else SubTransactionForm()
-    form.reactive_id.choices = [
-        (r.id, r.name) for r in Reactive.get_reactives()]
+    form.product_id.choices = [
+        (p.id, p.name) for p in Product.get_products()]
     if form.validate_on_submit():
         transaction = Transaction(
             transaction_date=form.transaction_date.data,
             amount=form.amount.data,
-            reactive_id=form.reactive_id.data,
-            catalog_number=form.catalog_number.data,
-            manufacturer=form.manufacturer.data,
+            product_id=form.product_id.data,
             invoice=form.invoice.data,
             details=form.details.data,
             user=current_user

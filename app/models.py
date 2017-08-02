@@ -1,12 +1,14 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import asc
+from sqlalchemy import asc, orm
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
 
 from . import db
 from . import login_manager
+
+
 
 
 @login_manager.user_loader
@@ -396,30 +398,38 @@ class Product(db.Model):
     name = db.Column(db.String(128))
     manufacturer = db.Column(db.String(128))
     catalog = db.Column(db.String(128))
-    # TODO: think about turning this attribute into a property
-    amount = db.Column(db.Integer)
+    stock_unit = db.Column(db.Integer, default=1)
+    parent_id= db.Column(db.Integer, db.ForeignKey('products.id'))
+    subproduct = db.relationship(
+        'Product', backref='parent', uselist=False, remote_side=[id])
+    amount = db.Column(db.Integer, default=0)
     transactions = db.relationship(
         'Transaction', backref='product', lazy='dynamic')
 
+    @property
+    def is_unitary(self):
+        return self.stock_unit == 1
+
     @classmethod
     def get_products(cls):
-        return cls.query.order_by(asc(Product.id)).all()
+        return cls.query.order_by(asc(cls.id)).all()
 
     @classmethod
     def get_products_by_manufacturer(cls, manufacturer):
-        return cls.query.order_by(asc(Product.id)).filter_by(
-            manufacturer=manufacturer)
+        return cls.query.order_by(asc(cls.id)).filter_by(
+            manufacturer=manufacturer).all()
 
     @classmethod
-    def get_products_by_catalog(cls, catalog):
-        return cls.query.order_by(asc(Product.id)).filter_by(
-            catalog=catalog)
+    def get_product_by_catalog(cls, catalog):
+        return cls.query.order_by(asc(cls.id)).filter_by(
+            catalog=catalog).first()
+
 
     def __repr__(self):
-        return '<Product[{}]>'.format(self.name)
+        return '<Product[{}], cat: {}>'.format(self.id, self.name)
 
     def __str__(self):
-        return '<Product[{}]>'.format(self.name)
+        return '<Product[{}], cat: {}>'.format(self.id, self.name)
 
 
 class Transaction(db.Model):
@@ -428,10 +438,14 @@ class Transaction(db.Model):
     transaction_date = db.Column(db.Date)
     amount = db.Column(db.Integer)
     invoice = db.Column(db.String(64))
+    details = db.Column(db.String(128))
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __init__(self, **kwargs):
         super(Transaction, self).__init__(**kwargs)
         product = Product.query.get(self.product_id)
-        product.amount += self.amount
+        if product.is_unitary:
+            product.amount += self.amount
+        else:
+            product.subproduct.amount += self.amount * product.stock_unit
