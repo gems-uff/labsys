@@ -13,7 +13,7 @@ from app.models import (
     User, Role, Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample,
     Patient, CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
     Country, Region, State, City, Address,
-    Reactive, Transaction
+    Product, Transaction
 )
 from app.auth.views import ProtectedModelView
 
@@ -43,7 +43,7 @@ admin.add_views(
     ModelView(Region, db.session),
     ModelView(State, db.session),
     ModelView(City, db.session),
-    ModelView(Reactive, db.session),
+    ModelView(Product, db.session),
     ModelView(Transaction, db.session),
 )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))

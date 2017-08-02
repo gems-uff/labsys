@@ -7,18 +7,23 @@ from wtforms import (
     FloatField, widgets, ValidationError
 )
 from wtforms.validators import InputRequired, Optional
-from ..models import Reactive
+from ..models import Product
 
 
 class AddTransactionForm(FlaskForm):
-    reactive_id = SelectField('Reativo', coerce=int,
+    catalog = SelectField('Número de Catálogo',
+                                 validators=[InputRequired()])
+    manufacturer = SelectField('fabricante', validators=[Optional()])
+    reactive_id = SelectField('Produto', coerce=int,
                               validators=[InputRequired()])
-    amount = IntegerField('Quantidade recebida',
+    amount = IntegerField('Quantidade Recebida',
                           validators=[InputRequired()])
-    transaction_date = DateField('Data de registro',
+    transaction_date = DateField('Data de Registro',
                                     format='%d/%m/%Y',
                                     default=datetime.datetime.today(),
                                     validators=[InputRequired()])
+    invoice = StringField('Nota Fiscal', validators=[Optional()])
+    details = StringField('Observações', validators=[Optional()])
     submit = SubmitField('Enviar')
 
     def validate_amount(form, field):
@@ -28,14 +33,17 @@ class AddTransactionForm(FlaskForm):
 
 
 class SubTransactionForm(FlaskForm):
-    reactive_id = SelectField('Reativo', coerce=int,
+    catalog = StringField('Número do Catálogo', validators=[InputRequired()])
+    reactive_id = SelectField('Produto', coerce=int,
                               validators=[InputRequired()])
-    amount = IntegerField('Quantidade consumida',
+    amount = IntegerField('Quantidade Consumida',
                           validators=[InputRequired()])
-    transaction_date = DateField('Data de uso',
+    transaction_date = DateField('Data de Uso',
                                     format='%d/%m/%Y',
                                     default=datetime.datetime.today(),
                                     validators=[InputRequired()])
+
+
     submit = SubmitField('Enviar')
 
     def validate_amount(form, field):

@@ -9,7 +9,7 @@ from flask_login import current_user
 from app import inventory
 from .. import db
 from ..models import (
-    Transaction, Reactive
+    Transaction, Product
 )
 from . import inventory
 from .forms import AddTransactionForm, SubTransactionForm
@@ -40,6 +40,10 @@ def create_transaction(method):
             transaction_date=form.transaction_date.data,
             amount=form.amount.data,
             reactive_id=form.reactive_id.data,
+            catalog_number=form.catalog_number.data,
+            manufacturer=form.manufacturer.data,
+            invoice=form.invoice.data,
+            details=form.details.data,
             user=current_user
         )
         db.session.add(transaction)

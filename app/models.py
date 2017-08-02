@@ -389,23 +389,37 @@ class City(db.Model):
             self.state.uf_code if self.state is not None else 'None')
 
 
-class Reactive(db.Model):
-    __tablename__ = 'reactives'
+# TODO: unique keys? (Manufacturer, Catalog)
+class Product(db.Model):
+    __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
+    manufacturer = db.Column(db.String(128))
+    catalog = db.Column(db.String(128))
+    # TODO: think about turning this attribute into a property
     amount = db.Column(db.Integer)
     transactions = db.relationship(
-        'Transaction', backref='reactive', lazy='dynamic')
+        'Transaction', backref='product', lazy='dynamic')
 
     @classmethod
-    def get_reactives(cls):
-        return cls.query.order_by(asc(Reactive.id)).all()
+    def get_products(cls):
+        return cls.query.order_by(asc(Product.id)).all()
+
+    @classmethod
+    def get_products_by_manufacturer(cls, manufacturer):
+        return cls.query.order_by(asc(Product.id)).filter_by(
+            manufacturer=manufacturer)
+
+    @classmethod
+    def get_products_by_catalog(cls, catalog):
+        return cls.query.order_by(asc(Product.id)).filter_by(
+            catalog=catalog)
 
     def __repr__(self):
-        return '<Reactive[{}]>'.format(self.name)
+        return '<Product[{}]>'.format(self.name)
 
     def __str__(self):
-        return '<Reactive[{}]>'.format(self.name)
+        return '<Product[{}]>'.format(self.name)
 
 
 class Transaction(db.Model):
@@ -413,10 +427,11 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     transaction_date = db.Column(db.Date)
     amount = db.Column(db.Integer)
-    reactive_id = db.Column(db.Integer, db.ForeignKey('reactives.id'))
+    invoice = db.Column(db.String(64))
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __init__(self, **kwargs):
         super(Transaction, self).__init__(**kwargs)
-        reactive = Reactive.query.get(self.reactive_id)
-        reactive.amount += self.amount
+        product = Product.query.get(self.product_id)
+        product.amount += self.amount
