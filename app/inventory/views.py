@@ -30,9 +30,14 @@ def list_transactions():
     return render_template('inventory/list-transactions.html')
 
 
-@inventory.route('/transactions/<string:method>', methods=['GET', 'POST'])
-def create_transaction(method):
-    form = AddTransactionForm() if method == 'add' else SubTransactionForm()
+@inventory.route('/products/add', methods=['GET', 'POST'])
+def create_product():
+    return 'Not implemented yet'
+
+
+@inventory.route('/transactions/add', methods=['GET', 'POST'])
+def create_add_transaction():
+    form = AddTransactionForm()
     form.product_id.choices = [
         (p.id, p.name) for p in Product.get_products()]
     if form.validate_on_submit():
@@ -47,7 +52,28 @@ def create_transaction(method):
         db.session.add(transaction)
         db.session.commit()
         flash('Transação cadastrada com sucesso.')
-        return redirect(url_for('.create_transaction', method=method))
+        return redirect(url_for('.create_add_transaction', method='add'))
 
     return render_template(
-        'inventory/create-transaction.html', form=form, method=method)
+        'inventory/create-transaction.html', form=form, method='add')
+
+@inventory.route('/transactions/sub', methods=['GET', 'POST'])
+def create_sub_transaction():
+    form = SubTransactionForm()
+    form.product_id.choices = [
+        (p.id, p.name) for p in Product.get_products(unitary_only=True)]
+    if form.validate_on_submit():
+        transaction = Transaction(
+            transaction_date=form.transaction_date.data,
+            amount=form.amount.data,
+            product_id=form.product_id.data,
+            details=form.details.data,
+            user=current_user
+        )
+        db.session.add(transaction)
+        db.session.commit()
+        flash('Transação cadastrada com sucesso.')
+        return redirect(url_for('.create_sub_transaction', method='sub'))
+
+    return render_template(
+        'inventory/create-transaction.html', form=form, method='sub')

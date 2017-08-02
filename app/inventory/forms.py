@@ -27,11 +27,10 @@ class AddTransactionForm(FlaskForm):
     def validate_amount(form, field):
         if field.data < 1:
             raise ValidationError(
-                'Quantidade de produtos deve ser maior ou igual a 1')
+                'Quantidade Recebida deve ser maior ou igual a 1')
 
 
 class SubTransactionForm(FlaskForm):
-    catalog = StringField('Número do Catálogo', validators=[InputRequired()])
     product_id = SelectField('Produto', coerce=int,
                               validators=[InputRequired()])
     amount = IntegerField('Quantidade Consumida',
@@ -40,16 +39,17 @@ class SubTransactionForm(FlaskForm):
                                     format='%d/%m/%Y',
                                     default=datetime.datetime.today(),
                                     validators=[InputRequired()])
+    details = StringField('Observações', validators=[Optional()])
     submit = SubmitField('Enviar')
 
     def validate_amount(form, field):
         product = Product.query.get(form.product_id.data)
         if field.data < 1:
             raise ValidationError(
-                'Quantidade de produtos deve ser maior ou igual a 1')
+                'Quantidade Consumida deve ser maior ou igual a 1')
         elif (product.amount - field.data) < 0:
             raise ValidationError('Não há essa quantidade do produto'
-                                  'selecionado em estoque. O total é: {}'
+                                  '  selecionado em estoque. O total é: {}'
                                   .format(product.amount))
         else:
             field.data = -field.data

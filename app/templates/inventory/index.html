@@ -4,7 +4,8 @@
 
 {% block page_content %}
   <div>
-    <p><a href="{{ url_for('inventory.create_transaction', method='add') }}" class="btn btn-success">Registrar recebimento de reativo</a></p>
-    <p><a href="{{ url_for('inventory.create_transaction', method='subtract') }}" class="btn btn-danger">Registrar consumo de reativo</a></p>
+    <p><a href="{{ url_for('inventory.create_add_transaction') }}" class="btn btn-success">Registrar Recebimento de Reativo</a></p>
+    <p><a href="{{ url_for('inventory.create_sub_transaction') }}" class="btn btn-danger">Registrar Consumo de Reativo</a></p>
+    <p><a href="{{ url_for('inventory.create_product') }}" class="btn btn-warning">Cadastrar Novo Reativo no Catálogo</a></p>
   </div>
 {% endblock %}

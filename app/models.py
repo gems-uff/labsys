@@ -411,19 +411,27 @@ class Product(db.Model):
         return self.stock_unit == 1
 
     @classmethod
-    def get_products(cls):
-        return cls.query.order_by(asc(cls.id)).all()
+    def get_products(cls, unitary_only=False):
+        products = cls.query.order_by(asc(cls.id)).all()
+        if unitary_only:
+            return [p for p in products if p.is_unitary]
+        return products
 
     @classmethod
-    def get_products_by_manufacturer(cls, manufacturer):
-        return cls.query.order_by(asc(cls.id)).filter_by(
+    def get_products_by_manufacturer(cls, manufacturer, unitary_only=False):
+        products = cls.query.order_by(asc(cls.id)).filter_by(
             manufacturer=manufacturer).all()
+        if unitary_only:
+            return [p for p in products if p.is_unitary]
+        return products
 
     @classmethod
-    def get_product_by_catalog(cls, catalog):
-        return cls.query.order_by(asc(cls.id)).filter_by(
+    def get_product_by_catalog(cls, catalog, unitary_only=False):
+        products = cls.query.order_by(asc(cls.id)).filter_by(
             catalog=catalog).first()
-
+        if unitary_only:
+            return [p for p in products if p.is_unitary]
+        return products
 
     def __repr__(self):
         return '<Product[{}], cat: {}>'.format(self.id, self.name)
