@@ -6,7 +6,7 @@ from wtforms import (StringField, SubmitField, FormField, FormField,
                      DateField, SelectField, IntegerField, FloatField, widgets,
                      ValidationError)
 from wtforms.validators import InputRequired, Optional
-from ..models import Product, Transaction
+from ..models import Product, StockProduct, Transaction
 
 
 class AddTransactionForm(FlaskForm):
@@ -31,9 +31,8 @@ class AddTransactionForm(FlaskForm):
 
 
 class SubTransactionForm(FlaskForm):
-    product_id = SelectField(
+    stock_product_id = SelectField(
         'Produto', coerce=int, validators=[InputRequired()])
-    allotment = StringField('Lote', validators=[InputRequired()])
     amount = IntegerField('Quantidade Consumida', validators=[InputRequired()])
     transaction_date = DateField(
         'Data de Uso',
@@ -44,13 +43,13 @@ class SubTransactionForm(FlaskForm):
     submit = SubmitField('Enviar')
 
     def validate_amount(form, field):
-        product = (form.product_id.data, form.allotment.data)
+        stock_product = StockProduct.query.get(form.stock_product_id.data)
         if field.data < 1:
             raise ValidationError(
                 'Quantidade Consumida deve ser maior ou igual a 1')
-        elif (Transaction.get_product_amount(product) < field.data):
+        elif (stock_product.amount < field.data):
             raise ValidationError(
                 'Não há essa quantidade do produto em estoque. O total é: {}'
-                .format(product[0]))
+                .format(stock_product.amount))
         else:
             field.data = -field.data

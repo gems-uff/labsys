@@ -462,33 +462,6 @@ class Transaction(db.Model):
         allotment = product[1]
         return cls.query.filter_by(product_id=id, allotment=allotment).count()
 
-    def __init__(self, product_allotment, **kwargs):
-        super(Transaction, self).__init__(**kwargs)
-        product = Product.query.get(self.product_id)
-
-        if not product.is_unitary:
-            product_id = product.subproduct.id
-
-        self.stock_product = StockProduct.query.filter_by(
-            product_id=product_id, allotment=product_allotment).first()
-
-        if self.stock_product is None:
-            if product.is_unitary:
-                self.stock_product = StockProduct(
-                    product_id=product.id,
-                    allotment=product_allotment,
-                    amount=self.amount, )
-            else:
-                self.stock_product = StockProduct(
-                    product_id=product.subproduct.id,
-                    allotment=product_allotment,
-                    amount=self.amount * product.stock_unit, )
-        else:
-            if product.is_unitary:
-                self.stock_product.amount += self.amount
-            else:
-                self.stock_product.amount += (self.amount * product.stock_unit)
-
     def __repr__(self):
         return '{} : {}'.format(self.transaction_date, self.product.name[:10])
 
@@ -503,6 +476,10 @@ class StockProduct(db.Model):
     amount = db.Column(db.Integer)
     transactions = db.relationship(
         'Transaction', backref='stock_product', lazy='dynamic')
+
+    @classmethod
+    def get_products_in_stock(cls):
+        return cls.query.filter(cls.amount > 0).all()
 
     def __repr__(self):
         return '<StockProduct[{}]: {}, lote {}>'.format(
