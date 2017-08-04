@@ -464,19 +464,30 @@ class Transaction(db.Model):
 
     def __init__(self, product_allotment, **kwargs):
         super(Transaction, self).__init__(**kwargs)
-        stock_product = StockProduct.query.filter_by(
-            product_id=self.product_id, allotment=product_allotment).first()
-        if stock_product is None:
-            stock_product = StockProduct(
-                product_id=self.product_id,
-                allotment=product_allotment,
-                amount=self.amount)
-            db.session.add(stock_product)
-            self.stock_product_id = stock_product.id
+        product = Product.query.get(self.product_id)
+
+        if not product.is_unitary:
+            product_id = product.subproduct.id
+
+        self.stock_product = StockProduct.query.filter_by(
+            product_id=product_id, allotment=product_allotment).first()
+
+        if self.stock_product is None:
+            if product.is_unitary:
+                self.stock_product = StockProduct(
+                    product_id=product.id,
+                    allotment=product_allotment,
+                    amount=self.amount, )
+            else:
+                self.stock_product = StockProduct(
+                    product_id=product.subproduct.id,
+                    allotment=product_allotment,
+                    amount=self.amount * product.stock_unit, )
         else:
-            self.stock_product_id = stock_product.id
-            stock_product.amount += self.amount
-        db.session.commit()
+            if product.is_unitary:
+                self.stock_product.amount += self.amount
+            else:
+                self.stock_product.amount += (self.amount * product.stock_unit)
 
     def __repr__(self):
         return '{} : {}'.format(self.transaction_date, self.product.name[:10])
