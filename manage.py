@@ -12,16 +12,13 @@ import app.models as models
 from app.models import (
     User, Role, Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample,
     Patient, CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Country, Region, State, City, Address,
-    Product, Transaction
-)
+    Country, Region, State, City, Address, Product, Transaction, StockProduct)
 from app.auth.views import ProtectedModelView
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
 migrate = Migrate(app, db)
 admin = Admin(app, name='labsys', template_mode='bootstrap3')
-
 
 # region Add ModelView
 admin.add_views(
@@ -45,8 +42,9 @@ admin.add_views(
     ModelView(City, db.session),
     ModelView(Product, db.session),
     ModelView(Transaction, db.session),
-)
+    ModelView(StockProduct, db.session), )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
+
 # endregion
 
 
@@ -54,8 +52,7 @@ def make_shell_context():
     return dict(
         app=app,
         db=db,
-        m=models,
-    )
+        m=models, )
 
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
@@ -83,7 +80,6 @@ def deploy():
     from flask_migrate import upgrade
     upgrade()
     load_initial_data()
-
 
 
 if __name__ == '__main__':

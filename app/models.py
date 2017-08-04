@@ -1,14 +1,12 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import asc, orm
+from sqlalchemy import asc, orm, UniqueConstraint
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
 
 from . import db
 from . import login_manager
-
-
 
 
 @login_manager.user_loader
@@ -36,9 +34,8 @@ class Role(db.Model):
     def insert_roles():
         roles = {
             'User': (Permission.VIEW, True),
-            'Staff': (Permission.VIEW |
-                       Permission.EDIT |
-                       Permission.CREATE, False),
+            'Staff': (Permission.VIEW | Permission.EDIT | Permission.CREATE,
+                      False),
             'Administrator': (0xff, False)
         }
         for r in roles:
@@ -118,6 +115,7 @@ class AnonymousUser(AnonymousUserMixin):
     def is_administrator(self):
         return False
 
+
 login_manager.anonymous_user = AnonymousUser
 
 
@@ -165,16 +163,24 @@ class Admission(db.Model):
     details = db.Column(db.String(255))
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     vaccine = db.relationship(
-        'Vaccine', backref='admission', uselist=False,
+        'Vaccine',
+        backref='admission',
+        uselist=False,
         cascade='all, delete-orphan')
     hospitalization = db.relationship(
-        'Hospitalization', backref='admission', uselist=False,
+        'Hospitalization',
+        backref='admission',
+        uselist=False,
         cascade='all, delete-orphan')
     uti_hospitalization = db.relationship(
-        'UTIHospitalization', backref='admission', uselist=False,
+        'UTIHospitalization',
+        backref='admission',
+        uselist=False,
         cascade='all, delete-orphan')
     clinical_evolution = db.relationship(
-        'ClinicalEvolution', backref='admission', uselist=False,
+        'ClinicalEvolution',
+        backref='admission',
+        uselist=False,
         cascade='all, delete-orphan')
     symptoms = db.relationship(
         'ObservedSymptom', backref='admission', lazy='dynamic')
@@ -239,12 +245,12 @@ class Symptom(db.Model):
     @classmethod
     def get_primary_symptoms(cls):
         return cls.query.filter(
-            cls.primary==True).order_by(asc(Symptom.id)).all()
+            cls.primary == True).order_by(asc(Symptom.id)).all()
 
     @classmethod
     def get_secondary_symptoms(cls):
         return cls.query.filter(
-            cls.primary==False).order_by(asc(Symptom.id)).all()
+            cls.primary == False).order_by(asc(Symptom.id)).all()
 
     def __repr__(self):
         return '<Symptom[{}]: {}>'.format(self.id, self.name)
@@ -381,17 +387,14 @@ class City(db.Model):
     admissions = db.relationship('Admission', backref='city', lazy='dynamic')
 
     def __repr__(self):
-        return '<City[{}/{}]>'.format(
-            self.name,
-            self.state.uf_code if self.state is not None else 'None')
+        return '<City[{}/{}]>'.format(self.name, self.state.uf_code
+                                      if self.state is not None else 'None')
 
     def __str__(self):
-        return '{}/{}'.format(
-            self.name,
-            self.state.uf_code if self.state is not None else 'None')
+        return '{}/{}'.format(self.name, self.state.uf_code
+                              if self.state is not None else 'None')
 
 
-# TODO: unique keys? (Manufacturer, Catalog)
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
@@ -399,12 +402,13 @@ class Product(db.Model):
     manufacturer = db.Column(db.String(128))
     catalog = db.Column(db.String(128))
     stock_unit = db.Column(db.Integer, default=1)
-    parent_id= db.Column(db.Integer, db.ForeignKey('products.id'))
+    parent_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     subproduct = db.relationship(
         'Product', backref='parent', uselist=False, remote_side=[id])
-    amount = db.Column(db.Integer, default=0)
     transactions = db.relationship(
         'Transaction', backref='product', lazy='dynamic')
+    stock_products = db.relationship(
+        'StockProduct', backref='product', lazy='dynamic')
 
     @property
     def is_unitary(self):
@@ -448,12 +452,47 @@ class Transaction(db.Model):
     invoice = db.Column(db.String(64))
     details = db.Column(db.String(128))
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    stock_product_id = db.Column(db.Integer,
+                                 db.ForeignKey('stock_products.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    def __init__(self, **kwargs):
+    @classmethod
+    def get_product_amount(cls, product):
+        id = product[0]
+        allotment = product[1]
+        return cls.query.filter_by(product_id=id, allotment=allotment).count()
+
+    def __init__(self, product_allotment, **kwargs):
         super(Transaction, self).__init__(**kwargs)
-        product = Product.query.get(self.product_id)
-        if product.is_unitary:
-            product.amount += self.amount
+        stock_product = StockProduct.query.filter_by(
+            product_id=self.product_id, allotment=product_allotment).first()
+        if stock_product is None:
+            stock_product = StockProduct(
+                product_id=self.product_id,
+                allotment=product_allotment,
+                amount=self.amount)
+            db.session.add(stock_product)
+            self.stock_product_id = stock_product.id
         else:
-            product.subproduct.amount += self.amount * product.stock_unit
+            self.stock_product_id = stock_product.id
+            stock_product.amount += self.amount
+        db.session.commit()
+
+    def __repr__(self):
+        return '{} : {}'.format(self.transaction_date, self.product.name[:10])
+
+
+class StockProduct(db.Model):
+    __tablename__ = 'stock_products'
+    __table_args__ = (UniqueConstraint(
+        'product_id', 'allotment', name='stock_product'), )
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    allotment = db.Column(db.String(64))
+    amount = db.Column(db.Integer)
+    transactions = db.relationship(
+        'Transaction', backref='stock_product', lazy='dynamic')
+
+    def __repr__(self):
+        return '<StockProduct[{}]: {}, lote {}>'.format(
+            self.id, self.product.name[:10], self.allotment)
