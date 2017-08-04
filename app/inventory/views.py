@@ -88,14 +88,15 @@ def create_sub_transaction():
         for sp in StockProduct.get_products_in_stock()
     ]
     if form.validate_on_submit():
-        allotment = StockProduct.query.get(form.stock_product)
-        transaction = Transaction(
-            product_allotment=form.allotment.data,
-            product_id=form.stock_product_id.data,
-            amount=form.amount.data,
-            transaction_date=form.transaction_date.data,
-            details=form.details.data,
-            user=current_user)
+        allotment = StockProduct.query.get(
+            form.stock_product_id.data).allotment
+        transaction = Transaction(user=current_user)
+        form.populate_obj(transaction)
+        transaction.stock_product = StockProduct.query.get(
+            transaction.stock_product_id)
+        # transaction.amount is negative (form changes its sign)
+        transaction.stock_product.amount += transaction.amount
+        transaction.product = transaction.stock_product.product
         db.session.add(transaction)
         db.session.commit()
         flash('Baixa realizada com sucesso.')

@@ -479,7 +479,7 @@ class StockProduct(db.Model):
 
     @classmethod
     def get_products_in_stock(cls):
-        return cls.query.filter(cls.amount > 0).all()
+        return cls.query.filter(cls.amount > 0).order_by(asc(cls.id)).all()
 
     def __repr__(self):
         return '<StockProduct[{}]: {}, lote {}>'.format(
