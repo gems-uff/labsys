@@ -12,7 +12,7 @@ from ..models import Product, StockProduct, Transaction
 class AddTransactionForm(FlaskForm):
     # fabricante, catalogo
     product_id = SelectField(
-        'Produto', coerce=int, validators=[InputRequired()])
+        'Reativo', coerce=int, validators=[InputRequired()])
     allotment = StringField('Lote', validators=[InputRequired()])
     amount = IntegerField('Quantidade Recebida', validators=[InputRequired()])
     transaction_date = DateField(
@@ -32,7 +32,7 @@ class AddTransactionForm(FlaskForm):
 
 class SubTransactionForm(FlaskForm):
     stock_product_id = SelectField(
-        'Produto', coerce=int, validators=[InputRequired()])
+        'Reativo', coerce=int, validators=[InputRequired()])
     amount = IntegerField('Quantidade Consumida', validators=[InputRequired()])
     transaction_date = DateField(
         'Data de Uso',
@@ -49,7 +49,15 @@ class SubTransactionForm(FlaskForm):
                 'Quantidade Consumida deve ser maior ou igual a 1')
         elif (stock_product.amount < field.data):
             raise ValidationError(
-                'Não há essa quantidade do produto em estoque. O total é: {}'
+                'Não há essa quantidade do reativo em estoque. O total é: {}'
                 .format(stock_product.amount))
         else:
             field.data = -field.data
+
+
+class ReactiveForm(FlaskForm):
+    name = StringField('Nome do Reativo', validators=[InputRequired()])
+    manufacturer = StringField('Fabricante', validators=[InputRequired()])
+    catalog = StringField('Número de Catálogo', validators=[InputRequired()])
+    stock_unit = IntegerField(
+        'Unidade de Estoque', default=1, validators=[InputRequired()])
