@@ -17,6 +17,8 @@ class Config:
     LABSYS_MAIL_SUBJECT_PREFIX = '[LabSys]'
     LABSYS_MAIL_SENDER = 'LabSys Admin <gabrielcrsaldanha@gmail.com>'
 
+    BOOTSTRAP_SERVE_LOCAL = True
+
     @staticmethod
     def init_app(app):
         pass
