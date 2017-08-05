@@ -24,23 +24,27 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    BOOTSTRAP_SERVE_LOCAL = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
 
 
 class TestingConfig(Config):
     TESTING = True
+    BOOTSTRAP_SERVE_LOCAL = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
     WTF_CSRF_ENABLED = False
 
 
 class ProductionConfig(Config):
+    BOOTSTRAP_SERVE_LOCAL = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 
 
 class HerokuConfig(ProductionConfig):
+    BOOTSTRAP_SERVE_LOCAL = False
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
 
     @classmethod
@@ -64,6 +68,5 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
     'heroku': HerokuConfig,
-
     'default': DevelopmentConfig
 }
