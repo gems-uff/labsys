@@ -2,8 +2,6 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "utils/_forms_rendering.html" as frender %}
 
-{% block title %}Flasky{% endblock %}
-
 {% block page_content %}
   {{ frender.render_simple_errors(form) }}
   <form class="form" method="post">

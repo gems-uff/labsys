@@ -10,7 +10,6 @@ from ..models import Product, StockProduct, Transaction
 
 
 class AddTransactionForm(FlaskForm):
-    # fabricante, catalogo
     product_id = SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
     allotment = StringField('Lote', validators=[InputRequired()])
@@ -55,9 +54,25 @@ class SubTransactionForm(FlaskForm):
             field.data = -field.data
 
 
-class ReactiveForm(FlaskForm):
+class ProductForm(FlaskForm):
     name = StringField('Nome do Reativo', validators=[InputRequired()])
     manufacturer = StringField('Fabricante', validators=[InputRequired()])
     catalog = StringField('Número de Catálogo', validators=[InputRequired()])
     stock_unit = IntegerField(
         'Unidade de Estoque', default=1, validators=[InputRequired()])
+    subproduct_catalog = StringField(
+        'Subproduto (Número de Catálogo)', validators=[Optional()])
+    subproduct_id = HiddenField()
+    submit = SubmitField('Cadastrar')
+
+    def validate_subproduct_catalog(form, field):
+        if field.data != '':
+            manufacturer_products = Product.get_products_by_manufacturer(
+                form.manufacturer.data)
+            subproducts = [
+                p.id for p in manufacturer_products if p.catalog == field.data
+            ]
+            if len(subproducts) == 0:
+                raise ValidationError('Subproduto informado não existe.')
+            else:
+                form.subproduct_id.data = subproducts[0]

@@ -15,7 +15,7 @@ from app import inventory
 from .. import db
 from ..models import (Transaction, Product, StockProduct)
 from . import inventory
-from .forms import AddTransactionForm, SubTransactionForm
+from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 
 
 @inventory.route('/', methods=['GET'])
@@ -23,14 +23,24 @@ def index():
     return render_template('inventory/index.html')
 
 
-@inventory.route('/products', methods=['GET'])
+@inventory.route('/reactives', methods=['GET'])
 def list_products():
     return render_template('inventory/list-products.html')
 
 
-@inventory.route('/products/add', methods=['GET', 'POST'])
-def create_product():
-    return 'Not implemented yet'
+@inventory.route('/reactives/add', methods=['GET', 'POST'])
+def create_reactive():
+    form = ProductForm()
+    if form.validate_on_submit():
+        reactive = Product()
+        form.populate_obj(reactive)
+        if form.subproduct_id.data != '':
+            reactive.subproduct = Product.query.get(form.subproduct_id.data)
+        db.session.add(reactive)
+        db.session.commit()
+        flash('Reativo cadastrado com sucesso!')
+        return redirect(url_for('.create_reactive'))
+    return render_template('inventory/create-reactive.html', form=form)
 
 
 @inventory.route('/transactions', methods=['GET'])

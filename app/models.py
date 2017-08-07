@@ -396,6 +396,8 @@ class City(db.Model):
 
 
 class Product(db.Model):
+    # TODO: change parent_id to child_it in order to not allow a product to have
+    # more than one type of subproduct
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))

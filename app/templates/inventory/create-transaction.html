@@ -1,16 +1,15 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
-{% block title %}
-  Cadastrar
-  {% if method == 'add' %}
-    Recebimento
-  {% else %}
-    Utilização
-  {% endif %}
-  de Reativo
-{% endblock %}
-
 {% block page_content %}
-  {{ wtf.quick_form(form) }}
+<div class="page-header">
+    <h1>
+      {% if method=='add'%}
+        Registrar Recebimento de Reativo
+      {% else %}
+        Registrar Baixa de Reativo
+      {% endif %}
+    </h1>
+</div>
+{{ wtf.quick_form(form) }}
 {% endblock %}
