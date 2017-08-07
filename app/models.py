@@ -404,6 +404,7 @@ class Product(db.Model):
     manufacturer = db.Column(db.String(128))
     catalog = db.Column(db.String(128))
     stock_unit = db.Column(db.Integer, default=1)
+    min_stock = db.Column(db.Integer, default=1)
     parent_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     subproduct = db.relationship(
         'Product', backref='parent', uselist=False, remote_side=[id])

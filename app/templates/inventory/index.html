@@ -4,8 +4,15 @@
 
 {% block page_content %}
   <div>
-    <p><a href="{{ url_for('inventory.create_add_transaction') }}" class="btn btn-success">Registrar Recebimento de Reativo</a></p>
-    <p><a href="{{ url_for('inventory.create_sub_transaction') }}" class="btn btn-danger">Registrar Baixa de Reativo</a></p>
-    <p><a href="{{ url_for('inventory.create_reactive') }}" class="btn btn-warning">Cadastrar Novo Reativo no Catálogo</a></p>
+    <a href="{{ url_for('inventory.create_add_transaction') }}" class="btn btn-success">Registrar Recebimento de Reativo</a>
+    <a href="{{ url_for('inventory.create_sub_transaction') }}" class="btn btn-danger">Registrar Baixa de Reativo</a>
+    <a href="{{ url_for('inventory.create_reactive') }}" class="btn btn-warning">Cadastrar Novo Reativo no Catálogo</a>
   </div>
+  <p></p>
+  <div>
+    <a href="{{ url_for('inventory.list_transactions') }}" class="btn btn-default">Visualizar Transações</a>
+    <a href="{{ url_for('inventory.list_catalog') }}" class="btn btn-default">Visualizar Catálogo</a>
+  </div>
+
+  {% include "inventory/_stock.html" %}
 {% endblock %}

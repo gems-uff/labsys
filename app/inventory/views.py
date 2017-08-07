@@ -20,12 +20,14 @@ from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 
 @inventory.route('/', methods=['GET'])
 def index():
-    return render_template('inventory/index.html')
+    reactives = StockProduct.get_products_in_stock()
+    return render_template('inventory/index.html', reactives=reactives)
 
 
-@inventory.route('/reactives', methods=['GET'])
-def list_products():
-    return render_template('inventory/list-products.html')
+@inventory.route('/catalog', methods=['GET'])
+def list_catalog():
+    catalog = Product.query.all()
+    return render_template('inventory/list-catalog.html', catalog=catalog)
 
 
 @inventory.route('/reactives/add', methods=['GET', 'POST'])
@@ -45,7 +47,9 @@ def create_reactive():
 
 @inventory.route('/transactions', methods=['GET'])
 def list_transactions():
-    return render_template('inventory/list-transactions.html')
+    transactions = Transaction.query.all()
+    return render_template(
+        'inventory/list-transactions.html', transactions=transactions)
 
 
 @inventory.route('/transactions/add', methods=['GET', 'POST'])

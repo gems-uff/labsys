@@ -60,6 +60,8 @@ class ProductForm(FlaskForm):
     catalog = StringField('Número de Catálogo', validators=[InputRequired()])
     stock_unit = IntegerField(
         'Unidade de Estoque', default=1, validators=[InputRequired()])
+    min_stock = IntegerField(
+        'Estoque Mínimo', default=1, validators=[InputRequired()])
     subproduct_catalog = StringField(
         'Subproduto (Número de Catálogo)', validators=[Optional()])
     subproduct_id = HiddenField()
