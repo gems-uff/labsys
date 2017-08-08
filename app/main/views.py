@@ -1,24 +1,35 @@
 import datetime
 
 from flask import (
-    render_template, session, redirect, url_for, current_app, flash, request,
-    abort,
-)
+    render_template,
+    session,
+    redirect,
+    url_for,
+    current_app,
+    flash,
+    request,
+    abort, )
 from flask_login import login_required
 
 from .. import db
 from ..models import (
-    User, Permission,
+    User,
+    Permission,
     Admission,
-    Patient, Address,
-    Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Symptom, ObservedSymptom,
-    Sample, Method, CdcExam,
-)
+    Patient,
+    Address,
+    Vaccine,
+    Hospitalization,
+    UTIHospitalization,
+    ClinicalEvolution,
+    Symptom,
+    ObservedSymptom,
+    Sample,
+    Method,
+    CdcExam, )
 from app.decorators import admin_required, permission_required
 from . import main
 from .forms import NameForm, AdmissionForm, VaccineForm
-
 
 IGNORED = 9
 TRUE = 1
@@ -28,7 +39,6 @@ FALSE = 0
 @main.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
-
 
 
 @main.route('/admissions', methods=['GET'])
@@ -47,6 +57,7 @@ def symptom_in_admission_symptoms(symptom_id, admission):
             return obs_symptom
     return found
 
+
 @main.route('/admissions/<int:id>/detail', methods=['GET', 'POST'])
 @main.route('/admissions/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -54,10 +65,14 @@ def symptom_in_admission_symptoms(symptom_id, admission):
 def detail_admission(id):
     admission = Admission.query.get_or_404(id)
 
-    symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
-                for s in Symptom.get_primary_symptoms()]
-    sec_symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
-                    for s in Symptom.get_secondary_symptoms()]
+    symptoms = [{
+        'symptom_id': s.id,
+        'symptom_name': s.name
+    } for s in Symptom.get_primary_symptoms()]
+    sec_symptoms = [{
+        'symptom_id': s.id,
+        'symptom_name': s.name
+    } for s in Symptom.get_secondary_symptoms()]
 
     for obs_symptom in admission.symptoms:
         for symptom in symptoms:
@@ -85,8 +100,7 @@ def detail_admission(id):
         clinical_evolution=admission.clinical_evolution,
         symptoms=symptoms,
         sec_symptoms=sec_symptoms,
-        samples=admission.samples,
-    )
+        samples=admission.samples, )
     # TODO: if has permission to edit, link to edit view
 
     return render_template('create-admission.html', form=form, edit=False)
@@ -98,10 +112,14 @@ def detail_admission(id):
 def edit_admission(id):
     admission = Admission.query.get_or_404(id)
 
-    symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
-                for s in Symptom.get_primary_symptoms()]
-    sec_symptoms = [{'symptom_id': s.id, 'symptom_name': s.name}
-                    for s in Symptom.get_secondary_symptoms()]
+    symptoms = [{
+        'symptom_id': s.id,
+        'symptom_name': s.name
+    } for s in Symptom.get_primary_symptoms()]
+    sec_symptoms = [{
+        'symptom_id': s.id,
+        'symptom_name': s.name
+    } for s in Symptom.get_secondary_symptoms()]
 
     for obs_symptom in admission.symptoms:
         for symptom in symptoms:
@@ -112,7 +130,6 @@ def edit_admission(id):
             if sec_symptom['symptom_id'] == obs_symptom.symptom.id:
                 sec_symptom['observed'] = obs_symptom.observed
                 sec_symptom['details'] = obs_symptom.details
-
 
     form = AdmissionForm(
         id_lvrs_intern=admission.id_lvrs_intern,
@@ -130,8 +147,7 @@ def edit_admission(id):
         clinical_evolution=admission.clinical_evolution,
         symptoms=symptoms,
         sec_symptoms=sec_symptoms,
-        samples=admission.samples,
-    )
+        samples=admission.samples, )
     form.submit.label.text = 'Editar'
 
     if form.validate_on_submit():
@@ -152,9 +168,12 @@ def edit_admission(id):
                 if form.patient.residence.data['state_id'] is not -1 else None
             admission.patient.residence.city_id = form.patient.residence.data['city_id']\
                 if form.patient.residence.data['city_id'] is not -1 else None
-            admission.patient.residence.neighborhood = form.patient.residence.data['neighborhood']
-            admission.patient.residence.zone = form.patient.residence.data['zone']
-            admission.patient.residence.details = form.patient.residence.data['details']
+            admission.patient.residence.neighborhood = form.patient.residence.data[
+                'neighborhood']
+            admission.patient.residence.zone = form.patient.residence.data[
+                'zone']
+            admission.patient.residence.details = form.patient.residence.data[
+                'details']
 
             admission.id_lvrs_intern = form.id_lvrs_intern.data
             admission.first_symptoms_date = form.first_symptoms_date.data
@@ -178,7 +197,8 @@ def edit_admission(id):
             if form.hospitalization.data['occurred'] is not IGNORED:
                 admission.hospitalization.occurred = \
                     bool(form.hospitalization.data['occurred'])
-                admission.hospitalization.date = form.hospitalization.data['date']
+                admission.hospitalization.date = form.hospitalization.data[
+                    'date']
             else:
                 admission.hospitalization = None
 
@@ -222,7 +242,7 @@ def edit_admission(id):
                     sec_symptom_form.data['symptom_id'], admission)
                 if observed is None:
                     if sec_symptom_form.data['observed'] is True:
-                         ObservedSymptom(
+                        ObservedSymptom(
                             observed=sec_symptom_form.data['observed'],
                             details=sec_symptom_form.data['details'],
                             symptom_id=sec_symptom_form.data['symptom_id'],
@@ -242,9 +262,11 @@ def edit_admission(id):
                 sample = admission.samples[index]
                 if sample is not None:
                     sample.admission_date = sample_form.data['admission_date']
-                    sample.collection_date = sample_form.data['collection_date']
+                    sample.collection_date = sample_form.data[
+                        'collection_date']
                     sample.semepi = sample_form.data['semepi']
-                    sample.method_id = sample_form.data['method_id'] if sample_form.data['method_id'] is not -1 else None
+                    sample.method_id = sample_form.data[
+                        'method_id'] if sample_form.data['method_id'] is not -1 else None
                     sample_form.cdc_exam.form.populate_obj(sample.cdc_exam)
 
                 index += 1
@@ -272,11 +294,14 @@ def delete_admission(id):
 @permission_required(Permission.CREATE)
 def create_admission():
     form = AdmissionForm(
-        symptoms=[{'symptom_id': s.id, 'symptom_name': s.name}
-                  for s in Symptom.get_primary_symptoms()],
-        sec_symptoms=[{'symptom_id': s.id, 'symptom_name': s.name}
-                      for s in Symptom.get_secondary_symptoms()],
-    )
+        symptoms=[{
+            'symptom_id': s.id,
+            'symptom_name': s.name
+        } for s in Symptom.get_primary_symptoms()],
+        sec_symptoms=[{
+            'symptom_id': s.id,
+            'symptom_name': s.name
+        } for s in Symptom.get_secondary_symptoms()], )
 
     # POST and valid
     if form.validate_on_submit():
@@ -288,58 +313,56 @@ def create_admission():
                 birth_date=form.patient.data['birth_date'],
                 age=form.patient.data['age'],
                 age_unit=form.patient.data['age_unit'],
-                gender=form.patient.data['gender'],
-            )
+                gender=form.patient.data['gender'], )
 
             Address(
                 patient=patient,
-                country_id=form.patient.residence.data['country_id'] if form.patient.residence.data['country_id'] is not -1 else None,
-                state_id=form.patient.residence.data['state_id'] if form.patient.residence.data['state_id'] is not -1 else None,
-                city_id=form.patient.residence.data['city_id'] if form.patient.residence.data['city_id'] is not -1 else None,
+                country_id=form.patient.residence.data['country_id'] if
+                form.patient.residence.data['country_id'] is not -1 else None,
+                state_id=form.patient.residence.data['state_id']
+                if form.patient.residence.data['state_id'] is not -1 else None,
+                city_id=form.patient.residence.data['city_id']
+                if form.patient.residence.data['city_id'] is not -1 else None,
                 neighborhood=form.patient.residence.data['neighborhood'],
                 zone=form.patient.residence.data['zone'],
-                details=form.patient.residence.data['details']
-            )
+                details=form.patient.residence.data['details'])
 
             admission = Admission(
                 id_lvrs_intern=form.id_lvrs_intern.data,
                 first_symptoms_date=form.first_symptoms_date.data,
                 semepi_symptom=form.semepi_symptom.data,
-                state_id=form.state_id.data if form.state_id.data is not -1 else None,
-                city_id=form.city_id.data if form.city_id.data is not -1 else None,
+                state_id=form.state_id.data
+                if form.state_id.data is not -1 else None,
+                city_id=form.city_id.data
+                if form.city_id.data is not -1 else None,
                 health_unit=form.health_unit.data,
                 requesting_institution=form.requesting_institution.data,
                 details=form.details.data,
-                patient=patient,
-            )
+                patient=patient, )
 
             if form.vaccine.data['applied'] is not IGNORED:
                 Vaccine(
                     applied=bool(form.vaccine.data['applied']),
                     last_dose_date=form.vaccine.data['last_dose_date'],
-                    admission=admission,
-                )
+                    admission=admission, )
 
             if form.hospitalization.data['occurred'] is not IGNORED:
                 Hospitalization(
                     occurred=bool(form.hospitalization.data['occurred']),
                     date=form.hospitalization.data['date'],
-                    admission=admission,
-                )
+                    admission=admission, )
 
             if form.uti_hospitalization.data['occurred'] is not IGNORED:
                 UTIHospitalization(
                     occurred=bool(form.uti_hospitalization.data['occurred']),
                     date=form.uti_hospitalization.data['date'],
-                    admission=admission,
-                )
+                    admission=admission, )
 
             if form.clinical_evolution.data['death'] is not IGNORED:
                 ClinicalEvolution(
                     death=bool(form.clinical_evolution.data['death']),
                     date=form.vaccine.data['date'],
-                    admission=admission,
-                )
+                    admission=admission, )
 
             for symptom_form in form.symptoms:
                 if symptom_form.data['observed'] is not IGNORED:
@@ -347,8 +370,7 @@ def create_admission():
                         observed=bool(symptom_form.data['observed']),
                         details=symptom_form.data['details'],
                         symptom_id=symptom_form.data['symptom_id'],
-                        admission=admission,
-                    )
+                        admission=admission, )
 
             for sec_symptom_form in form.sec_symptoms:
                 if sec_symptom_form.data['observed'] is True:
@@ -356,8 +378,7 @@ def create_admission():
                         observed=True,
                         details=sec_symptom_form.data['details'],
                         symptom_id=sec_symptom_form.data['symptom_id'],
-                        admission=admission,
-                    )
+                        admission=admission, )
 
             for sample_form in form.samples:
                 sample = Sample(
@@ -365,16 +386,14 @@ def create_admission():
                     collection_date=sample_form.data['collection_date'],
                     semepi=sample_form.data['semepi'],
                     method_id=sample_form.data['method_id']
-                        if sample_form.data['method_id'] is not -1 else None,
-                    admission=admission,
-                )
+                    if sample_form.data['method_id'] is not -1 else None,
+                    admission=admission, )
                 CdcExam(
                     flu_type=sample_form.cdc_exam.data['flu_type'],
                     flu_subtype=sample_form.cdc_exam.data['flu_subtype'],
                     dominant_ct=sample_form.cdc_exam.data['dominant_ct'],
                     details=sample_form.cdc_exam.data['details'],
-                    sample=sample,
-                )
+                    sample=sample, )
 
             db.session.add(admission)
             flash('Admissão criada com sucesso!')
@@ -382,4 +401,6 @@ def create_admission():
             flash('Número Interno já cadastrado! Escolha outro!')
         return redirect(url_for('.create_admission'))
 
-    return render_template('create-admission.html', form=form,)
+    return render_template(
+        'create-admission.html',
+        form=form, )

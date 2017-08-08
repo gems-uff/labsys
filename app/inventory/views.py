@@ -9,28 +9,35 @@ from flask import (
     flash,
     request,
     abort, )
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 from app import inventory
+from app.decorators import admin_required, permission_required
 from .. import db
-from ..models import (Transaction, Product, StockProduct)
+from ..models import (Transaction, Product, StockProduct, Permission)
 from . import inventory
 from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 
 
 @inventory.route('/', methods=['GET'])
+@login_required
+@permission_required(Permission.VIEW)
 def index():
     reactives = StockProduct.get_products_in_stock()
     return render_template('inventory/index.html', reactives=reactives)
 
 
 @inventory.route('/catalog', methods=['GET'])
+@login_required
+@permission_required(Permission.VIEW)
 def list_catalog():
     catalog = Product.query.all()
     return render_template('inventory/list-catalog.html', catalog=catalog)
 
 
 @inventory.route('/reactives/add', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
 def create_reactive():
     form = ProductForm()
     if form.validate_on_submit():
@@ -46,6 +53,8 @@ def create_reactive():
 
 
 @inventory.route('/transactions', methods=['GET'])
+@login_required
+@permission_required(Permission.VIEW)
 def list_transactions():
     transactions = Transaction.query.all()
     return render_template(
@@ -53,6 +62,8 @@ def list_transactions():
 
 
 @inventory.route('/transactions/add', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
 def create_add_transaction():
     form = AddTransactionForm()
     form.product_id.choices = [(p.id, p.name) for p in Product.get_products()]
@@ -95,6 +106,8 @@ def create_add_transaction():
 
 
 @inventory.route('/transactions/sub', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
 def create_sub_transaction():
     form = SubTransactionForm()
     form.stock_product_id.choices = [

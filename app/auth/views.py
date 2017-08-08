@@ -1,6 +1,10 @@
-from flask import(
-    render_template, redirect, request, url_for, flash, current_app,
-)
+from flask import (
+    render_template,
+    redirect,
+    request,
+    url_for,
+    flash,
+    current_app, )
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_admin.contrib.sqla import ModelView
 
@@ -9,6 +13,7 @@ from .. import db
 from ..email import send_email
 from . import auth
 from .forms import LoginForm, RegistrationForm
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -35,14 +40,19 @@ def logout():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data,
-                    username=form.username.data,
-                    password=form.password.data)
+        user = User(
+            email=form.email.data,
+            username=form.username.data,
+            password=form.password.data)
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
-        send_email(user.email, 'Confirme sua conta',
-                   'auth/email/confirm', user=user, token=token)
+        send_email(
+            user.email,
+            'Confirme sua conta',
+            'auth/email/confirm',
+            user=user,
+            token=token)
         flash('Uma mensagem de confirmação foi enviado para seu email.')
         return redirect(url_for('main.index'))
     return render_template('auth/register.html', form=form)
@@ -80,19 +90,21 @@ def unconfirmed():
 @login_required
 def resend_confirmation():
     token = current_user.generate_confirmation_token()
-    send_email(current_user.email, 'Confirme sua conta',
-               'auth/email/confirm', user=current_user, token=token)
+    send_email(
+        current_user.email,
+        'Confirme sua conta',
+        'auth/email/confirm',
+        user=current_user,
+        token=token)
     flash('Uma nova mensagem de confirmação foi enviada ao seu email.')
     return redirect(url_for('main.index'))
 
 
 class ProtectedModelView(ModelView):
-
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.is_administrator(
+        )
 
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
         return redirect(url_for('login', next=request.url))
-
-
