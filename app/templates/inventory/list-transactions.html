@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}LabSys - Estoque{% endblock %}
+
+{% block page_content %}
+{% include "inventory/_navigation.html" %}
+<div class="page-header">
+    <h1>
+      Transações Realizadas
+    </h1>
+</div>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th width="30%">Reativo</th>
+      <th width="10%">Data da Transação</th>
+      <th width="20%">Responsável</th>
+      <th width="10%">Tipo</th>
+      <th width="10%">Quantidade</th>
+      <th width="20%">Observações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for transaction in transactions %}
+      <tr>
+        <td>({{ transaction.product.catalog }}) {{ transaction.product.name }}</td>
+        <td>{{ transaction.transaction_date }}</td>
+        <td>{{ transaction.user.username }}</td>
+        {% if transaction.amount < 0 %}
+          <td class="danger">Retirada</td>
+        {% else %}
+          <td class="success">Recebimento</td>
+        {% endif %}
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.details }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

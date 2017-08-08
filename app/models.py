@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import asc
-from flask_login import UserMixin
+from sqlalchemy import asc, orm, UniqueConstraint
+from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import asc
 
@@ -16,15 +16,42 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+class Permission:
+    VIEW = 0x01
+    CREATE = 0x02
+    EDIT = 0x04
+    DELETE = 0x08
+    ADMINISTER = 0x80
+
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)
+    permissions = db.Column(db.Integer)
     users = db.relationship('User', backref='role', lazy='dynamic')
+
+    @staticmethod
+    def insert_roles():
+        roles = {
+            'User': (Permission.VIEW, True),
+            'Staff': (Permission.VIEW | Permission.EDIT | Permission.CREATE,
+                      False),
+            'Administrator': (0xff, False)
+        }
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            role.permissions = roles[r][0]
+            role.default = roles[r][1]
+            db.session.add(role)
+        db.session.commit()
 
     def __repr__(self):
         return '<Role %r>' % self.name
-    
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -32,8 +59,25 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     confirmed = db.Column(db.Boolean, default=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    transactions = db.relationship(
+        'Transaction', backref='user', lazy='dynamic')
+
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.role is None:
+            if self.email == current_app.config['LABSYS_ADMIN']:
+                self.role = Role.query.filter_by(permissions=0xff).first()
+            if self.role is None:
+                self.role = Role.query.filter_by(default=True).first()
+
+    def can(self, permissions):
+        return self.role is not None and \
+               (self.role.permissions & permissions) == permissions
+
+    def is_administrator(self):
+        return self.can(Permission.ADMINISTER)
 
     def generate_confirmation_token(self, expiration_seconds=3600):
         serializer = Serializer(current_app.config['SECRET_KEY'])
@@ -64,6 +108,17 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+class AnonymousUser(AnonymousUserMixin):
+    def can(self, permissions):
+        return False
+
+    def is_administrator(self):
+        return False
+
+
+login_manager.anonymous_user = AnonymousUser
 
 
 class Patient(db.Model):
@@ -110,16 +165,24 @@ class Admission(db.Model):
     details = db.Column(db.String(255))
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     vaccine = db.relationship(
-        'Vaccine', backref='admission', uselist=False,
+        'Vaccine',
+        backref='admission',
+        uselist=False,
         cascade='all, delete-orphan')
     hospitalization = db.relationship(
-        'Hospitalization', backref='admission', uselist=False,
+        'Hospitalization',
+        backref='admission',
+        uselist=False,
         cascade='all, delete-orphan')
     uti_hospitalization = db.relationship(
-        'UTIHospitalization', backref='admission', uselist=False,
+        'UTIHospitalization',
+        backref='admission',
+        uselist=False,
         cascade='all, delete-orphan')
     clinical_evolution = db.relationship(
-        'ClinicalEvolution', backref='admission', uselist=False,
+        'ClinicalEvolution',
+        backref='admission',
+        uselist=False,
         cascade='all, delete-orphan')
     symptoms = db.relationship(
         'ObservedSymptom', backref='admission', lazy='dynamic')
@@ -184,12 +247,12 @@ class Symptom(db.Model):
     @classmethod
     def get_primary_symptoms(cls):
         return cls.query.filter(
-            cls.primary==True).order_by(asc(Symptom.id)).all()
+            cls.primary == True).order_by(asc(Symptom.id)).all()
 
     @classmethod
     def get_secondary_symptoms(cls):
         return cls.query.filter(
-            cls.primary==False).order_by(asc(Symptom.id)).all()
+            cls.primary == False).order_by(asc(Symptom.id)).all()
 
     def __repr__(self):
         return '<Symptom[{}]: {}>'.format(self.id, self.name)
@@ -326,11 +389,103 @@ class City(db.Model):
     admissions = db.relationship('Admission', backref='city', lazy='dynamic')
 
     def __repr__(self):
-        return '<City[{}/{}]>'.format(
-            self.name,
-            self.state.uf_code if self.state is not None else 'None')
+        return '<City[{}/{}]>'.format(self.name, self.state.uf_code
+                                      if self.state is not None else 'None')
 
     def __str__(self):
-        return '{}/{}'.format(
-            self.name,
-            self.state.uf_code if self.state is not None else 'None')
+        return '{}/{}'.format(self.name, self.state.uf_code
+                              if self.state is not None else 'None')
+
+
+class Product(db.Model):
+    # TODO: change parent_id to child_it in order to not allow a product to have
+    # more than one type of subproduct
+    __tablename__ = 'products'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128))
+    manufacturer = db.Column(db.String(128))
+    catalog = db.Column(db.String(128))
+    stock_unit = db.Column(db.Integer, default=1)
+    min_stock = db.Column(db.Integer, default=1)
+    parent_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    subproduct = db.relationship(
+        'Product', backref='parent', uselist=False, remote_side=[id])
+    transactions = db.relationship(
+        'Transaction', backref='product', lazy='dynamic')
+    stock_products = db.relationship(
+        'StockProduct', backref='product', lazy='dynamic')
+
+    @property
+    def is_unitary(self):
+        return self.stock_unit == 1
+
+    @classmethod
+    def get_products(cls, unitary_only=False):
+        products = cls.query.order_by(asc(cls.id)).all()
+        if unitary_only:
+            return [p for p in products if p.is_unitary]
+        return products
+
+    @classmethod
+    def get_products_by_manufacturer(cls, manufacturer, unitary_only=False):
+        products = cls.query.order_by(asc(cls.id)).filter_by(
+            manufacturer=manufacturer).all()
+        if unitary_only:
+            return [p for p in products if p.is_unitary]
+        return products
+
+    @classmethod
+    def get_product_by_catalog(cls, catalog, unitary_only=False):
+        products = cls.query.order_by(asc(cls.id)).filter_by(
+            catalog=catalog).first()
+        if unitary_only:
+            return [p for p in products if p.is_unitary]
+        return products
+
+    def __repr__(self):
+        return '<Product[{}], cat: {}>'.format(self.id, self.name)
+
+    def __str__(self):
+        return '<Product[{}], cat: {}>'.format(self.id, self.name)
+
+
+class Transaction(db.Model):
+    __tablename__ = 'transactions'
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_date = db.Column(db.Date)
+    amount = db.Column(db.Integer)
+    invoice = db.Column(db.String(64))
+    details = db.Column(db.String(128))
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    stock_product_id = db.Column(db.Integer,
+                                 db.ForeignKey('stock_products.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    @classmethod
+    def get_product_amount(cls, product):
+        id = product[0]
+        allotment = product[1]
+        return cls.query.filter_by(product_id=id, allotment=allotment).count()
+
+    def __repr__(self):
+        return '{} : {}'.format(self.transaction_date, self.product.name[:10])
+
+
+class StockProduct(db.Model):
+    __tablename__ = 'stock_products'
+    __table_args__ = (UniqueConstraint(
+        'product_id', 'allotment', name='stock_product'), )
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+    allotment = db.Column(db.String(64))
+    amount = db.Column(db.Integer)
+    transactions = db.relationship(
+        'Transaction', backref='stock_product', lazy='dynamic')
+
+    @classmethod
+    def get_products_in_stock(cls):
+        return cls.query.filter(cls.amount > 0).order_by(asc(cls.id)).all()
+
+    def __repr__(self):
+        return '<StockProduct[{}]: {}, lote {}>'.format(
+            self.id, self.product.name[:10], self.allotment)
