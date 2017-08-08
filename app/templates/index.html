@@ -14,4 +14,7 @@
       (Página inicial)
     </h1>
 </div>
+{% if not current_user.is_authenticated %}
+<p>Realize seu login ou cadastro aqui: <a href="{{ url_for('auth.login') }}">Login</a></p>
+{% endif %}
 {% endblock %}
