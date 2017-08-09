@@ -3,7 +3,7 @@
 from flask import Flask, render_template
 
 from labsys import commands, public, user
-from labsys.extensions import bcrypt, cache, csrf_protect, db, debug_toolbar, login_manager, migrate, webpack, sslify
+from labsys.extensions import bcrypt, cache, csrf_protect, db, debug_toolbar, login_manager, migrate, webpack, bootstrap, mail
 from labsys.settings import ProdConfig
 
 
@@ -33,8 +33,6 @@ def register_extensions(app):
     debug_toolbar.init_app(app)
     migrate.init_app(app, db)
     webpack.init_app(app)
-    if not app.config['SSL_DISABLE']:
-        sslify.init_app(app)
     mail.init_app(app)
     return None
 
