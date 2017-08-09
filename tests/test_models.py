@@ -1,33 +1,67 @@
-import unittest
-from app import create_app, db
-from app.models import Sample, Admission
+# -*- coding: utf-8 -*-
+"""Model unit tests."""
+import datetime as dt
+
+import pytest
+
+from labsys.user.models import Role, User
+
+from .factories import UserFactory
 
 
-class SampleModelTestCase(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app('testing')
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        db.create_all()
+@pytest.mark.usefixtures('db')
+class TestUser:
+    """User tests."""
 
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+    def test_get_by_id(self):
+        """Get user by ID."""
+        user = User('foo', 'foo@bar.com')
+        user.save()
 
-    def test_sample_ordering(self):
-        admission = Admission()
-        sample1 = Sample()
-        sample2 = Sample()
-        sample3 = Sample()
+        retrieved = User.get_by_id(user.id)
+        assert retrieved == user
 
-        self.assertEqual(len(admission.samples.all()), 0)
-        sample1.admission = admission
-        self.assertEqual(sample1.ordering, 1)
-        sample2.admission = admission
-        self.assertEqual(sample2.ordering, 2)
-        sample2.admission = None
-        self.assertEqual(sample2.ordering, -1)
-        sample3.admission = admission
-        self.assertEqual(sample3.ordering, 2)
+    def test_created_at_defaults_to_datetime(self):
+        """Test creation date."""
+        user = User(username='foo', email='foo@bar.com')
+        user.save()
+        assert bool(user.created_at)
+        assert isinstance(user.created_at, dt.datetime)
 
+    def test_password_is_nullable(self):
+        """Test null password."""
+        user = User(username='foo', email='foo@bar.com')
+        user.save()
+        assert user.password is None
+
+    def test_factory(self, db):
+        """Test user factory."""
+        user = UserFactory(password='myprecious')
+        db.session.commit()
+        assert bool(user.username)
+        assert bool(user.email)
+        assert bool(user.created_at)
+        assert user.is_admin is False
+        assert user.active is True
+        assert user.check_password('myprecious')
+
+    def test_check_password(self):
+        """Check password."""
+        user = User.create(username='foo', email='foo@bar.com',
+                           password='foobarbaz123')
+        assert user.check_password('foobarbaz123') is True
+        assert user.check_password('barfoobaz') is False
+
+    def test_full_name(self):
+        """User full name."""
+        user = UserFactory(first_name='Foo', last_name='Bar')
+        assert user.full_name == 'Foo Bar'
+
+    def test_roles(self):
+        """Add a role to a user."""
+        role = Role(name='admin')
+        role.save()
+        user = UserFactory()
+        user.roles.append(role)
+        user.save()
+        assert role in user.roles
