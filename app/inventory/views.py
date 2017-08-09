@@ -129,7 +129,7 @@ def create_sub_transaction():
         transaction.product = transaction.stock_product.product
         if stock_is_at_minimum(transaction.stock_product, transaction.product):
             send_email(
-                User.get_administrator_emails(),
+                User.get_stock_alert_emails(),
                 'Alerta de Estoque',
                 'inventory/email/stock_alert',
                 reactive_name=transaction.product.name,

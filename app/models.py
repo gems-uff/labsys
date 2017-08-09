@@ -69,8 +69,11 @@ class User(UserMixin, db.Model):
         'Transaction', backref='user', lazy='dynamic')
 
     @classmethod
-    def get_administrator_emails(cls):
-        return [u.email for u in User.query.all() if u.is_administrator()]
+    def get_stock_alert_emails(cls):
+        return [
+            u.email for u in User.query.all()
+            if u.is_administrator() and u.stock_mail_alert
+        ]
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
