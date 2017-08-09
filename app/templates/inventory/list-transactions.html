@@ -18,6 +18,7 @@
       <th width="10%">Tipo</th>
       <th width="10%">Quantidade</th>
       <th width="15%">Número da Nota</th>
+      <th width="10%">Projeto/Financiador</th>
       <th width="15%">Observações</th>
     </tr>
   </thead>
@@ -38,6 +39,12 @@
         {% else %}
           <td>Nota não informada</td>
         {% endif %}
+        {% if transaction.financier %}
+          <td>{{ transaction.financier }}</td>
+        {% else %}
+          <td>Não informado</td>
+        {% endif %}
+
         <td>{{ transaction.details }}</td>
       </tr>
     {% endfor %}

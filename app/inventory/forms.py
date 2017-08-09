@@ -26,10 +26,12 @@ class AddTransactionForm(FlaskForm):
                   'Nota Fiscal'), ('Nota de Fornecimento (FIOCRUZ)',
                                    'Nota de Fornecimento (FIOCRUZ)'),
                  ('Nota de Fornecimento (Ministério da Saúde)',
-                  'Nota de Fornecimento (Ministério da Saúde)')),
+                  'Nota de Fornecimento (Ministério da Saúde)'), ('Outros',
+                                                                  'Outros')),
         default='Nota Fiscal',
         validators=[Optional()])
     invoice = StringField('Número da Nota', validators=[Optional()])
+    financier = StringField('Projeto/Financiador', validators=[Optional()])
     details = StringField('Observações', validators=[Optional()])
     submit = SubmitField('Enviar')
 

@@ -56,7 +56,7 @@ def create_reactive():
 @login_required
 @permission_required(Permission.VIEW)
 def list_transactions():
-    transactions = Transaction.query.all()
+    transactions = Transaction.get_transactions_ordered()
     return render_template(
         'inventory/list-transactions.html', transactions=transactions)
 

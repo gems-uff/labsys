@@ -1,6 +1,6 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import asc, orm, UniqueConstraint
+from sqlalchemy import asc, desc, orm, UniqueConstraint
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import asc
@@ -456,7 +456,8 @@ class Transaction(db.Model):
     amount = db.Column(db.Integer)
     invoice_type = db.Column(db.String(64))
     invoice = db.Column(db.String(64))
-    details = db.Column(db.String(128))
+    financier = db.Column(db.String(128))
+    details = db.Column(db.String(256))
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     stock_product_id = db.Column(db.Integer,
                                  db.ForeignKey('stock_products.id'))
@@ -467,6 +468,10 @@ class Transaction(db.Model):
         id = product[0]
         allotment = product[1]
         return cls.query.filter_by(product_id=id, allotment=allotment).count()
+
+    @classmethod
+    def get_transactions_ordered(cls):
+        return cls.query.order_by(desc(cls.transaction_date)).all()
 
     def __repr__(self):
         return '{} : {}'.format(self.transaction_date, self.product.name[:10])
