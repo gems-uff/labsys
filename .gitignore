@@ -140,3 +140,6 @@ __pycache__
 # Visual Paradigm
 *.vpp.bak*
 *.vpp.lck
+
+# Spacemacs
+.projectile

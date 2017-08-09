@@ -14,10 +14,11 @@
     <tr>
       <th width="30%">Reativo</th>
       <th width="10%">Data da Transação</th>
-      <th width="20%">Responsável</th>
+      <th width="10%">Responsável</th>
       <th width="10%">Tipo</th>
       <th width="10%">Quantidade</th>
-      <th width="20%">Observações</th>
+      <th width="15%">Número da Nota</th>
+      <th width="15%">Observações</th>
     </tr>
   </thead>
   <tbody>
@@ -32,6 +33,11 @@
           <td class="success">Recebimento</td>
         {% endif %}
         <td>{{ transaction.amount }}</td>
+        {% if transaction.invoice %}
+          <td>{{ transaction.invoice }} - {{ transaction.invoice_type }}</td>
+        {% else %}
+          <td>Nota não informada</td>
+        {% endif %}
         <td>{{ transaction.details }}</td>
       </tr>
     {% endfor %}

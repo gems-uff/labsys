@@ -454,6 +454,7 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     transaction_date = db.Column(db.Date)
     amount = db.Column(db.Integer)
+    invoice_type = db.Column(db.String(64))
     invoice = db.Column(db.String(64))
     details = db.Column(db.String(128))
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))

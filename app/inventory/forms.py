@@ -1,11 +1,11 @@
 import datetime
 
 from flask_wtf import FlaskForm
-from wtforms import (StringField, SubmitField, FormField, FormField,
-                     RadioField, HiddenField, FieldList, BooleanField, Label,
-                     DateField, SelectField, IntegerField, FloatField, widgets,
-                     ValidationError)
+from wtforms import (BooleanField, DateField, FieldList, FloatField, FormField,
+                     HiddenField, IntegerField, Label, RadioField, SelectField,
+                     StringField, SubmitField, ValidationError, widgets)
 from wtforms.validators import InputRequired, Optional
+
 from ..models import Product, StockProduct, Transaction
 
 
@@ -19,7 +19,17 @@ class AddTransactionForm(FlaskForm):
         format='%d/%m/%Y',
         default=datetime.datetime.today(),
         validators=[InputRequired()])
-    invoice = StringField('Nota Fiscal', validators=[Optional()])
+    invoice_type = SelectField(
+        'Tipo de Nota',
+        coerce=str,
+        choices=(('Nota Fiscal',
+                  'Nota Fiscal'), ('Nota de Fornecimento (FIOCRUZ)',
+                                   'Nota de Fornecimento (FIOCRUZ)'),
+                 ('Nota de Fornecimento (Ministério da Saúde)',
+                  'Nota de Fornecimento (Ministério da Saúde)')),
+        default='Nota Fiscal',
+        validators=[Optional()])
+    invoice = StringField('Número da Nota', validators=[Optional()])
     details = StringField('Observações', validators=[Optional()])
     submit = SubmitField('Enviar')
 
