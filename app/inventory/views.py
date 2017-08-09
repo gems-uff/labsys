@@ -11,10 +11,12 @@ from flask import (
     abort, )
 from flask_login import current_user, login_required
 
+from app.inventory.utils import stock_is_at_minimum
 from app import inventory
 from app.decorators import admin_required, permission_required
+from app.email import send_email
 from .. import db
-from ..models import (Transaction, Product, StockProduct, Permission)
+from ..models import (Transaction, Product, StockProduct, Permission, User)
 from . import inventory
 from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 
@@ -125,6 +127,15 @@ def create_sub_transaction():
         # transaction.amount is negative (form changes its sign)
         transaction.stock_product.amount += transaction.amount
         transaction.product = transaction.stock_product.product
+        if stock_is_at_minimum(transaction.stock_product, transaction.product):
+            send_email(
+                User.get_administrator_emails(),
+                'Alerta de Estoque',
+                'inventory/email/stock_alert',
+                reactive_name=transaction.product.name,
+                amount_in_stock=StockProduct.count_total_stock_of_product(
+                    transaction.product.id),
+                min_stock=transaction.stock_product.product.min_stock)
         db.session.add(transaction)
         db.session.commit()
         flash('Baixa realizada com sucesso.')

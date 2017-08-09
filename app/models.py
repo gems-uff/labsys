@@ -1,3 +1,6 @@
+import operator
+from functools import reduce
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import asc, desc, orm, UniqueConstraint
@@ -60,9 +63,14 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
+    stock_mail_alert = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     transactions = db.relationship(
         'Transaction', backref='user', lazy='dynamic')
+
+    @classmethod
+    def get_administrator_emails(cls):
+        return [u.email for u in User.query.all() if u.is_administrator()]
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -491,6 +499,12 @@ class StockProduct(db.Model):
     @classmethod
     def get_products_in_stock(cls):
         return cls.query.filter(cls.amount > 0).order_by(asc(cls.id)).all()
+
+    @classmethod
+    def count_total_stock_of_product(cls, product_id):
+        catalog_product = Product.query.get(product_id)
+        amounts_in_stock = [sp.amount for sp in catalog_product.stock_products]
+        return reduce(operator.add, amounts_in_stock)
 
     def __repr__(self):
         return '<StockProduct[{}]: {}, lote {}>'.format(

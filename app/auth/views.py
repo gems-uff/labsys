@@ -48,7 +48,7 @@ def register():
         db.session.commit()
         token = user.generate_confirmation_token()
         send_email(
-            user.email,
+            [user.email],
             'Confirme sua conta',
             'auth/email/confirm',
             user=user,
@@ -91,7 +91,7 @@ def unconfirmed():
 def resend_confirmation():
     token = current_user.generate_confirmation_token()
     send_email(
-        current_user.email,
+        [current_user.email],
         'Confirme sua conta',
         'auth/email/confirm',
         user=current_user,
