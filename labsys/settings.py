@@ -56,7 +56,7 @@ class TestConfig(Config):
 
     TESTING = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
     # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
     BCRYPT_LOG_ROUNDS = 4
     WTF_CSRF_ENABLED = False  # Allows form testing

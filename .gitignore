@@ -67,3 +67,6 @@ envs/
 
 # Mac OSX specific
 .DS_Store
+
+# No idea...
+.cache/

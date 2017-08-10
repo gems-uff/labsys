@@ -27,6 +27,7 @@ class RegisterForm(FlaskForm):
     def validate(self):
         """Validate the form."""
         initial_validation = super(RegisterForm, self).validate()
+        print(initial_validation)
         if not initial_validation:
             return False
         user = User.query.filter_by(username=self.username.data).first()
