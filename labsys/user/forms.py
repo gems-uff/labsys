@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 """User forms."""
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField
-from wtforms.validators import DataRequired, Email, EqualTo, Length
+from wtforms.validators import InputRequired, Email, EqualTo, Length
 
 from .models import User
 
 
-class RegisterForm(Form):
+class RegisterForm(FlaskForm):
     """Register form."""
 
     username = StringField('Username',
-                           validators=[DataRequired(), Length(min=3, max=25)])
+                           validators=[InputRequired(), Length(min=3, max=25)])
     email = StringField('Email',
-                        validators=[DataRequired(), Email(), Length(min=6, max=40)])
+                        validators=[InputRequired(), Email(), Length(min=6, max=40)])
     password = PasswordField('Password',
-                             validators=[DataRequired(), Length(min=6, max=40)])
+                             validators=[InputRequired(), Length(min=6, max=40)])
     confirm = PasswordField('Verify password',
-                            [DataRequired(), EqualTo('password', message='Passwords must match')])
+                            [InputRequired(), EqualTo('password', message='Passwords must match')])
 
     def __init__(self, *args, **kwargs):
         """Create instance."""
