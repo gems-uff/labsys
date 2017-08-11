@@ -68,7 +68,8 @@ def list_transactions():
 @permission_required(Permission.EDIT)
 def create_add_transaction():
     form = AddTransactionForm()
-    form.product_id.choices = [(p.id, p.name) for p in Product.get_products()]
+    form.product_id.choices = [(p.id, ' ({}) {}'.format(p.catalog, p.name))
+                               for p in Product.get_products()]
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
@@ -82,6 +83,7 @@ def create_add_transaction():
                 transaction.stock_product = StockProduct(
                     product_id=catalog_product.id,
                     allotment=form.allotment.data,
+                    expiration_date=form.expiration_date.data,
                     amount=transaction.amount, )
             else:
                 transaction.stock_product.amount += transaction.amount
@@ -94,6 +96,7 @@ def create_add_transaction():
                 transaction.stock_product = StockProduct(
                     product_id=product_id,
                     allotment=form.allotment.data,
+                    expiration_date=form.expiration_date.data,
                     amount=(transaction.amount * catalog_product.stock_unit))
             else:
                 transaction.stock_product.amount += (

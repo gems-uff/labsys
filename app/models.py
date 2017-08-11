@@ -494,6 +494,7 @@ class StockProduct(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
     allotment = db.Column(db.String(64))
+    expiration_date = db.Column(db.Date)
     amount = db.Column(db.Integer)
     transactions = db.relationship(
         'Transaction', backref='stock_product', lazy='dynamic')

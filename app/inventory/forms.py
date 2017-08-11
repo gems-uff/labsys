@@ -13,6 +13,8 @@ class AddTransactionForm(FlaskForm):
     product_id = SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
     allotment = StringField('Lote', validators=[InputRequired()])
+    expiration_date = DateField(
+        'Data de Validade', format='%d/%m/%Y', validators=[Optional()])
     amount = IntegerField('Quantidade Recebida', validators=[InputRequired()])
     transaction_date = DateField(
         'Data de Registro',
