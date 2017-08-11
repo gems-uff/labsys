@@ -40,7 +40,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    BOOTSTRAP_SERVE_LOCAL = False
+    BOOTSTRAP_SERVE_LOCAL = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 
