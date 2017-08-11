@@ -1,13 +1,11 @@
-Dear {{ user.username }},
+Prezado usuario do LabSys,
 
-Welcome to Flasky!
-
-To confirm your account please click on the following link:
+Para confirmar sua conta, clique no link a seguir:
 
 {{ url_for('auth.confirm', token=token, _external=True) }}
 
-Sincerely,
+Atenciosamente,
 
-The Flasky Team
+Equipe LabSys
 
-Note: replies to this email address are not monitored.
+Importante:respostas a esse e-mail nao sao monitoradas.

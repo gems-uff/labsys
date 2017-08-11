@@ -1,8 +1,7 @@
-<p>Dear {{ user.username }},</p>
-<p>Welcome to <b>Flasky</b>!</p>
-<p>To confirm your account please <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">click here</a>.</p>
-<p>Alternatively, you can paste the following link in your browser's address bar:</p>
+<p>Prezado usuario do LabSys,</p>
+<p>Para confirmar sua conta <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">clique aqui</a>.</p>
+<p>Se preferir, cole o link a seguir na barra seu browser:</p>
 <p>{{ url_for('auth.confirm', token=token, _external=True) }}</p>
-<p>Sincerely,</p>
-<p>The Flasky Team</p>
-<p><small>Note: replies to this email address are not monitored.</small></p>
+<p>Atenciosamente,</p>
+<p>Equipe LabSys</p>
+<p><small>Importante: respostas a esse e-mail nao sao monitoradas.</small></p>

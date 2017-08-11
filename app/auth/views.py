@@ -8,7 +8,7 @@ from flask import (
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_admin.contrib.sqla import ModelView
 
-from ..models import User
+from ..models import User, PreAllowedUser, Role
 from .. import db
 from ..email import send_email
 from . import auth
@@ -41,6 +41,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(email=form.email.data, password=form.password.data)
+        if user.email in PreAllowedUser.get_emails():
+            user.role = Role.query.filter_by(name='Staff').first()
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()

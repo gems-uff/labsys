@@ -9,10 +9,11 @@ from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 
 import app.models as models
-from app.models import (
-    User, Role, Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample,
-    Patient, CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Country, Region, State, City, Address, Product, Transaction, StockProduct)
+from app.models import (User, Role, PreAllowedUser, Admission, Symptom,
+                        ObservedSymptom, Vaccine, Method, Sample, Patient,
+                        CdcExam, Hospitalization, UTIHospitalization,
+                        ClinicalEvolution, Country, Region, State, City,
+                        Address, Product, Transaction, StockProduct)
 from app.auth.views import ProtectedModelView
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -24,6 +25,7 @@ admin = Admin(app, name='labsys', template_mode='bootstrap3')
 admin.add_views(
     ProtectedModelView(User, db.session),
     ProtectedModelView(Role, db.session),
+    ProtectedModelView(PreAllowedUser, db.session),
     ProtectedModelView(Admission, db.session),
     ProtectedModelView(Patient, db.session),
     ProtectedModelView(Address, db.session),

@@ -511,3 +511,15 @@ class StockProduct(db.Model):
     def __repr__(self):
         return '<StockProduct[{}]: {}, lote {}>'.format(
             self.id, self.product.name[:10], self.allotment)
+
+
+class PreAllowedUser(db.Model):
+    """Table storing users that are directly added as 'Staff'"""
+    __tablename__ = 'pre_allowed_users'
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(128))
+    email = db.Column(db.String(128))
+
+    @classmethod
+    def get_emails(cls):
+        return [u.email for u in cls.query.all()]
