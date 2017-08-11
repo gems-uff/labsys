@@ -7,8 +7,9 @@
   <thead>
     <tr>
       <th width="40%">Reativo</th>
-      <th width="30%">Fabricante</th>
+      <th width="20%">Fabricante</th>
       <th width="10%">Lote</th>
+      <th width="10%">Validade</th>
       <th width="10%">Quantidade em Estoque</th>
       <th width="10%">Estoque Mínimo</th>
     </tr>
@@ -19,6 +20,7 @@
         <td>({{ reactive.product.catalog }}) {{ reactive.product.name }}</td>
         <td>{{ reactive.product.manufacturer }}</td>
         <td>{{ reactive.allotment }}</td>
+        <td>{{ reactive.expiration_date }}</td>
         {% if reactive.amount < reactive.product.min_stock %}
           <td class="danger" title="Estoque abaixo do mínimo">{{ reactive.amount }}</td>
         {% else %}
