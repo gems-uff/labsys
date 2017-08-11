@@ -33,7 +33,7 @@ def index():
 @login_required
 @permission_required(Permission.VIEW)
 def list_catalog():
-    catalog = Product.query.all()
+    catalog = Product.get_products()
     return render_template('inventory/list-catalog.html', catalog=catalog)
 
 

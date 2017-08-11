@@ -60,7 +60,6 @@ class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
-    username = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
     stock_mail_alert = db.Column(db.Boolean, default=False)
@@ -118,7 +117,7 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.email
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -432,7 +431,7 @@ class Product(db.Model):
 
     @classmethod
     def get_products(cls, unitary_only=False):
-        products = cls.query.order_by(asc(cls.id)).all()
+        products = cls.query.order_by(asc(cls.name)).all()
         if unitary_only:
             return [p for p in products if p.is_unitary]
         return products

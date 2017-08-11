@@ -27,7 +27,7 @@
       <tr>
         <td>({{ transaction.product.catalog }}) {{ transaction.product.name }}</td>
         <td>{{ transaction.transaction_date }}</td>
-        <td>{{ transaction.user.username }}</td>
+        <td>{{ transaction.user.email }}</td>
         {% if transaction.amount < 0 %}
           <td class="danger">Retirada</td>
         {% else %}
