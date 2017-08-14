@@ -1,3 +1,3 @@
 Prezado Usuário do LabSys,
-O reativo {{ reactive_name }} esta com estoque = {{ amount_in_stock }}, considerado abaixo do valor minimo = {{ min_stock }}.
-Por favor, nao responda esse email.
+O reativo {{ reactive_name }} está com estoque = {{ amount_in_stock }}, considerado abaixo do valor mínimo = {{ min_stock }}.
+Por favor, não responda esse email.
