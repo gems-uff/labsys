@@ -118,7 +118,7 @@ def create_sub_transaction():
     form.stock_product_id.choices = [
         (sp.id, sp.product.name + ' | Lote: ' + sp.allotment +
          ' | {} unidades.'.format(sp.amount))
-        for sp in StockProduct.get_products_in_stock()
+        for sp in StockProduct.list_products_in_stock()
     ]
     if form.validate_on_submit():
         allotment = StockProduct.query.get(

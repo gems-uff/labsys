@@ -500,8 +500,12 @@ class StockProduct(db.Model):
         'Transaction', backref='stock_product', lazy='dynamic')
 
     @classmethod
-    def get_products_in_stock(cls):
+    def list_products_in_stock(cls):
         return cls.query.filter(cls.amount > 0).order_by(asc(cls.id)).all()
+
+    @classmethod
+    def get_products_in_stock(cls):
+        return cls.query.order_by(asc(cls.id)).all()
 
     @classmethod
     def count_total_stock_of_product(cls, product_id):
