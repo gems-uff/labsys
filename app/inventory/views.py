@@ -1,19 +1,8 @@
-import datetime
-
-from flask import (
-    render_template,
-    session,
-    redirect,
-    url_for,
-    current_app,
-    flash,
-    request,
-    abort, )
+from flask import render_template, redirect, url_for, flash
 from flask_login import current_user, login_required
 
 from app.inventory.utils import stock_is_at_minimum
-from app import inventory
-from app.decorators import admin_required, permission_required
+from app.decorators import permission_required
 from app.email import send_email
 from .. import db
 from ..models import (Transaction, Product, StockProduct, Permission, User)
@@ -81,11 +70,11 @@ def create_add_transaction():
         if catalog_product.is_unitary:
             transaction.stock_product = StockProduct.query.filter_by(
                 product_id=catalog_product.id,
-                allotment=form.allotment.data).first()
+                lot_number=form.lot_number.data).first()
             if transaction.stock_product is None:
                 transaction.stock_product = StockProduct(
                     product_id=catalog_product.id,
-                    allotment=form.allotment.data,
+                    lot_number=form.lot_number.data,
                     expiration_date=form.expiration_date.data,
                     amount=transaction.amount, )
             else:
@@ -94,11 +83,12 @@ def create_add_transaction():
         else:
             product_id = catalog_product.subproduct.id
             transaction.stock_product = StockProduct.query.filter_by(
-                product_id=product_id, allotment=form.allotment.data).first()
+                product_id=product_id,
+                lot_number=form.lot_number.data).first()
             if transaction.stock_product is None:
                 transaction.stock_product = StockProduct(
                     product_id=product_id,
-                    allotment=form.allotment.data,
+                    lot_number=form.lot_number.data,
                     expiration_date=form.expiration_date.data,
                     amount=(transaction.amount * catalog_product.stock_unit))
             else:
@@ -119,13 +109,13 @@ def create_add_transaction():
 def create_sub_transaction():
     form = SubTransactionForm()
     form.stock_product_id.choices = [
-        (sp.id, sp.product.name + ' | Lote: ' + sp.allotment +
+        (sp.id, sp.product.name + ' | Lote: ' + sp.lot_number +
          ' | {} unidades.'.format(sp.amount))
         for sp in StockProduct.list_products_in_stock()
     ]
     if form.validate_on_submit():
-        allotment = StockProduct.query.get(
-            form.stock_product_id.data).allotment
+        lot_number = StockProduct.query.get(
+            form.stock_product_id.data).lot_number
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
         transaction.stock_product = StockProduct.query.get(

@@ -483,8 +483,9 @@ class Transaction(db.Model):
     @classmethod
     def get_product_amount(cls, product):
         id = product[0]
-        allotment = product[1]
-        return cls.query.filter_by(product_id=id, allotment=allotment).count()
+        lot_number = product[1]
+        return cls.query.filter_by(
+            product_id=id, lot_number=lot_number).count()
 
     @classmethod
     def get_transactions_ordered(cls):
@@ -497,10 +498,10 @@ class Transaction(db.Model):
 class StockProduct(db.Model):
     __tablename__ = 'stock_products'
     __table_args__ = (UniqueConstraint(
-        'product_id', 'allotment', name='stock_product'), )
+        'product_id', 'lot_number', name='stock_product'), )
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    allotment = db.Column(db.String(64))
+    lot_number = db.Column(db.String(64))
     expiration_date = db.Column(db.Date)
     amount = db.Column(db.Integer)
     transactions = db.relationship(
@@ -508,7 +509,7 @@ class StockProduct(db.Model):
 
     def __repr__(self):
         return '<StockProduct[{}]: {}, lote {}>'.format(
-            self.id, self.product.name[:10], self.allotment)
+            self.id, self.product.name[:10], self.lot_number)
 
     @classmethod
     def list_products_in_stock(cls):
