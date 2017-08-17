@@ -25,8 +25,11 @@ from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 @login_required
 @permission_required(Permission.VIEW)
 def index():
-    reactives = StockProduct.get_products_in_stock()
-    return render_template('inventory/index.html', reactives=reactives)
+    products = Product.get_products(unitary_only=True)
+    for p in products:
+        p.aggregate_amount = p.count_amount_stock_products()
+        print(p.aggregate_amount)
+    return render_template('inventory/index.html', products=products)
 
 
 @inventory.route('/catalog', methods=['GET'])
@@ -136,8 +139,8 @@ def create_sub_transaction():
                 'Alerta de Estoque',
                 'inventory/email/stock_alert',
                 reactive_name=transaction.product.name,
-                amount_in_stock=StockProduct.count_total_stock_of_product(
-                    transaction.product.id),
+                amount_in_stock=
+                transaction.product.count_amount_stock_products(),
                 min_stock=transaction.stock_product.product.min_stock)
         db.session.add(transaction)
         db.session.commit()

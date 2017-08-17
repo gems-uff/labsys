@@ -3,7 +3,7 @@ from functools import reduce
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import asc, desc, orm, UniqueConstraint
+from sqlalchemy import asc, desc, orm, UniqueConstraint, func
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import asc
@@ -452,6 +452,13 @@ class Product(db.Model):
             return [p for p in products if p.is_unitary]
         return products
 
+    def count_amount_stock_products(self):
+        amount_in_stock = 0
+        for stock_product in self.stock_products:
+            amount_in_stock += stock_product.amount
+
+        return amount_in_stock
+
     def __repr__(self):
         return '<Product[{}], cat: {}>'.format(self.id, self.name)
 
@@ -499,23 +506,13 @@ class StockProduct(db.Model):
     transactions = db.relationship(
         'Transaction', backref='stock_product', lazy='dynamic')
 
-    @classmethod
-    def list_products_in_stock(cls):
-        return cls.query.filter(cls.amount > 0).order_by(asc(cls.id)).all()
-
-    @classmethod
-    def get_products_in_stock(cls):
-        return cls.query.order_by(asc(cls.id)).all()
-
-    @classmethod
-    def count_total_stock_of_product(cls, product_id):
-        catalog_product = Product.query.get(product_id)
-        amounts_in_stock = [sp.amount for sp in catalog_product.stock_products]
-        return reduce(operator.add, amounts_in_stock)
-
     def __repr__(self):
         return '<StockProduct[{}]: {}, lote {}>'.format(
             self.id, self.product.name[:10], self.allotment)
+
+    @classmethod
+    def list_products_in_stock(cls):
+        return cls.query.filter(cls.amount > 0).all()
 
 
 class PreAllowedUser(db.Model):
