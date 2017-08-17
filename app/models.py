@@ -438,7 +438,7 @@ class Product(db.Model):
 
     @classmethod
     def get_products_by_manufacturer(cls, manufacturer, unitary_only=False):
-        products = cls.query.order_by(asc(cls.id)).filter_by(
+        products = cls.query.order_by(asc(cls.name)).filter_by(
             manufacturer=manufacturer).all()
         if unitary_only:
             return [p for p in products if p.is_unitary]
@@ -446,7 +446,7 @@ class Product(db.Model):
 
     @classmethod
     def get_product_by_catalog(cls, catalog, unitary_only=False):
-        products = cls.query.order_by(asc(cls.id)).filter_by(
+        products = cls.query.order_by(asc(cls.name)).filter_by(
             catalog=catalog).first()
         if unitary_only:
             return [p for p in products if p.is_unitary]

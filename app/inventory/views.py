@@ -17,7 +17,6 @@ def index():
     products = Product.get_products(unitary_only=True)
     for p in products:
         p.aggregate_amount = p.count_amount_stock_products()
-        print(p.aggregate_amount)
     return render_template('inventory/index.html', products=products)
 
 
@@ -60,7 +59,7 @@ def list_transactions():
 @permission_required(Permission.EDIT)
 def create_add_transaction():
     form = AddTransactionForm()
-    form.product_id.choices = [(p.id, ' ({}) {}'.format(p.catalog, p.name))
+    form.product_id.choices = [(p.id, ' {} | {}'.format(p.catalog, p.name))
                                for p in Product.get_products()]
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
@@ -123,7 +122,7 @@ def create_sub_transaction():
         # transaction.amount is negative (form changes its sign)
         transaction.stock_product.amount += transaction.amount
         transaction.product = transaction.stock_product.product
-        if stock_is_at_minimum(transaction.stock_product, transaction.product):
+        if stock_is_at_minimum(transaction.product):
             send_email(
                 User.get_stock_alert_emails(),
                 'Alerta de Estoque',
