@@ -22,7 +22,7 @@ class ProdConfig(Config):
 
     ENV = 'prod'
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/prod_labsys'  # TODO: Change me
+    SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_DB')
     DEBUG_TB_ENABLED = False  # Disable Debug toolbar
 
 
