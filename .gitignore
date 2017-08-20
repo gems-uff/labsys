@@ -44,6 +44,7 @@ docs/_build
 
 # Virtualenvs
 env/
+.envs/
 
 # npm
 /node_modules/
@@ -51,3 +52,7 @@ env/
 # webpack-built files
 /labsys/static/build/
 /labsys/webpack/manifest.json
+
+
+# SQLite
+*.db
