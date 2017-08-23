@@ -15,7 +15,11 @@
   <tbody>
     {% for product in products %}
       <tr>
-        <td>({{ product.catalog }}) {{ product.name }}</td>
+        <td>
+          <a data-toggle="collapse" href="#collapseStockProducts-{{loop.index}}" aria-expanded="false" aria-controls="collapseStockProducts">
+            ({{ product.catalog }}) {{ product.name }}
+          </a>
+        </td>
         <td>{{ product.manufacturer }}</td>
         <td {% if product.aggregate_amount < product.min_stock %} class="danger" title="Estoque abaixo do mínimo"{% endif %}>
             {{ product.aggregate_amount }}
@@ -23,7 +27,7 @@
         <td>{{ product.min_stock }}</td>
       </tr>
       {% if product.aggregate_amount > 0 %}
-        <tr><td><table class="table table-striped table-bordered">
+        <tr class="collapse" id="collapseStockProducts-{{loop.index}}"><td><table class="table table-striped table-bordered">
           <thead>
             <tr>
               <th>Lote</th>
@@ -42,6 +46,7 @@
           </tbody>
         </table></td></tr>
       {% endif %}
+      </div>
     {% endfor %}
   </tbody>
 </table>
