@@ -27,7 +27,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     BOOTSTRAP_SERVE_LOCAL = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
 
 
