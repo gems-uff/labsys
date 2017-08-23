@@ -17,13 +17,31 @@
       <tr>
         <td>({{ product.catalog }}) {{ product.name }}</td>
         <td>{{ product.manufacturer }}</td>
-        {% if product.aggregate_amount < product.min_stock %}
-          <td class="danger" title="Estoque abaixo do mínimo">{{ product.aggregate_amount }}</td>
-        {% else %}
-          <td>{{ product.aggregate_amount }}</td>
-        {% endif %}
+        <td {% if product.aggregate_amount < product.min_stock %} class="danger" title="Estoque abaixo do mínimo"{% endif %}>
+            {{ product.aggregate_amount }}
+        </td>
         <td>{{ product.min_stock }}</td>
       </tr>
+      {% if product.aggregate_amount > 0 %}
+        <tr><td><table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Lote</th>
+              <th>Quantidade em estoque</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for stock_product in product.stock_products %}
+              {% if stock_product.amount > 0 %}
+                <tr>
+                  <td>{{ stock_product.lot_number }}</td>
+                  <td>{{ stock_product.amount }}</td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table></td></tr>
+      {% endif %}
     {% endfor %}
   </tbody>
 </table>
