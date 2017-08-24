@@ -64,7 +64,8 @@ def create_add_transaction():
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
-        transaction.execute(form.data)
+        transaction.execute(form.amount.data, form.lot_number.data,
+                            form.expiration_date.data)
         db.session.add(transaction)
         db.session.commit()
         flash('Entrada realizada com sucesso.')
@@ -85,15 +86,12 @@ def create_sub_transaction():
         for sp in StockProduct.list_products_in_stock()
     ]
     if form.validate_on_submit():
-        lot_number = StockProduct.query.get(
-            form.stock_product_id.data).lot_number
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
-        transaction.stock_product = StockProduct.query.get(
-            transaction.stock_product_id)
-        # transaction.amount is negative (form changes its sign)
-        transaction.stock_product.amount += transaction.amount
-        transaction.product = transaction.stock_product.product
+        transaction.execute(form.amount.data)
+        db.session.add(transaction)
+        db.session.commit()
+        flash('Baixa realizada com sucesso.')
         if stock_is_at_minimum(transaction.product):
             send_email(
                 User.get_stock_alert_emails(),
@@ -103,9 +101,6 @@ def create_sub_transaction():
                 amount_in_stock=
                 transaction.product.count_amount_stock_products(),
                 min_stock=transaction.stock_product.product.min_stock)
-        db.session.add(transaction)
-        db.session.commit()
-        flash('Baixa realizada com sucesso.')
         return redirect(url_for('.create_sub_transaction', method='sub'))
 
     return render_template(
