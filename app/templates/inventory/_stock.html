@@ -32,6 +32,7 @@
             <tr>
               <th>Lote</th>
               <th>Quantidade em estoque</th>
+              <th>Data de validade</th>
             </tr>
           </thead>
           <tbody>
@@ -40,6 +41,7 @@
                 <tr>
                   <td>{{ stock_product.lot_number }}</td>
                   <td>{{ stock_product.amount }}</td>
+                  <td>{{ stock_product.expiration_date }}</td>
                 </tr>
               {% endif %}
             {% endfor %}
