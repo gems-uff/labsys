@@ -491,8 +491,35 @@ class Transaction(db.Model):
     def get_transactions_ordered(cls):
         return cls.query.order_by(desc(cls.transaction_date)).all()
 
+    def get_stock_product_amount(self, catalog_product, amount):
+        if catalog_product.is_unitary:
+            return amount
+        else:
+            return catalog_product.stock_unit * amount
+
+    def get_stock_product_catalog_id(self, catalog_product):
+        if catalog_product.is_unitary:
+            return catalog_product.id
+        else:
+            return catalog_product.subproduct.id
+
+    def execute(self, form_dict):
+        form_dict = dict((k, v) for k, v in form_dict.items())
+        product = Product.query.get(self.product_id)
+        stock_product = StockProduct.query.filter_by(
+            product_id=product.id, lot_number=form_dict['lot_number']).first()
+        if stock_product is None:
+            stock_product = StockProduct(amount=0)
+            db.session.add(stock_product)
+
+        stock_product.lot_number = form_dict['lot_number']
+        stock_product.amount += self.get_stock_product_amount(
+            product, form_dict['amount'])
+        stock_product.product_id = self.get_stock_product_catalog_id(product)
+        stock_product.expiration_date = form_dict['expiration_date']
+
     def __repr__(self):
-        return '{} : {}'.format(self.transaction_date, self.product.name[:10])
+        return '{} : {}'.format(self.id, self.transaction_date)
 
 
 class StockProduct(db.Model):
