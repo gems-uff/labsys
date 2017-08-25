@@ -100,12 +100,26 @@ def create_sub_transaction():
         'inventory/create-transaction.html', form=form, method='sub')
 
 
-@inventory.route('/transactions/<int:id>/edit', methods=['GET', 'POST'])
+@inventory.route('/transactions/add/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
+# TODO: only owner or admin can edit a transaction
 def edit_add_transaction(id):
-    #transaction = Transaction.query.get_or_404(id)
-    form = AddTransactionForm()
+    transaction = Transaction.query.get_or_404(id)
+    form = AddTransactionForm(
+        obj=transaction,
+        lot_number=transaction.stock_product.lot_number,
+        expiration_date=transaction.stock_product.expiration_date)
+    if form.validate_on_submit():
+        Transaction.revert(transaction)
+        # Normal add flow
+        form.populate_obj(transaction)
+        transaction.receive_product(form.lot_number.data,
+                                    form.expiration_date.data)
+        db.session.add(transaction)
+        db.session.commit()
+        flash('Entrada atualizada com sucesso.')
+        return redirect(url_for('.edit_add_transaction', id=id, method='add'))
 
     return render_template(
         'inventory/create-transaction.html', form=form, method='add')

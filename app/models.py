@@ -506,13 +506,13 @@ class Transaction(db.Model):
         # First product of this lot added => create a new StockProduct
         if self.stock_product is None:
             self.stock_product = StockProduct(
-                product_id=self.product.unit_product.id,
-                lot_number=lot_number,
-                expiration_date=expiration_date,
-                amount=self.product.stock_unit * self.amount, )
+                product_id=self.product.unit_product.id)
         # There's already one product of this lot => Add to its amount only
-        else:
-            self.stock_product.amount += self.product.stock_unit * self.amount
+        # Or update it
+        self.stock_product.amount += self.product.stock_unit * self.amount
+        self.stock_product.lot_number = lot_number
+        self.stock_product.expiration_date = expiration_date or \
+                                             self.expiration_date
 
     def consume_product(self):
         # I just need the product of a consume transaction
@@ -523,17 +523,11 @@ class Transaction(db.Model):
 
     @classmethod
     def revert(cls, transaction):
-        # TODO: maybe it's better to wrap all this into a session in order to
-        # prevent multiple reversions on the same transaction (e.g. shell)
-        if transaction.product.is_unitary:
-            transaction.stock_product.amount -= transaction.amount
-        else:
-            transaction.stock_product.amount -= (
-                transaction.amount * transaction.product.stock_unit)
+        transaction.stock_product.amount -= (
+            transaction.amount * transaction.product.stock_unit)
+        transaction.amount = 0
         if transaction.stock_product.amount == 0:
             StockProduct.erase_depleted()
-        db.session.delete(transaction)
-        db.session.commit()
 
     def __repr__(self):
         return '{} : {}'.format(self.id, self.transaction_date)
