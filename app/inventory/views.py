@@ -104,6 +104,7 @@ def create_sub_transaction():
 @login_required
 @permission_required(Permission.EDIT)
 # TODO: only owner or admin can edit a transaction
+# TODO: can only edit add transactions
 def edit_add_transaction(id):
     transaction = Transaction.query.get_or_404(id)
     form = AddTransactionForm(
@@ -123,3 +124,16 @@ def edit_add_transaction(id):
 
     return render_template(
         'inventory/create-transaction.html', form=form, method='add')
+
+
+@inventory.route('/transactions/sub/<int:id>/delete', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
+# TODO: only owner or admin can edit a transaction
+def delete_sub_transaction(id):
+    transaction = Transaction.query.get_or_404(id)
+    Transaction.revert(transaction)
+    db.session.delete(transaction)
+    db.session.commit()
+    flash('Transação excluída com sucesso.')
+    return redirect(url_for('.list_transactions'))
