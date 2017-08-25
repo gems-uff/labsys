@@ -438,7 +438,7 @@ class Product(db.Model):
 
     @classmethod
     def get_products(cls, unitary_only=False):
-        products = cls.query.order_by(asc(cls.name)).all()
+        products = cls.query.order_by(asc(cls.catalog)).all()
         if unitary_only:
             return [p for p in products if p.is_unitary]
         return products
@@ -556,7 +556,12 @@ class StockProduct(db.Model):
 
     @classmethod
     def list_products_in_stock(cls):
-        return cls.query.filter(cls.amount > 0).all()
+        stock_products = cls.query.filter(cls.amount > 0).all()
+        return sorted(
+            stock_products,
+            key=
+            lambda stock_product: (stock_product.product.catalog, stock_product.expiration_date)
+        )
 
     @classmethod
     def erase_depleted(cls):

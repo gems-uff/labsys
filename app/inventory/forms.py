@@ -24,7 +24,7 @@ class AddTransactionForm(FlaskForm):
     transaction_date = DateField(
         'Data de Registro',
         format='%d/%m/%Y',
-        default=datetime.datetime.today(),
+        default=datetime.datetime.now(),
         validators=[InputRequired()])
     invoice_type = SelectField(
         'Tipo de Nota',
@@ -52,8 +52,8 @@ class SubTransactionForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.stock_product_id.choices = [
-            (sp.id, sp.product.name + ' | Lote: ' + sp.lot_number +
-             ' | {} unidades.'.format(sp.amount))
+            (sp.id, '{} | Lote: {} | Unidades: {} | {}'.format(
+                sp.product.catalog, sp.lot_number, sp.amount, sp.product.name))
             for sp in StockProduct.list_products_in_stock()
         ]
 
@@ -63,7 +63,7 @@ class SubTransactionForm(FlaskForm):
     transaction_date = DateField(
         'Data de Uso',
         format='%d/%m/%Y',
-        default=datetime.datetime.today(),
+        default=datetime.datetime.now(),
         validators=[InputRequired()])
     details = StringField('Observações', validators=[Optional()])
     submit = SubmitField('Enviar')
