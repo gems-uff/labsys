@@ -476,8 +476,8 @@ class Product(db.Model):
 class Transaction(db.Model):
     __tablename__ = 'transactions'
     id = db.Column(db.Integer, primary_key=True)
-    transaction_date = db.Column(db.Date)
-    amount = db.Column(db.Integer)
+    transaction_date = db.Column(db.DateTime)
+    amount = db.Column(db.Integer, default=0)
     invoice_type = db.Column(db.String(64))
     invoice = db.Column(db.String(64))
     financier = db.Column(db.String(128))
@@ -506,7 +506,7 @@ class Transaction(db.Model):
         # First product of this lot added => create a new StockProduct
         if self.stock_product is None:
             self.stock_product = StockProduct(
-                product_id=self.product.unit_product.id)
+                product_id=self.product.unit_product.id, amount=0)
         # There's already one product of this lot => Add to its amount only
         # Or update it
         self.stock_product.amount += self.product.stock_unit * self.amount
