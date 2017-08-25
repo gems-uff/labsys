@@ -522,6 +522,21 @@ class Transaction(db.Model):
             stock_product.product_id = self.get_stock_product_catalog_id(
                 product)
         stock_product.amount += self.get_stock_product_amount(product, amount)
+        self.stock_product = stock_product
+
+    @classmethod
+    def revert(cls, transaction):
+        # TODO: maybe it's better to wrap all this into a session in order to
+        # prevent multiple reversions on the same transaction (e.g. shell)
+        if transaction.product.is_unitary:
+            transaction.stock_product.amount -= transaction.amount
+        else:
+            transaction.stock_product.amount -= (
+                transaction.amount * transaction.product.stock_unit)
+        if transaction.stock_product.amount == 0:
+            StockProduct.erase_depleted()
+        db.session.delete(transaction)
+        db.session.commit()
 
     def __repr__(self):
         return '{} : {}'.format(self.id, self.transaction_date)
@@ -546,6 +561,11 @@ class StockProduct(db.Model):
     @classmethod
     def list_products_in_stock(cls):
         return cls.query.filter(cls.amount > 0).all()
+
+    @classmethod
+    def erase_depleted(cls):
+        """Erase all lots of stock products which amount is zero"""
+        print('Not implemented yet. Should erase stock product w/ amount = 0')
 
 
 class PreAllowedUser(db.Model):
