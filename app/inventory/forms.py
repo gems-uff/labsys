@@ -10,6 +10,11 @@ from ..models import Product, StockProduct, Transaction
 
 
 class AddTransactionForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.product_id.choices = [(p.id, ' {} | {}'.format(p.catalog, p.name))
+                                   for p in Product.get_products()]
+
     product_id = SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
     lot_number = StringField('Lote', validators=[InputRequired()])
@@ -44,6 +49,14 @@ class AddTransactionForm(FlaskForm):
 
 
 class SubTransactionForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.stock_product_id.choices = [
+            (sp.id, sp.product.name + ' | Lote: ' + sp.lot_number +
+             ' | {} unidades.'.format(sp.amount))
+            for sp in StockProduct.list_products_in_stock()
+        ]
+
     stock_product_id = SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
     amount = IntegerField('Quantidade Consumida', validators=[InputRequired()])

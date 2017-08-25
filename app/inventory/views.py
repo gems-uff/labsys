@@ -59,8 +59,6 @@ def list_transactions():
 @permission_required(Permission.EDIT)
 def create_add_transaction():
     form = AddTransactionForm()
-    form.product_id.choices = [(p.id, ' {} | {}'.format(p.catalog, p.name))
-                               for p in Product.get_products()]
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
@@ -80,11 +78,6 @@ def create_add_transaction():
 @permission_required(Permission.EDIT)
 def create_sub_transaction():
     form = SubTransactionForm()
-    form.stock_product_id.choices = [
-        (sp.id, sp.product.name + ' | Lote: ' + sp.lot_number +
-         ' | {} unidades.'.format(sp.amount))
-        for sp in StockProduct.list_products_in_stock()
-    ]
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
@@ -107,11 +100,12 @@ def create_sub_transaction():
         'inventory/create-transaction.html', form=form, method='sub')
 
 
-@inventory.route('/transactions/add/<int:id>/edit', methods=['GET', 'POST'])
+@inventory.route('/transactions/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 def edit_add_transaction(id):
-    transaction = Transaction.query.get_or_404(id)
+    #transaction = Transaction.query.get_or_404(id)
     form = AddTransactionForm()
+
     return render_template(
         'inventory/create-transaction.html', form=form, method='add')
