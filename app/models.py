@@ -429,6 +429,13 @@ class Product(db.Model):
     def is_unitary(self):
         return self.stock_unit == 1
 
+    @property
+    def unit_product(self):
+        if self.is_unitary:
+            return self
+        else:
+            return self.subproduct
+
     @classmethod
     def get_products(cls, unitary_only=False):
         products = cls.query.order_by(asc(cls.name)).all()
@@ -491,38 +498,28 @@ class Transaction(db.Model):
     def get_transactions_ordered(cls):
         return cls.query.order_by(desc(cls.transaction_date)).all()
 
-    def get_stock_product_amount(self, catalog_product, amount):
-        if catalog_product.is_unitary:
-            return amount
+    def receive_product(self, lot_number, expiration_date=None):
+        self.product = Product.query.get(self.product_id)
+        self.stock_product = StockProduct.query.filter_by(
+            product_id=self.product.unit_product.id,
+            lot_number=lot_number).first()
+        # First product of this lot added => create a new StockProduct
+        if self.stock_product is None:
+            self.stock_product = StockProduct(
+                product_id=self.product.unit_product.id,
+                lot_number=lot_number,
+                expiration_date=expiration_date,
+                amount=self.product.stock_unit * self.amount, )
+        # There's already one product of this lot => Add to its amount only
         else:
-            return catalog_product.stock_unit * amount
+            self.stock_product.amount += self.product.stock_unit * self.amount
 
-    def get_stock_product_catalog_id(self, catalog_product):
-        if catalog_product.is_unitary:
-            return catalog_product.id
-        else:
-            return catalog_product.subproduct.id
-
-    def execute(self, amount, lot_number=None, expiration_date=None):
-        if self.stock_product_id:
-            stock_product = StockProduct.query.get(self.stock_product_id)
-            product = stock_product.product
-            self.product = product
-        else:
-            product = Product.query.get(self.product_id)
-            stock_product = StockProduct.query.filter_by(
-                product_id=product.id, lot_number=lot_number).first()
-        if stock_product is None:
-            stock_product = StockProduct(amount=0)
-            db.session.add(stock_product)
-            # `expiration_date` is derived from `lot_number`
-            stock_product.lot_number = lot_number
-            if expiration_date:
-                stock_product.expiration_date = expiration_date
-            stock_product.product_id = self.get_stock_product_catalog_id(
-                product)
-        stock_product.amount += self.get_stock_product_amount(product, amount)
-        self.stock_product = stock_product
+    def consume_product(self):
+        # I just need the product of a consume transaction
+        # to show it in the stock view
+        self.stock_product = StockProduct.query.get(self.stock_product_id)
+        self.product = self.stock_product.product
+        self.stock_product.amount += self.amount
 
     @classmethod
     def revert(cls, transaction):
@@ -557,6 +554,11 @@ class StockProduct(db.Model):
     def __repr__(self):
         return '<StockProduct[{}]: {}, lote {}>'.format(
             self.id, self.product.name[:10], self.lot_number)
+
+    @classmethod
+    def total_amount_in_stock(cls, stock_product):
+        # TODO: implement
+        pass
 
     @classmethod
     def list_products_in_stock(cls):

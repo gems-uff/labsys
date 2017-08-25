@@ -64,8 +64,8 @@ def create_add_transaction():
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
-        transaction.execute(form.amount.data, form.lot_number.data,
-                            form.expiration_date.data)
+        transaction.receive_product(form.lot_number.data,
+                                    form.expiration_date.data)
         db.session.add(transaction)
         db.session.commit()
         flash('Entrada realizada com sucesso.')
@@ -88,18 +88,18 @@ def create_sub_transaction():
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
-        transaction.execute(form.amount.data)
+        transaction.consume_product()
         db.session.add(transaction)
         db.session.commit()
         flash('Baixa realizada com sucesso.')
-        if stock_is_at_minimum(transaction.product):
+        if stock_is_at_minimum(transaction.stock_product.product):
             send_email(
                 User.get_stock_alert_emails(),
                 'Alerta de Estoque',
                 'inventory/email/stock_alert',
-                reactive_name=transaction.product.name,
-                amount_in_stock=
-                transaction.product.count_amount_stock_products(),
+                reactive_name=transaction.stock_product.product.name,
+                amount_in_stock=transaction.stock_product.product.
+                count_amount_stock_products(),
                 min_stock=transaction.stock_product.product.min_stock)
         return redirect(url_for('.create_sub_transaction', method='sub'))
 
@@ -111,4 +111,7 @@ def create_sub_transaction():
 @login_required
 @permission_required(Permission.EDIT)
 def edit_add_transaction(id):
-    return ('Not implemented yet')
+    transaction = Transaction.query.get_or_404(id)
+    form = AddTransactionForm()
+    return render_template(
+        'inventory/create-transaction.html', form=form, method='add')
