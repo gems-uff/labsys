@@ -1,6 +1,8 @@
 import operator
+from datetime import datetime
 from functools import reduce
 
+from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import asc, desc, orm, UniqueConstraint, func
@@ -476,7 +478,7 @@ class Product(db.Model):
 class Transaction(db.Model):
     __tablename__ = 'transactions'
     id = db.Column(db.Integer, primary_key=True)
-    transaction_date = db.Column(db.DateTime)
+    transaction_date = db.Column(db.DateTime, default=datetime.now())
     amount = db.Column(db.Integer, default=0)
     invoice_type = db.Column(db.String(64))
     invoice = db.Column(db.String(64))
@@ -556,11 +558,13 @@ class StockProduct(db.Model):
 
     @classmethod
     def list_products_in_stock(cls):
+        # TODO: if expiration_date is None it raises a TypeError '>'
+        # TODO: make it right
         stock_products = cls.query.filter(cls.amount > 0).all()
         return sorted(
             stock_products,
             key=
-            lambda stock_product: (stock_product.product.catalog, stock_product.expiration_date)
+            lambda stock_product: (stock_product.product.catalog, stock_product.expiration_date or 1)
         )
 
     @classmethod

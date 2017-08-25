@@ -21,11 +21,6 @@ class AddTransactionForm(FlaskForm):
     expiration_date = DateField(
         'Data de Validade', format='%d/%m/%Y', validators=[Optional()])
     amount = IntegerField('Quantidade Recebida', validators=[InputRequired()])
-    transaction_date = DateField(
-        'Data de Registro',
-        format='%d/%m/%Y',
-        default=datetime.datetime.now(),
-        validators=[InputRequired()])
     invoice_type = SelectField(
         'Tipo de Nota',
         coerce=str,
@@ -60,11 +55,6 @@ class SubTransactionForm(FlaskForm):
     stock_product_id = SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
     amount = IntegerField('Quantidade Consumida', validators=[InputRequired()])
-    transaction_date = DateField(
-        'Data de Uso',
-        format='%d/%m/%Y',
-        default=datetime.datetime.now(),
-        validators=[InputRequired()])
     details = StringField('Observações', validators=[Optional()])
     submit = SubmitField('Enviar')
 
