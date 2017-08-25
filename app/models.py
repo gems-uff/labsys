@@ -561,7 +561,10 @@ class StockProduct(db.Model):
     @classmethod
     def erase_depleted(cls):
         """Erase all lots of stock products which amount is zero"""
-        print('Not implemented yet. Should erase stock product w/ amount = 0')
+        for sp in cls.query.all():
+            if sp.amount == 0:
+                db.session.delete(sp)
+        db.session.commit()
 
 
 class PreAllowedUser(db.Model):
