@@ -126,11 +126,11 @@ def edit_add_transaction(id):
         'inventory/create-transaction.html', form=form, method='add')
 
 
-@inventory.route('/transactions/sub/<int:id>/delete', methods=['GET', 'POST'])
+@inventory.route('/transactions/delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
-# TODO: only owner or admin can edit a transaction
-def delete_sub_transaction(id):
+# TODO: only owner or admin can delete a transaction
+def delete_transaction(id):
     transaction = Transaction.query.get_or_404(id)
     Transaction.revert(transaction)
     db.session.delete(transaction)
