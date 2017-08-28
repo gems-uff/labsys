@@ -478,7 +478,7 @@ class Product(db.Model):
 class Transaction(db.Model):
     __tablename__ = 'transactions'
     id = db.Column(db.Integer, primary_key=True)
-    transaction_date = db.Column(db.DateTime, default=datetime.now())
+    transaction_date = db.Column(db.DateTime, default=datetime.now)
     amount = db.Column(db.Integer, default=0)
     invoice_type = db.Column(db.String(64))
     invoice = db.Column(db.String(64))
