@@ -147,3 +147,6 @@ __pycache__
 # Sublime files
 *.sublime-project
 *.sublime-workspace
+
+# Queries with sensitive data
+docs/ignored-queries/
