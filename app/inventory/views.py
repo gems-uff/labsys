@@ -129,7 +129,6 @@ def edit_add_transaction(id):
 @inventory.route('/transactions/delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
-# TODO: only owner or admin can delete a transaction
 def delete_transaction(id):
     transaction = Transaction.query.get_or_404(id)
     if transaction.user == current_user or current_user.is_administrator():
@@ -143,8 +142,8 @@ def delete_transaction(id):
 
 
 @inventory.route('/export/<string:table>')
-# @login_required
-# @permission_required(Permission.VIEW)
+@login_required
+@permission_required(Permission.VIEW)
 def export(table):
     response = export_table(table, table + '.csv')
     return response
