@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, abort
 from flask_login import current_user, login_required
 
-from app.inventory.utils import stock_is_at_minimum
+from .utils import stock_is_at_minimum, export_table
 from app.decorators import permission_required
 from app.email import send_email
 from .. import db
@@ -142,8 +142,9 @@ def delete_transaction(id):
         abort(403)
 
 
-@inventory.route('/export')
-@login_required
-@permission_required(Permission.VIEW)
-def show_export_options():
-    return 'Not implemented yet'
+@inventory.route('/export/<string:table>')
+# @login_required
+# @permission_required(Permission.VIEW)
+def export(table):
+    response = export_table(table, table + '.csv')
+    return response
