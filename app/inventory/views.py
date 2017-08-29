@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, abort
 from flask_login import current_user, login_required
 
 from app.inventory.utils import stock_is_at_minimum
@@ -132,8 +132,18 @@ def edit_add_transaction(id):
 # TODO: only owner or admin can delete a transaction
 def delete_transaction(id):
     transaction = Transaction.query.get_or_404(id)
-    Transaction.revert(transaction)
-    db.session.delete(transaction)
-    db.session.commit()
-    flash('Transação excluída com sucesso.')
-    return redirect(url_for('.list_transactions'))
+    if transaction.user == current_user or current_user.is_administrator():
+        Transaction.revert(transaction)
+        db.session.delete(transaction)
+        db.session.commit()
+        flash('Transação excluída com sucesso.')
+        return redirect(url_for('.list_transactions'))
+    else:
+        abort(403)
+
+
+@inventory.route('/export')
+@login_required
+@permission_required(Permission.VIEW)
+def show_export_options():
+    return 'Not implemented yet'
