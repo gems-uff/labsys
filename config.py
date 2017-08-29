@@ -45,6 +45,7 @@ class ProductionConfig(Config):
 class HerokuConfig(ProductionConfig):
     BOOTSTRAP_SERVE_LOCAL = False
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
     @classmethod
     def init_app(cls, app):
