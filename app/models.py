@@ -300,6 +300,7 @@ class Sample(db.Model):
     admission_date = db.Column(db.Date())
     collection_date = db.Column(db.Date())
     semepi = db.Column(db.Integer)
+    details = db.Column(db.String(128))
     _ordering = db.Column(db.Integer)
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))

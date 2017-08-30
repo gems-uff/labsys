@@ -1,9 +1,19 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    StringField, SubmitField, FormField, FormField, RadioField, HiddenField,
-    FieldList, BooleanField, Label, DateField, SelectField, IntegerField,
-    FloatField, widgets,
-)
+    StringField,
+    SubmitField,
+    FormField,
+    FormField,
+    RadioField,
+    HiddenField,
+    FieldList,
+    BooleanField,
+    Label,
+    DateField,
+    SelectField,
+    IntegerField,
+    FloatField,
+    widgets, )
 from wtforms.validators import InputRequired, Optional
 
 import app.custom_fields as cfields
@@ -16,7 +26,6 @@ class NameForm(FlaskForm):
 
 
 class ResidenceForm(FlaskForm):
-
     class Meta:
         csrf = False
 
@@ -26,31 +35,28 @@ class ResidenceForm(FlaskForm):
     neighborhood = StringField('Bairro')
     zone = RadioField(
         label='Zona',
-        choices=(
-            (1, 'Urbana'), (2, 'Rural'), (3, 'Periurbana'), (9, 'Ignorado')),
+        choices=((1, 'Urbana'), (2, 'Rural'), (3, 'Periurbana'), (9,
+                                                                  'Ignorado')),
         default=9,
-        coerce=int,
-    )
+        coerce=int, )
     details = StringField('Detalhes da residência')
 
 
 class PatientForm(FlaskForm):
     name = StringField('Nome do paciente')
-    birth_date = DateField('Data de nascimento', format='%d/%m/%Y',
-                           validators=[Optional()])
+    birth_date = DateField(
+        'Data de nascimento', format='%d/%m/%Y', validators=[Optional()])
     age = IntegerField('Idade', validators=[Optional()])
     age_unit = RadioField(
         label='Tipo idade',
         choices=(('Y', 'Anos'), ('M', 'Meses'), ('D', 'Dias'), ('H', 'Horas')),
         default='Y',
-        coerce=str,
-    )
+        coerce=str, )
     gender = RadioField(
         label='Sexo',
         choices=(('M', 'Masculino'), ('F', 'Feminino'), ('I', 'Ignorado')),
         default='I',
-        coerce=str,
-    )
+        coerce=str, )
     residence = FormField(ResidenceForm, label='Residência')
 
 
@@ -58,7 +64,6 @@ YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
 
 
 class VaccineForm(FlaskForm):
-
     class Meta:
         csrf = False
 
@@ -66,17 +71,14 @@ class VaccineForm(FlaskForm):
         label='Aplicação',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
-        coerce=int,
-    )
+        coerce=int, )
     last_dose_date = DateField(
         label='Data da última dose',
         format='%d/%m/%Y',
-        validators=[Optional()]
-    )
+        validators=[Optional()])
 
 
 class HospitalizationForm(FlaskForm):
-
     class Meta:
         csrf = False
 
@@ -84,17 +86,14 @@ class HospitalizationForm(FlaskForm):
         label='Ocorreu internação?',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
-        coerce=int,
-    )
+        coerce=int, )
     date = DateField(
         label='Data de internação (entrada)',
         format='%d/%m/%Y',
-        validators=[Optional()]
-    )
+        validators=[Optional()])
 
 
 class UTIHospitalizationForm(FlaskForm):
-
     class Meta:
         csrf = False
 
@@ -102,17 +101,14 @@ class UTIHospitalizationForm(FlaskForm):
         label='Foi internado em UTI?',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
-        coerce=int,
-    )
+        coerce=int, )
     date = DateField(
         label='Data de internação (entrada)',
         format='%d/%m/%Y',
-        validators=[Optional()]
-    )
+        validators=[Optional()])
 
 
 class ClinicalEvolutionForm(FlaskForm):
-
     class Meta:
         csrf = False
 
@@ -120,27 +116,22 @@ class ClinicalEvolutionForm(FlaskForm):
         label='Evoluiu para óbito?',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
-        coerce=int,
-    )
+        coerce=int, )
     date = DateField(
-        label='Data do óbito',
-        format='%d/%m/%Y',
-        validators=[Optional()]
-    )
+        label='Data do óbito', format='%d/%m/%Y', validators=[Optional()])
 
 
 class ObservedSymptomForm(FlaskForm):
     def __init__(self, **kwargs):
         super(ObservedSymptomForm, self).__init__(csrf_enabled=False, **kwargs)
-        self.observed.label = Label(
-            self.observed.id, kwargs.pop('symptom_name', 'Undefined'))
+        self.observed.label = Label(self.observed.id,
+                                    kwargs.pop('symptom_name', 'Undefined'))
 
     symptom_id = IntegerField(widget=widgets.HiddenInput())
     observed = RadioField(
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
-        coerce=int,
-    )
+        coerce=int, )
     details = StringField()
 
 
@@ -148,8 +139,8 @@ class SecondarySymptomForm(FlaskForm):
     def __init__(self, **kwargs):
         super(SecondarySymptomForm, self).__init__(
             csrf_enabled=False, **kwargs)
-        self.observed.label = Label(
-            self.observed.id, kwargs.pop('symptom_name', 'Undefined'))
+        self.observed.label = Label(self.observed.id,
+                                    kwargs.pop('symptom_name', 'Undefined'))
 
     symptom_id = IntegerField(widget=widgets.HiddenInput())
     observed = BooleanField()
@@ -163,25 +154,19 @@ class CdcForm(FlaskForm):
     flu_type = SelectField(
         'Tipagem',
         # TODO: model flu/subtype
-        choices=(('A', 'A'), ('B', 'B'),
-                 ('Inconclusive', 'Inconclusivo'),
-                 ('Não Realizado', 'Não Realizado'),
-                 ('Ignorado', 'Ignorado')),
+        choices=(('A', 'A'), ('B', 'B'), ('Inconclusive', 'Inconclusivo'),
+                 ('Não Realizado', 'Não Realizado'), ('Ignorado', 'Ignorado')),
         default='Ignorado',
-        coerce=str,
-    )
+        coerce=str, )
     flu_subtype = SelectField(
         'Subtipo OU Linhagem',
-        choices=(('H1', 'H1'), ('H3', 'H3'),
-                 ('Victoria', 'Victoria'), ('Yamagata', 'Yamagata'),
-                 ('Não Subtipado', 'Não SubtipADO'),
-                 ('Não Subtipável', 'Não SubtipÁVEL'),
-                 ('Ignorado', 'Ignorado')),
+        choices=(('H1', 'H1'), ('H3', 'H3'), ('Victoria', 'Victoria'), (
+            'Yamagata', 'Yamagata'), ('Não Subtipado', 'Não SubtipADO'), (
+                'Não Subtipável', 'Não SubtipÁVEL'), ('Ignorado', 'Ignorado')),
         default='Ignorado',
-        coerce=str,
-    )
+        coerce=str, )
     dominant_ct = FloatField('CT (principal)', validators=[Optional()])
-    details = StringField('Informações adicionais')
+    details = StringField('Informações adicionais sobre exame')
 
 
 class SampleForm(FlaskForm):
@@ -189,29 +174,27 @@ class SampleForm(FlaskForm):
         super(SampleForm, self).__init__(csrf_enabled=False, **kwargs)
 
     collection_date = DateField(
-        'Data de coleta',
-        format='%d/%m/%Y',
-        validators=[InputRequired()]
-    )
-    semepi = IntegerField('Semana Epidemiológica (Coleta)',
-                          validators=[Optional()])
+        'Data de coleta', format='%d/%m/%Y', validators=[InputRequired()])
+    semepi = IntegerField(
+        'Semana Epidemiológica (Coleta)', validators=[Optional()])
     admission_date = DateField(
         'Data de Entrada no LVRS',
         format='%d/%m/%Y',
-        validators=[InputRequired()]
-    )
+        validators=[InputRequired()])
+    details = StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
     cdc_exam = FormField(label='Resultado Exame CDC', form_class=CdcForm)
 
 
 class AdmissionForm(FlaskForm):
-    id_lvrs_intern = StringField('Número Interno',
-                                 validators=[InputRequired()])
-    first_symptoms_date = DateField('Data dos Primeiros Sintomas',
-                                    format='%d/%m/%Y',
-                                    validators=[Optional()])
-    semepi_symptom = IntegerField('Semana Epidemiológica (Sintomas)',
-                                  validators=[Optional()])
+    id_lvrs_intern = StringField(
+        'Número Interno', validators=[InputRequired()])
+    first_symptoms_date = DateField(
+        'Data dos Primeiros Sintomas',
+        format='%d/%m/%Y',
+        validators=[Optional()])
+    semepi_symptom = IntegerField(
+        'Semana Epidemiológica (Sintomas)', validators=[Optional()])
     state_id = cfields.StateSelectField('UF de Registro do Caso')
     city_id = cfields.CitySelectField('Município de registro do caso')
     health_unit = StringField('Unidade de Saúde')
@@ -219,17 +202,18 @@ class AdmissionForm(FlaskForm):
     details = StringField('Informações Adicionais')
     patient = FormField(PatientForm, label='Dados do Paciente')
     vaccine = FormField(VaccineForm, label='Vacina contra Gripe')
-    hospitalization = FormField(HospitalizationForm,
-                                label='Internação Hospitalar')
-    uti_hospitalization = FormField(UTIHospitalizationForm,
-                                    label='Internação UTI')
-    clinical_evolution = FormField(ClinicalEvolutionForm,
-                                   label='Evolução Clínica')
+    hospitalization = FormField(
+        HospitalizationForm, label='Internação Hospitalar')
+    uti_hospitalization = FormField(
+        UTIHospitalizationForm, label='Internação UTI')
+    clinical_evolution = FormField(
+        ClinicalEvolutionForm, label='Evolução Clínica')
     symptoms = FieldList(FormField(ObservedSymptomForm))
-    sec_symptoms = FieldList(FormField(SecondarySymptomForm),
-                             label='Sintomas Secundários')
+    sec_symptoms = FieldList(
+        FormField(SecondarySymptomForm), label='Sintomas Secundários')
     # TODO: #1 must be dynamic
-    samples = FieldList(FormField(label='Amostra', form_class=SampleForm),
-                        label='Amostras',
-                        min_entries=1)
+    samples = FieldList(
+        FormField(label='Amostra', form_class=SampleForm),
+        label='Amostras',
+        min_entries=1)
     submit = SubmitField('Criar')

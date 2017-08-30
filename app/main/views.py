@@ -265,6 +265,7 @@ def edit_admission(id):
                     sample.collection_date = sample_form.data[
                         'collection_date']
                     sample.semepi = sample_form.data['semepi']
+                    sample.details = sample_form.data['details']
                     sample.method_id = sample_form.data[
                         'method_id'] if sample_form.data['method_id'] is not -1 else None
                     sample_form.cdc_exam.form.populate_obj(sample.cdc_exam)
@@ -385,6 +386,7 @@ def create_admission():
                     admission_date=sample_form.data['admission_date'],
                     collection_date=sample_form.data['collection_date'],
                     semepi=sample_form.data['semepi'],
+                    details=sample_form.data['details'],
                     method_id=sample_form.data['method_id']
                     if sample_form.data['method_id'] is not -1 else None,
                     admission=admission, )
