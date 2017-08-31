@@ -411,7 +411,7 @@ class City(db.Model):
 
 
 class Product(db.Model):
-    # TODO: change parent_id to child_it in order to not allow a product to have
+    # TODO: change parent_id to child_id in order to not allow a product to have
     # more than one type of subproduct
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True)
@@ -542,8 +542,8 @@ class StockProduct(db.Model):
         'product_id', 'lot_number', name='stock_product'), )
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    lot_number = db.Column(db.String(64))
-    expiration_date = db.Column(db.Date)
+    lot_number = db.Column(db.String(64), nullable=False)
+    expiration_date = db.Column(db.Date(), nullable=False)
     amount = db.Column(db.Integer)
     transactions = db.relationship(
         'Transaction', backref='stock_product', lazy='dynamic')
@@ -559,13 +559,12 @@ class StockProduct(db.Model):
 
     @classmethod
     def list_products_in_stock(cls):
-        # TODO: if expiration_date is None it raises a TypeError '>'
-        # TODO: make it right
         stock_products = cls.query.filter(cls.amount > 0).all()
+
         return sorted(
             stock_products,
             key=
-            lambda stock_product: (stock_product.product.catalog, stock_product.expiration_date or 1)
+            lambda stock_product: (stock_product.product.catalog, stock_product.expiration_date)
         )
 
     @classmethod

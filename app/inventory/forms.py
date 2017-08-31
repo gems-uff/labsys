@@ -19,7 +19,7 @@ class AddTransactionForm(FlaskForm):
         'Reativo', coerce=int, validators=[InputRequired()])
     lot_number = StringField('Lote', validators=[InputRequired()])
     expiration_date = DateField(
-        'Data de Validade', format='%d/%m/%Y', validators=[Optional()])
+        'Data de Validade', format='%d/%m/%Y', validators=[InputRequired()])
     amount = IntegerField('Quantidade Recebida', validators=[InputRequired()])
     invoice_type = SelectField(
         'Tipo de Nota',

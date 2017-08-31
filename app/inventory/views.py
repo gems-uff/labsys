@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, abort
+from flask import render_template, redirect, url_for, flash, abort, request
 from flask_login import current_user, login_required
 
 from .utils import stock_is_at_minimum, export_table
@@ -59,6 +59,7 @@ def list_transactions():
 @permission_required(Permission.EDIT)
 def create_add_transaction():
     form = AddTransactionForm()
+    #if request.method == 'POST':
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
