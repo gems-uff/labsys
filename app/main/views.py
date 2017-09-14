@@ -11,10 +11,9 @@ from flask import (
     abort, )
 from flask_login import login_required
 
-from .. import db
-from ..models import (
-    User,
-    Permission,
+from app import db
+
+from .models import (
     Admission,
     Patient,
     Address,
@@ -30,6 +29,7 @@ from ..models import (
 from app.decorators import admin_required, permission_required
 from . import main
 from .forms import NameForm, AdmissionForm, VaccineForm
+from app.auth.models import Permission
 
 IGNORED = 9
 TRUE = 1

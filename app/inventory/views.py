@@ -4,8 +4,9 @@ from flask_login import current_user, login_required
 from .utils import stock_is_at_minimum, export_table
 from app.decorators import permission_required
 from app.email import send_email
-from .. import db
-from ..models import (Transaction, Product, StockProduct, Permission, User)
+from app import db
+from app.auth.models import Permission, User
+from app.inventory.models import Transaction, Product, StockProduct
 from . import inventory
 from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 

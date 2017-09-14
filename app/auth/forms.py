@@ -12,7 +12,7 @@ from wtforms.validators import (
     Regexp,
     EqualTo, )
 
-from app.models import User
+from .models import User
 
 
 class LoginForm(FlaskForm):

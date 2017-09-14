@@ -8,12 +8,13 @@ from flask_admin import Admin
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 
-import app.models as models
-from app.models import (User, Role, PreAllowedUser, Admission, Symptom,
-                        ObservedSymptom, Vaccine, Method, Sample, Patient,
-                        CdcExam, Hospitalization, UTIHospitalization,
-                        ClinicalEvolution, Country, Region, State, City,
-                        Address, Product, Transaction, StockProduct)
+from app.auth.models import User, Role, PreAllowedUser
+from app.main.models import (
+    Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
+    CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
+    Region, State, City, Address
+)
+from app.inventory.models import Product, Transaction, StockProduct
 from app.auth.views import ProtectedModelView
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -46,18 +47,17 @@ admin.add_views(
     ProtectedModelView(Transaction, db.session),
     ProtectedModelView(StockProduct, db.session), )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
-
 # endregion
 
 
 def make_shell_context():
     return dict(
-        app=app,
-        db=db,
-        m=models, )
+        app=app, db=db, User=User, Role=Role,
+        Product=Product, StockProduct=StockProduct
+    )
 
 
-manager.add_command("shell", Shell(make_context=make_shell_context))
+manager.add_command('shell', Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
 
 

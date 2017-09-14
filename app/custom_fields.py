@@ -1,5 +1,5 @@
 import wtforms as wt
-import app.models as models
+from app.main import models
 
 
 def get_cities_choices():

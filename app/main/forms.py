@@ -17,7 +17,7 @@ from wtforms import (
 from wtforms.validators import InputRequired, Optional
 
 import app.custom_fields as cfields
-import app.models as models
+from . import models
 
 
 class NameForm(FlaskForm):
