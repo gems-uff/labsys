@@ -1,14 +1,14 @@
-from flask import render_template, redirect, url_for, flash, abort, request
+from flask import render_template, redirect, url_for, flash, abort
 from flask_login import current_user, login_required
 
-from .utils import stock_is_at_minimum, export_table
-from labsys.decorators import permission_required
-from labsys.email import send_email
 from labsys import db
+from labsys.auth.decorators import permission_required
 from labsys.auth.models import Permission, User
-from labsys.inventory.models import Transaction, Product, StockProduct
+from labsys.inventory.models import Transaction, Product
+from labsys.utils.email import send_email
 from . import inventory
 from .forms import AddTransactionForm, SubTransactionForm, ProductForm
+from .utils import stock_is_at_minimum, export_table
 
 
 @inventory.route('/', methods=['GET'])

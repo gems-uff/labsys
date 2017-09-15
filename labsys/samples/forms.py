@@ -3,9 +3,7 @@ from wtforms import (
     StringField,
     SubmitField,
     FormField,
-    FormField,
     RadioField,
-    HiddenField,
     FieldList,
     BooleanField,
     Label,
@@ -16,8 +14,7 @@ from wtforms import (
     widgets, )
 from wtforms.validators import InputRequired, Optional
 
-import labsys.custom_fields as cfields
-from . import models
+from . import custom_fields as cfields
 
 
 class NameForm(FlaskForm):

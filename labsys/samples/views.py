@@ -1,18 +1,16 @@
-import datetime
-
 from flask import (
     render_template,
-    session,
     redirect,
     url_for,
-    current_app,
     flash,
-    request,
     abort, )
 from flask_login import login_required
 
 from labsys import db
-
+from labsys.auth.decorators import permission_required
+from labsys.auth.models import Permission
+from . import samples
+from .forms import AdmissionForm
 from .models import (
     Admission,
     Patient,
@@ -24,24 +22,19 @@ from .models import (
     Symptom,
     ObservedSymptom,
     Sample,
-    Method,
     CdcExam, )
-from labsys.decorators import admin_required, permission_required
-from . import main
-from .forms import NameForm, AdmissionForm, VaccineForm
-from labsys.auth.models import Permission
 
 IGNORED = 9
 TRUE = 1
 FALSE = 0
 
 
-@main.route('/', methods=['GET'])
+@samples.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
 
-@main.route('/admissions', methods=['GET'])
+@samples.route('/admissions', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def list_admissions():
@@ -58,8 +51,8 @@ def symptom_in_admission_symptoms(symptom_id, admission):
     return found
 
 
-@main.route('/admissions/<int:id>/detail', methods=['GET', 'POST'])
-@main.route('/admissions/<int:id>', methods=['GET', 'POST'])
+@samples.route('/admissions/<int:id>/detail', methods=['GET', 'POST'])
+@samples.route('/admissions/<int:id>', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.VIEW)
 def detail_admission(id):
@@ -106,7 +99,7 @@ def detail_admission(id):
     return render_template('create-admission.html', form=form, edit=False)
 
 
-@main.route('/admissions/<int:id>/edit', methods=['GET', 'POST'])
+@samples.route('/admissions/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 def edit_admission(id):
@@ -279,7 +272,7 @@ def edit_admission(id):
     return render_template('create-admission.html', form=form)
 
 
-@main.route('/admissions/<int:id>/delete', methods=['GET'])
+@samples.route('/admissions/<int:id>/delete', methods=['GET'])
 @login_required
 @permission_required(Permission.DELETE)
 def delete_admission(id):
@@ -290,7 +283,7 @@ def delete_admission(id):
     return ('Delete not implemented yet.')
 
 
-@main.route('/admissions/create', methods=['GET', 'POST'])
+@samples.route('/admissions/create', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.CREATE)
 def create_admission():

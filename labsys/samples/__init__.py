@@ -1,12 +1,12 @@
 from flask import Blueprint
 
-main = Blueprint('main', __name__)
+samples = Blueprint('samples', __name__)
 
 from . import views, errors
 from labsys.auth.models import Permission
 
 
-@main.app_context_processor
+@samples.app_context_processor
 def inject_permissions():
     """This function is executed each request,
     even though outside of the bluprint"""
