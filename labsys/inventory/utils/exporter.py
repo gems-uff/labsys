@@ -1,7 +1,7 @@
 import io
 import csv
 
-from app import db
+from labsys import db
 
 def export_inventory(file_name='estoque.csv'):
     memory = io.StringIO()

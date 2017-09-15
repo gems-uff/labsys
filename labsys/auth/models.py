@@ -12,7 +12,7 @@ from sqlalchemy import asc
 
 from flask import current_app
 
-from app import db, login_manager
+from labsys import db, login_manager
 
 
 @login_manager.user_loader

@@ -1,6 +1,6 @@
 import unittest
-from app import create_app, db
-from app.models import User, Role, Permission, AnonymousUser
+from labsys import create_app, db
+from labsys.models import User, Role, Permission, AnonymousUser
 
 
 class UserModelTestCase(unittest.TestCase):

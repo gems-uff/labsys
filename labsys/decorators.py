@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import abort
 from flask_login import current_user
-from app.auth.models import Permission
+from labsys.auth.models import Permission
 
 
 def permission_required(permission):

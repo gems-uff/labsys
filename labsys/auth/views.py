@@ -9,8 +9,8 @@ from flask_login import login_user, logout_user, login_required, current_user
 from flask_admin.contrib.sqla import ModelView
 
 from .models import User, PreAllowedUser, Role
-from app import db
-from app.email import send_email
+from labsys import db
+from labsys.email import send_email
 from . import auth
 from .forms import LoginForm, RegistrationForm
 

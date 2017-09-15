@@ -1,8 +1,8 @@
 import unittest
 import datetime
 from flask import current_app, url_for, get_flashed_messages
-from app import create_app, db
-from app.models import *
+from labsys import create_app, db
+from labsys.models import *
 
 
 class TestCreateAdmissionView(unittest.TestCase):

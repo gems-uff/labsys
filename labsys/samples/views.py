@@ -11,7 +11,7 @@ from flask import (
     abort, )
 from flask_login import login_required
 
-from app import db
+from labsys import db
 
 from .models import (
     Admission,
@@ -26,10 +26,10 @@ from .models import (
     Sample,
     Method,
     CdcExam, )
-from app.decorators import admin_required, permission_required
+from labsys.decorators import admin_required, permission_required
 from . import main
 from .forms import NameForm, AdmissionForm, VaccineForm
-from app.auth.models import Permission
+from labsys.auth.models import Permission
 
 IGNORED = 9
 TRUE = 1

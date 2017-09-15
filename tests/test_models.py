@@ -1,6 +1,6 @@
 import unittest
-from app import create_app, db
-from app.models import Sample, Admission
+from labsys import create_app, db
+from labsys.models import Sample, Admission
 
 
 class SampleModelTestCase(unittest.TestCase):

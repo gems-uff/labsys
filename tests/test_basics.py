@@ -1,7 +1,7 @@
 import unittest
 from flask import current_app, url_for
-from app import create_app, db
-from app.models import *
+from labsys import create_app, db
+from labsys.models import *
 
 
 class BasicsTestCase(unittest.TestCase):

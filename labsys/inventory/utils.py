@@ -4,7 +4,7 @@ import io
 from flask import make_response
 from psycopg2 import sql
 
-from app import db
+from labsys import db
 
 
 def filter_table_name(source):

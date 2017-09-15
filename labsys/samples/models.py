@@ -6,7 +6,7 @@ from sqlalchemy import asc, desc, orm, UniqueConstraint, func
 
 from flask import current_app
 
-from app import db, login_manager
+from labsys import db, login_manager
 
 
 class Patient(db.Model):

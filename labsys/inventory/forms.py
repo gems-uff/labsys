@@ -6,7 +6,7 @@ from wtforms import (BooleanField, DateField, FieldList, FloatField, FormField,
                      StringField, SubmitField, ValidationError, widgets)
 from wtforms.validators import InputRequired, Optional
 
-from app.inventory.models import Product, StockProduct, Transaction
+from labsys.inventory.models import Product, StockProduct, Transaction
 
 
 class AddTransactionForm(FlaskForm):

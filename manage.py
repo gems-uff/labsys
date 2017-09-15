@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import os
-from app import create_app, db
+from labsys import create_app, db
 
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
@@ -8,14 +8,14 @@ from flask_admin import Admin
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 
-from app.auth.models import User, Role, PreAllowedUser
-from app.main.models import (
+from labsys.auth.models import User, Role, PreAllowedUser
+from labsys.samples.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
     Region, State, City, Address
 )
-from app.inventory.models import Product, Transaction, StockProduct
-from app.auth.views import ProtectedModelView
+from labsys.inventory.models import Product, Transaction, StockProduct
+from labsys.auth.views import ProtectedModelView
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
@@ -72,7 +72,7 @@ def test():
 @manager.command
 def load_initial_data():
     """Load initial models data"""
-    import app.data_loader as dl
+    import labsys.data_loader as dl
     dl.load_data(db)
 
 

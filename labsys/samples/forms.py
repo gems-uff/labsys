@@ -16,7 +16,7 @@ from wtforms import (
     widgets, )
 from wtforms.validators import InputRequired, Optional
 
-import app.custom_fields as cfields
+import labsys.custom_fields as cfields
 from . import models
 
 

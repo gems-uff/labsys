@@ -1,8 +1,8 @@
 import unittest
 from flask import current_app, url_for
-from app import create_app, db
-from app.models import *
-from app.main.forms import *
+from labsys import create_app, db
+from labsys.models import *
+from labsys.samples.forms import *
 
 
 class TestForms(unittest.TestCase):
