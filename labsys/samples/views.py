@@ -24,6 +24,7 @@ from .models import (
     Sample,
     CdcExam, )
 
+
 IGNORED = 9
 TRUE = 1
 FALSE = 0
@@ -34,12 +35,12 @@ def index():
     return render_template('index.html')
 
 
-@samples.route('/admissions', methods=['GET'])
+@samples.route('/samples', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def list_admissions():
     admissions = Admission.query.all()
-    return render_template('list-admissions.html', admissions=admissions)
+    return render_template('samples/list-admissions.html', admissions=admissions)
 
 
 def symptom_in_admission_symptoms(symptom_id, admission):
@@ -51,8 +52,8 @@ def symptom_in_admission_symptoms(symptom_id, admission):
     return found
 
 
-@samples.route('/admissions/<int:id>/detail', methods=['GET', 'POST'])
-@samples.route('/admissions/<int:id>', methods=['GET', 'POST'])
+@samples.route('/samples/<int:id>/detail', methods=['GET', 'POST'])
+@samples.route('/samples/<int:id>', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.VIEW)
 def detail_admission(id):
