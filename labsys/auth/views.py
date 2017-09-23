@@ -4,39 +4,42 @@ from flask import (
     request,
     url_for,
     flash,
+    Blueprint
 )
 from flask_admin.contrib.sqla import ModelView
 from flask_login import login_user, logout_user, login_required, current_user
 
-from labsys import db
+from ..extensions import db
 from labsys.utils.email import send_email
-from . import auth
 from .forms import LoginForm, RegistrationForm
 from .models import User, PreAllowedUser, Role
 
 
-@auth.route('/login', methods=['GET', 'POST'])
+blueprint = Blueprint('auth', __name__)
+
+
+@blueprint.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
-            return redirect(request.args.get('next') or url_for('samples.index'))
+            return redirect(request.args.get('next') or url_for('main.index'))
         flash('Usuário ou password inválido(s).')
 
     return render_template('auth/login.html', form=form)
 
 
-@auth.route('/logout')
+@blueprint.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('Log Out realizado com sucesso.')
-    return redirect(url_for('samples.index'))
+    return redirect(url_for('admissions.list_admissions'))
 
 
-@auth.route('/register', methods=['GET', 'POST'])
+@blueprint.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -53,23 +56,23 @@ def register():
             user=user,
             token=token)
         flash('Uma mensagem de confirmação foi enviado para seu email.')
-        return redirect(url_for('samples.index'))
+        return redirect(url_for('admissions.list_admissions'))
     return render_template('auth/register.html', form=form)
 
 
-@auth.route('/confirm/<token>')
+@blueprint.route('/confirm/<token>')
 @login_required
 def confirm(token):
     if current_user.confirmed:
-        return redirect(url_for('samples.index'))
+        return redirect(url_for('admissions.list_admissions'))
     if current_user.confirm(token):
         flash('Conta verificada. Obrigado!')
     else:
         flash('O link de confirmação não é válido ou expirou.')
-    return redirect(url_for('samples.index'))
+    return redirect(url_for('admissions.list_admissions'))
 
 
-@auth.before_app_request
+@blueprint.before_app_request
 def before_request():
     if current_user.is_authenticated \
             and not current_user.confirmed \
@@ -78,14 +81,14 @@ def before_request():
         return redirect(url_for('auth.unconfirmed'))
 
 
-@auth.route('/unconfirmed')
+@blueprint.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
-        return redirect(url_for('samples.index'))
+        return redirect(url_for('admissions.list_admissions'))
     return render_template('auth/unconfirmed.html')
 
 
-@auth.route('/confirm')
+@blueprint.route('/confirm')
 @login_required
 def resend_confirmation():
     token = current_user.generate_confirmation_token()
@@ -96,7 +99,7 @@ def resend_confirmation():
         user=current_user,
         token=token)
     flash('Uma nova mensagem de confirmação foi enviada ao seu email.')
-    return redirect(url_for('samples.index'))
+    return redirect(url_for('admissions.list_admissions'))
 
 
 class ProtectedModelView(ModelView):

@@ -3,7 +3,7 @@
 {% block title %}LVRS - Amostras{% endblock %}
 
 {% block page_content %}
-{% include "_navigation.html" %}
+{% include "admissions/_navigation.html" %}
 <div class="page-header">
     <h1>
       Listagem de Admissões
@@ -25,8 +25,8 @@
         {% if admission.samples %}
           <td>{{ admission.samples[0].collection_date.strftime('%d/%m/%Y') }}</td>
         {% endif %}
-        <td><a href="{{ url_for('samples.edit_admission', id=admission.id) }}">Editar</a></td>
-        <td><a href="{{ url_for('samples.delete_admission', id=admission.id) }}">Deletar</a></td>
+        <td><a href="{{ url_for('admissions.edit_admission', id=admission.id) }}">Editar</a></td>
+        <td><a href="{{ url_for('admissions.delete_admission', id=admission.id) }}">Deletar</a></td>
       </tr>
     {% endfor %}
   </tbody>

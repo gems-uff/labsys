@@ -1,12 +1,7 @@
-import operator
-from datetime import datetime
-
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import asc, desc, orm, UniqueConstraint, func
+from sqlalchemy import asc
 
-from flask import current_app
-
-from labsys import db, login_manager
+from ..extensions import db
 
 
 class Patient(db.Model):

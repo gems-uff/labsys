@@ -1,17 +1,18 @@
-from flask import render_template, redirect, url_for, flash, abort
+from flask import render_template, redirect, url_for, flash, abort, Blueprint
 from flask_login import current_user, login_required
 
-from labsys import db
-from labsys.auth.decorators import permission_required
-from labsys.auth.models import Permission, User
-from labsys.inventory.models import Transaction, Product
-from labsys.utils.email import send_email
-from . import inventory
+from ..extensions import db
+from ..auth.decorators import permission_required
+from ..auth.models import Permission, User
+from .models import Transaction, Product
+from ..utils.email import send_email
 from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 from .utils import stock_is_at_minimum, export_table
 
 
-@inventory.route('/', methods=['GET'])
+blueprint = Blueprint('inventory', __name__)
+
+@blueprint.route('/', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def index():
@@ -21,7 +22,7 @@ def index():
     return render_template('inventory/index.html', products=products)
 
 
-@inventory.route('/catalog', methods=['GET'])
+@blueprint.route('/catalog', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def list_catalog():
@@ -29,7 +30,7 @@ def list_catalog():
     return render_template('inventory/list-catalog.html', catalog=catalog)
 
 
-@inventory.route('/reactives/add', methods=['GET', 'POST'])
+@blueprint.route('/reactives/add', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 def create_reactive():
@@ -46,7 +47,7 @@ def create_reactive():
     return render_template('inventory/create-reactive.html', form=form)
 
 
-@inventory.route('/transactions', methods=['GET'])
+@blueprint.route('/transactions', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def list_transactions():
@@ -55,12 +56,11 @@ def list_transactions():
         'inventory/list-transactions.html', transactions=transactions)
 
 
-@inventory.route('/transactions/add', methods=['GET', 'POST'])
+@blueprint.route('/transactions/add', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 def create_add_transaction():
     form = AddTransactionForm()
-    #if request.method == 'POST':
     if form.validate_on_submit():
         transaction = Transaction(user=current_user)
         form.populate_obj(transaction)
@@ -75,7 +75,7 @@ def create_add_transaction():
         'inventory/create-transaction.html', form=form, method='add')
 
 
-@inventory.route('/transactions/sub', methods=['GET', 'POST'])
+@blueprint.route('/transactions/sub', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 def create_sub_transaction():
@@ -102,7 +102,7 @@ def create_sub_transaction():
         'inventory/create-transaction.html', form=form, method='sub')
 
 
-@inventory.route('/transactions/add/<int:id>/edit', methods=['GET', 'POST'])
+@blueprint.route('/transactions/add/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 # TODO: only owner or admin can edit a transaction
@@ -128,7 +128,7 @@ def edit_add_transaction(id):
         'inventory/create-transaction.html', form=form, method='add')
 
 
-@inventory.route('/transactions/delete/<int:id>', methods=['GET', 'POST'])
+@blueprint.route('/transactions/delete/<int:id>', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 def delete_transaction(id):
@@ -143,7 +143,7 @@ def delete_transaction(id):
         abort(403)
 
 
-@inventory.route('/export/<string:table>')
+@blueprint.route('/export/<string:table>')
 @login_required
 @permission_required(Permission.VIEW)
 def export(table):

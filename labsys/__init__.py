@@ -1,45 +1,33 @@
 from flask import Flask
-from flask_bootstrap import Bootstrap
-from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_mail import Mail
 
 from config import config
 
-bootstrap = Bootstrap()
-mail = Mail()
-moment = Moment()
-db = SQLAlchemy()
-
-login_manager = LoginManager()
-login_manager.session_protection = 'strong'
-login_manager.login_view = 'auth.login'
+from .main.views import blueprint as main_blueprint
+from .admissions.views import blueprint as admissions_blueprint
+from .auth.views import blueprint as auth_blueprint
+from .inventory.views import blueprint as inventory_blueprint
+from .extensions import bootstrap, mail, moment, db, login_manager
 
 
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
-    config[config_name].init_app(app)
+    register_extensions(app)
+    register_blueprints(app)
 
+    return app
+
+
+def register_extensions(app):
     bootstrap.init_app(app)
     mail.init_app(app)
     moment.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
 
-    if not app.debug and not app.testing and not app.config['SSL_DISABLE']:
-        from flask_sslify import SSLify
-        sslify = SSLify(app)
 
-    from .samples import samples as main_blueprint
-    app.register_blueprint(main_blueprint)
-
-    from .auth import auth as auth_blueprint
+def register_blueprints(app):
+    app.register_blueprint(main_blueprint, url_prefix='/')
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
-
-    from .inventory import inventory as inventory_blueprint
     app.register_blueprint(inventory_blueprint, url_prefix='/inventory')
-
-    return app
-
+    app.register_blueprint(admissions_blueprint, url_prefix='/admissions')

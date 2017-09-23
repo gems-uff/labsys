@@ -1,18 +1,8 @@
-import operator
 from datetime import datetime
-from functools import reduce
 
-from sqlalchemy.sql import func
-from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import asc, desc, orm, UniqueConstraint, func
-from flask_login import UserMixin, AnonymousUserMixin
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from sqlalchemy import asc
+from sqlalchemy import asc, desc, UniqueConstraint
 
-from flask import current_app
-
-from labsys import db, login_manager
+from ..extensions import db
 
 
 class Product(db.Model):

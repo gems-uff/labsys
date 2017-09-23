@@ -3,13 +3,14 @@ from flask import (
     redirect,
     url_for,
     flash,
-    abort, )
+    abort,
+    Blueprint
+)
 from flask_login import login_required
 
-from labsys import db
+from ..extensions import db
 from labsys.auth.decorators import permission_required
 from labsys.auth.models import Permission
-from . import samples
 from .forms import AdmissionForm
 from .models import (
     Admission,
@@ -25,22 +26,25 @@ from .models import (
     CdcExam, )
 
 
+blueprint = Blueprint('admissions', __name__)
+
 IGNORED = 9
 TRUE = 1
 FALSE = 0
 
+@blueprint.app_context_processor
+def inject_permissions():
+    """This function is executed each request,
+    even though outside of the bluprint"""
+    return dict(Permission=Permission)
 
-@samples.route('/', methods=['GET'])
-def index():
-    return render_template('index.html')
 
-
-@samples.route('/samples', methods=['GET'])
+@blueprint.route('/', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def list_admissions():
     admissions = Admission.query.all()
-    return render_template('samples/list-admissions.html', admissions=admissions)
+    return render_template('admissions/list-admissions.html', admissions=admissions)
 
 
 def symptom_in_admission_symptoms(symptom_id, admission):
@@ -52,8 +56,8 @@ def symptom_in_admission_symptoms(symptom_id, admission):
     return found
 
 
-@samples.route('/samples/<int:id>/detail', methods=['GET', 'POST'])
-@samples.route('/samples/<int:id>', methods=['GET', 'POST'])
+@blueprint.route('/<int:id>/detail', methods=['GET', 'POST'])
+@blueprint.route('/<int:id>', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.VIEW)
 def detail_admission(id):
@@ -97,10 +101,10 @@ def detail_admission(id):
         samples=admission.samples, )
     # TODO: if has permission to edit, link to edit view
 
-    return render_template('create-admission.html', form=form, edit=False)
+    return render_template('admissions/create-admission.html', form=form, edit=False)
 
 
-@samples.route('/admissions/<int:id>/edit', methods=['GET', 'POST'])
+@blueprint.route('/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 def edit_admission(id):
@@ -273,7 +277,7 @@ def edit_admission(id):
     return render_template('create-admission.html', form=form)
 
 
-@samples.route('/admissions/<int:id>/delete', methods=['GET'])
+@blueprint.route('/<int:id>/delete', methods=['GET'])
 @login_required
 @permission_required(Permission.DELETE)
 def delete_admission(id):
@@ -284,7 +288,7 @@ def delete_admission(id):
     return ('Delete not implemented yet.')
 
 
-@samples.route('/admissions/create', methods=['GET', 'POST'])
+@blueprint.route('/create', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.CREATE)
 def create_admission():
@@ -398,5 +402,5 @@ def create_admission():
         return redirect(url_for('.create_admission'))
 
     return render_template(
-        'create-admission.html',
+        'admissions/create-admission.html',
         form=form, )

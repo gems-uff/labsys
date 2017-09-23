@@ -2,9 +2,8 @@ import csv
 import io
 
 from flask import make_response
-from psycopg2 import sql
 
-from labsys import db
+from ..extensions import db
 
 
 def filter_table_name(source):

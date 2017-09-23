@@ -2,7 +2,7 @@ import unittest
 from flask import current_app, url_for
 from labsys import create_app, db
 from labsys.models import *
-from labsys.samples.forms import *
+from labsys.admissions.forms import *
 
 
 class TestForms(unittest.TestCase):
