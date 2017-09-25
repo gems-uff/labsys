@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 
 from config import config
 
@@ -14,6 +14,7 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     register_extensions(app)
     register_blueprints(app)
+    register_error_handlers(app)
 
     return app
 
@@ -31,3 +32,17 @@ def register_blueprints(app):
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
     app.register_blueprint(inventory_blueprint, url_prefix='/inventory')
     app.register_blueprint(admissions_blueprint, url_prefix='/admissions')
+
+
+def register_error_handlers(app):
+    @app.errorhandler(403)
+    def page_not_found(e):
+        return render_template('403.html'), 403
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template('500.html'), 500
