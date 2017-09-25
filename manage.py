@@ -6,7 +6,7 @@ from flask_admin.menu import MenuLink
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
 
-from labsys import create_app
+from labsys.app import create_app
 from labsys.extensions import db
 from labsys.auth.models import User, Role, PreAllowedUser
 from labsys.auth.views import ProtectedModelView
