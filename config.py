@@ -13,9 +13,9 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    LABSYS_ADMIN = os.environ.get('LABSYS_ADMIN')
+    LABSYS_ADMIN = os.environ.get('LABSYS_ADMIN', '')
     LABSYS_MAIL_SUBJECT_PREFIX = '[LabSys]'
-    LABSYS_MAIL_SENDER = 'LabSys Admin <gabrielcrsaldanha@gmail.com>'
+    LABSYS_MAIL_SENDER = 'LabSys Admin <{}>'.format(LABSYS_ADMIN)
 
     BOOTSTRAP_SERVE_LOCAL = True
 
@@ -34,7 +34,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    BOOTSTRAP_SERVE_LOCAL = True
+    BOOTSTRAP_SERVE_LOCAL = False
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
 

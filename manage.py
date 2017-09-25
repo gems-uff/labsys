@@ -17,7 +17,7 @@ from labsys.admissions.models import (
     Region, State, City, Address
 )
 
-app = create_app(os.getenv('FLASK_CONFIG') or 'default')
+app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
 migrate = Migrate(app, db)
 admin = Admin(app, name='labsys', template_mode='bootstrap3')
