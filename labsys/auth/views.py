@@ -22,10 +22,11 @@ blueprint = Blueprint('auth', __name__)
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        next = request.args.get('next')
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
-            return redirect(request.args.get('next') or url_for('main.index'))
+            return redirect(next or url_for('inventory.index'))
         flash('Usuário ou password inválido(s).')
 
     return render_template('auth/login.html', form=form)
