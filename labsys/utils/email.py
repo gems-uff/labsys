@@ -10,14 +10,18 @@ def send_async_email(app, msg):
 
 
 def send_email(recipients, subject, template, **kwargs):
-    app = current_app._get_current_object()
-    msg = Message(
-        subject=app.config['LABSYS_MAIL_SUBJECT_PREFIX'] + ' ' + subject,
-        sender=app.config['LABSYS_MAIL_SENDER'],
-        recipients=recipients,
-        charset='utf-8')
-    msg.body = render_template(template + '.txt', **kwargs)
-    msg.html = render_template(template + '.html', **kwargs)
-    thr = Thread(target=send_async_email, args=[app, msg])
-    thr.start()
-    return thr
+    if len(recipients) == 0:
+        print('Nenhum recipiente cadastrado para receber notificação.')
+        return None
+    else:
+        app = current_app._get_current_object()
+        msg = Message(
+            subject=app.config['LABSYS_MAIL_SUBJECT_PREFIX'] + ' ' + subject,
+            sender=app.config['LABSYS_MAIL_SENDER'],
+            recipients=recipients,
+            charset='utf-8')
+        msg.body = render_template(template + '.txt', **kwargs)
+        msg.html = render_template(template + '.html', **kwargs)
+        thr = Thread(target=send_async_email, args=[app, msg])
+        thr.start()
+        return thr
