@@ -86,6 +86,23 @@ class ProductForm(FlaskForm):
     subproduct_id = HiddenField()
     submit = SubmitField('Cadastrar')
 
+    def validate(self):
+        rv = FlaskForm.validate(self)
+        if not rv:
+            return False
+        if self.stock_unit.data > 1:
+            if self.subproduct_catalog.data == '':
+                self.subproduct_catalog.errors.append(
+                    'Subproduto deve ser preenchido para produtos não unitários.')
+                return False
+        else:
+            if self.subproduct_catalog.data != '':
+                self.subproduct_catalog.errors.append(
+                    'Produtos unitários não possuem subproduto.')
+                return False
+        return True
+
+
     def validate_stock_unit(form, field):
         if field.data < 1:
             raise ValidationError(
@@ -97,13 +114,6 @@ class ProductForm(FlaskForm):
             field.data = 0
 
     def validate_subproduct_catalog(form, field):
-        '''
-        TODO: make this validation be called even though field is empty
-        if form.stock_unit.data > 1 and field.data == '':
-            raise ValidationError(
-                'Catálogo de subproduto deve ser informado para produtos não unitários.'
-            )
-        '''
         if field.data != '':
             manufacturer_products = Product.get_products_by_manufacturer(
                 form.manufacturer.data)
