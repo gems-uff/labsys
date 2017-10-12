@@ -1,9 +1,12 @@
 import os
 
+import pytest
+
 from labsys.inventory.forms import ProductForm, AddTransactionForm, \
     SubTransactionForm
 
 
+@pytest.mark.skip()
 class TestProductForm:
     """Add product to catalog form."""
 

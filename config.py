@@ -23,25 +23,29 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     BOOTSTRAP_SERVE_LOCAL = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL')
+    DATABASE_URI_ENV_KEY = 'DEV_DATABASE_URL'
+    SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
 
 
 class TestingConfig(Config):
     TESTING = True
     BOOTSTRAP_SERVE_LOCAL = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')
+    DATABASE_URI_ENV_KEY = 'TEST_DATABASE_URL'
+    SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
     WTF_CSRF_ENABLED = False
 
 
 class ProductionConfig(Config):
     BOOTSTRAP_SERVE_LOCAL = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    DATABASE_URI_ENV_KEY = 'DATABASE_URL'
+    SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
 
 
 class HerokuConfig(ProductionConfig):
     BOOTSTRAP_SERVE_LOCAL = False
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    DATABASE_URI_ENV_KEY = 'DATABASE_URL'
+    SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
 
 
 config = {
