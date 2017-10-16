@@ -9,6 +9,8 @@ class Product(db.Model):
     # TODO: change parent_id to child_id in order to not allow a product to have
     # more than one type of subproduct
     __tablename__ = 'products'
+    __table_args__ = (UniqueConstraint(
+        'manufacturer', 'catalog', name='catalog_product'), )
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128))
     manufacturer = db.Column(db.String(128))
@@ -65,10 +67,12 @@ class Product(db.Model):
         return amount_in_stock
 
     def __repr__(self):
-        return '<Product[{}], cat: {}>'.format(self.id, self.name)
+        return '<Product[({}) {}], cat: {}>'.format(
+            self.id, self.name, self.catalog)
 
     def __str__(self):
-        return '<Product[{}], cat: {}>'.format(self.id, self.name)
+        return '<Product[({}) {}], cat: {}>'.format(
+            self.id, self.name, self.catalog)
 
 
 class Transaction(db.Model):
