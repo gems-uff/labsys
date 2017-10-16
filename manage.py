@@ -65,6 +65,9 @@ manager.add_command('db', MigrateCommand)
 @manager.command
 def test():
     """Run the tests."""
+    if app.config['DATABASE_URI_ENV_KEY'] != 'TEST_DATABASE_URL':
+        raise EnvironmentError(
+            'Trying to run tests outside testing environment!')
     import pytest
     rv = pytest.main(['--verbose'])
     exit(rv)
