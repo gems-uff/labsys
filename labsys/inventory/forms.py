@@ -91,13 +91,15 @@ class ProductForm(FlaskForm):
         if not rv:
             return False
         if self.stock_unit.data > 1:
-            if self.subproduct_catalog.data == '':
+            if self.subproduct_catalog.data == '' \
+                    or self.subproduct_catalog.data is None:
                 self.subproduct_catalog.errors.append(
                     'Subproduto deve ser preenchido para produtos '
                     'não unitários.')
                 return False
         else:
-            if self.subproduct_catalog.data != '':
+            if self.subproduct_catalog.data != '' \
+                    and self.subproduct_catalog.data is not None:
                 self.subproduct_catalog.errors.append(
                     'Produtos unitários não possuem subproduto.')
                 return False
