@@ -37,7 +37,7 @@ def login():
 def logout():
     logout_user()
     flash('Log Out realizado com sucesso.')
-    return redirect(url_for('admissions.list_admissions'))
+    return redirect(url_for('auth.login'))
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])
