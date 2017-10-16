@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import (BooleanField, DateField, FieldList, FloatField, FormField,
                      HiddenField, IntegerField, Label, RadioField, SelectField,
                      StringField, SubmitField, ValidationError, widgets)
-from wtforms.validators import InputRequired, Optional
+from wtforms.validators import InputRequired, DataRequired, Optional
 
 from labsys.inventory.models import Product, StockProduct, Transaction
 
@@ -72,11 +72,11 @@ class SubTransactionForm(FlaskForm):
 
 
 class ProductForm(FlaskForm):
-    name = StringField('Nome do Reativo', validators=[InputRequired()])
-    manufacturer = StringField('Fabricante', validators=[InputRequired()])
-    catalog = StringField('Número de Catálogo', validators=[InputRequired()])
+    name = StringField('Nome do Reativo', validators=[DataRequired()])
+    manufacturer = StringField('Fabricante', validators=[DataRequired()])
+    catalog = StringField('Número de Catálogo', validators=[DataRequired()])
     stock_unit = IntegerField(
-        'Unidade de Estoque', default=1, validators=[InputRequired()])
+        'Unidade de Estoque', default=1, validators=[DataRequired()])
     min_stock = IntegerField(
         'Estoque Mínimo (se produto unitário)',
         default=2,
@@ -93,7 +93,8 @@ class ProductForm(FlaskForm):
         if self.stock_unit.data > 1:
             if self.subproduct_catalog.data == '':
                 self.subproduct_catalog.errors.append(
-                    'Subproduto deve ser preenchido para produtos não unitários.')
+                    'Subproduto deve ser preenchido para produtos '
+                    'não unitários.')
                 return False
         else:
             if self.subproduct_catalog.data != '':
@@ -102,6 +103,14 @@ class ProductForm(FlaskForm):
                 return False
         return True
 
+    def validate_catalog(self, field):
+        products_by_catalog_and_manufacturer = \
+            Product.query.filter_by(
+                catalog = field.data,
+                manufacturer = self.manufacturer.data).all()
+        if len(products_by_catalog_and_manufacturer) != 0:
+            raise ValidationError(
+                'Esse produto já está registrado no catálogo!')
 
     def validate_stock_unit(form, field):
         if field.data < 1:

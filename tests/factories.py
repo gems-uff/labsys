@@ -23,7 +23,7 @@ class ProductFactory(BaseFactory):
     Any of these can be overriden
     product = ProductFactory(name='myname')
     '''
-    id = Sequence(lambda n: 'id-{}'.format(n))
+    #id = Sequence(lambda n: n)
     name = Sequence(lambda n: 'product-{}'.format(n))
     manufacturer = Sequence(lambda n: 'manufacturer-{}'.format(n))
     catalog = Sequence(lambda n: 'catalog-{}'.format(n))

@@ -4,14 +4,27 @@ import pytest
 
 from labsys.inventory.forms import ProductForm, AddTransactionForm, \
     SubTransactionForm
+from ..factories import ProductFactory
 
 
 @pytest.mark.usefixtures('db')
 class TestProductForm:
-    """Add product to catalog form."""
+
+    def test_validate_product_already_registered(self):
+        """
+        A product is already registered if its catalog and manufacturer already
+        exist.
+        """
+        error_msg = 'Esse produto já está registrado no catálogo!'
+        registered_product = ProductFactory(manufacturer='A', catalog='123')
+        form = ProductForm(obj=registered_product)
+
+        assert form.validate() is False
+        assert len(form.errors) == 1
+        assert error_msg in form.catalog.errors
 
     @pytest.mark.skip()
-    def test_validate_catalog_already_registered(self):
+    def test_create_product_same_catalog_but_differente_manufacturer(self):
         assert False
 
     @pytest.mark.skip()
