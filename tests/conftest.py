@@ -5,13 +5,12 @@ from webtest import TestApp
 
 from labsys.app import create_app
 from labsys.extensions import db as _db
-from config import TestingConfig
 
 
 @pytest.yield_fixture(scope='function')
 def app():
     """An application for the tests."""
-    _app = create_app(TestingConfig)
+    _app = create_app('testing')
     ctx = _app.test_request_context()
     ctx.push()
 

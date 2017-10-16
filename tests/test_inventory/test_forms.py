@@ -10,8 +10,8 @@ from labsys.inventory.forms import ProductForm, AddTransactionForm, \
 class TestProductForm:
     """Add product to catalog form."""
 
+    @pytest.mark.skip()
     def test_validate_catalog_already_registered(self):
-
         assert False
 
     @pytest.mark.skip()

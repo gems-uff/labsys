@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import os
 
 from flask_admin import Admin
@@ -14,8 +13,9 @@ from labsys.inventory.models import Product, Transaction, StockProduct
 from labsys.admissions.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
-    Region, State, City, Address
+    Region, State, City, Address,
 )
+from tests import factories as factory
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
@@ -53,7 +53,7 @@ admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 def make_shell_context():
     return dict(
         app=app, db=db, User=User, Role=Role,
-        Product=Product, StockProduct=StockProduct
+        Product=Product, StockProduct=StockProduct, factory=factory,
     )
 
 
