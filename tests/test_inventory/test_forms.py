@@ -2,6 +2,9 @@ import os
 
 import pytest
 
+from wtforms import Field
+from wtforms import ValidationError
+
 from labsys.inventory.forms import ProductForm, AddTransactionForm, \
     SubTransactionForm
 from labsys.inventory.models import Product
@@ -86,6 +89,27 @@ class TestProductForm:
         assert form.validate() is False
         error_msg = 'Subproduto informado não existe.'
         assert error_msg in form.subproduct_catalog.errors
+
+    def test_validate_subproduct_catalog(self):
+        form = ProductForm()
+        subproduct_catalog = Field()
+        subproduct_catalog.data = ''
+        form.validate_subproduct_catalog(subproduct_catalog)
+        assert len(form.errors) == 0
+        subproduct_catalog.data = None
+        form.validate_subproduct_catalog(subproduct_catalog)
+        assert len(form.errors) == 0
+        subproduct_catalog.data = '123'
+        error_msg = 'Subproduto informado não existe.'
+        with pytest.raises(ValidationError) as excinfo:
+            form.validate_subproduct_catalog(subproduct_catalog)
+        assert error_msg in str(excinfo.value)
+        product = ProductFactory(catalog='123', stock_unit=2)
+        form.manufacturer.data = product.manufacturer
+        error_msg = 'Subproduto informado não é unitário.'
+        with pytest.raises(ValidationError) as excinfo:
+            form.validate_subproduct_catalog(subproduct_catalog)
+        assert error_msg in str(excinfo.value)
 
     @pytest.mark.skip()
     def test_create_product_linked_to_subproduct(self):

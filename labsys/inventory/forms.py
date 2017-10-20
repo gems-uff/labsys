@@ -125,7 +125,7 @@ class ProductForm(FlaskForm):
             field.data = 0
 
     def validate_subproduct_catalog(form, field):
-        if field.data != '' or field.data is None:
+        if field.data != '' and field.data is not None:
             manufacturer_products = Product.get_products_by_manufacturer(
                 form.manufacturer.data)
             subproducts = [
