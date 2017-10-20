@@ -92,6 +92,7 @@ class TestProductForm:
 
     def test_validate_subproduct_catalog(self):
         form = ProductForm()
+        # Assert for empty and None
         subproduct_catalog = Field()
         subproduct_catalog.data = ''
         form.validate_subproduct_catalog(subproduct_catalog)
@@ -99,17 +100,27 @@ class TestProductForm:
         subproduct_catalog.data = None
         form.validate_subproduct_catalog(subproduct_catalog)
         assert len(form.errors) == 0
+
+        # Assert for nonexistent subproduct
         subproduct_catalog.data = '123'
         error_msg = 'Subproduto informado não existe.'
         with pytest.raises(ValidationError) as excinfo:
             form.validate_subproduct_catalog(subproduct_catalog)
         assert error_msg in str(excinfo.value)
+
+        # Assert for existent but non unitary
         product = ProductFactory(catalog='123', stock_unit=2)
         form.manufacturer.data = product.manufacturer
         error_msg = 'Subproduto informado não é unitário.'
         with pytest.raises(ValidationError) as excinfo:
             form.validate_subproduct_catalog(subproduct_catalog)
         assert error_msg in str(excinfo.value)
+
+        # Assert for existent and unitary : OK
+        # TODO: move tests related to a method to a different class
+        #product = ProductFactory(catalog='123', stock_unit=1)
+        #form.manufacturer.data = product.manufacturer
+        #assert form.validate_subproduct_catalog(subproduct_catalog) is True
 
     @pytest.mark.skip()
     def test_create_product_linked_to_subproduct(self):
