@@ -25,7 +25,7 @@ class ProductFactory(BaseFactory):
     '''
     #id = Sequence(lambda n: n)
     name = Sequence(lambda n: 'product-{}'.format(n))
-    manufacturer = Sequence(lambda n: 'manufacturer-{}'.format(n))
+    manufacturer = 'manufacturer'#Sequence(lambda n: 'manufacturer-{}'.format(n))
     catalog = Sequence(lambda n: 'catalog-{}'.format(n))
     stock_unit = 1
     min_stock = 2

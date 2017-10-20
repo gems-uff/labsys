@@ -105,11 +105,11 @@ class ProductForm(FlaskForm):
                 return False
         return True
 
-    def validate_catalog(self, field):
+    def validate_catalog(form, field):
         products_by_catalog_and_manufacturer = \
             Product.query.filter_by(
                 catalog = field.data,
-                manufacturer = self.manufacturer.data).all()
+                manufacturer = form.manufacturer.data).all()
         if len(products_by_catalog_and_manufacturer) != 0:
             raise ValidationError(
                 'Esse produto já está registrado no catálogo!')
@@ -125,7 +125,7 @@ class ProductForm(FlaskForm):
             field.data = 0
 
     def validate_subproduct_catalog(form, field):
-        if field.data != '':
+        if field.data != '' and field.data is not None:
             manufacturer_products = Product.get_products_by_manufacturer(
                 form.manufacturer.data)
             subproducts = [
