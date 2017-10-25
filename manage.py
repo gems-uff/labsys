@@ -16,7 +16,6 @@ from labsys.admissions.models import (
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
     Region, State, City, Address,
 )
-from tests import factories as factory
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
@@ -54,7 +53,7 @@ admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 def make_shell_context():
     return dict(
         app=app, db=db, User=User, Role=Role,
-        Product=Product, StockProduct=StockProduct, factory=factory,
+        Product=Product, StockProduct=StockProduct,
     )
 
 
