@@ -151,4 +151,5 @@ __pycache__
 # Queries with sensitive data
 docs/ignored-queries/
 
+# VSCode
 .vscode/
