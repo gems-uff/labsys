@@ -14,7 +14,7 @@ from labsys.inventory.models import Product, Transaction, StockProduct
 from labsys.admissions.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
-    Region, State, City, Address
+    Region, State, City, Address,
 )
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
@@ -53,7 +53,7 @@ admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 def make_shell_context():
     return dict(
         app=app, db=db, User=User, Role=Role,
-        Product=Product, StockProduct=StockProduct
+        Product=Product, StockProduct=StockProduct,
     )
 
 
@@ -64,6 +64,9 @@ manager.add_command('db', MigrateCommand)
 @manager.command
 def test():
     """Run the tests."""
+    if app.config['DATABASE_URI_ENV_KEY'] != 'TEST_DATABASE_URL':
+        raise EnvironmentError(
+            'Trying to run tests outside testing environment!')
     import pytest
     rv = pytest.main(['--verbose'])
     exit(rv)

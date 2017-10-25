@@ -274,7 +274,7 @@ def edit_admission(id):
             flash('Admissão editada com sucesso!')
         return redirect(url_for('main.edit_admission', id=admission.id))
 
-    return render_template('create-admission.html', form=form)
+    return render_template('admissions/create-admission.html', form=form)
 
 
 @blueprint.route('/<int:id>/delete', methods=['GET'])
