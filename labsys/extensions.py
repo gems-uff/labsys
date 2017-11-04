@@ -3,6 +3,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
+from playhouse.flask_utils import FlaskDB
 
 
 def setup_login_manager():
@@ -16,7 +17,5 @@ bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
+database = FlaskDB()
 login_manager = setup_login_manager()
-
-
-

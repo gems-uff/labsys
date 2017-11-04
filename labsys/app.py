@@ -6,7 +6,7 @@ from .main.views import blueprint as main_blueprint
 from .admissions.views import blueprint as admissions_blueprint
 from .auth.views import blueprint as auth_blueprint
 from .inventory.views import blueprint as inventory_blueprint
-from .extensions import bootstrap, mail, moment, db, login_manager
+from .extensions import bootstrap, mail, moment, db, database, login_manager
 
 
 def create_app(config_name):
@@ -23,6 +23,7 @@ def register_extensions(app):
     mail.init_app(app)
     moment.init_app(app)
     db.init_app(app)
+    database.init_app(app)
     login_manager.init_app(app)
 
 

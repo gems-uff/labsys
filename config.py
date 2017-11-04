@@ -16,7 +16,6 @@ class Config:
     LABSYS_ADMIN = os.environ.get('LABSYS_ADMIN', '')
     LABSYS_MAIL_SUBJECT_PREFIX = '[LabSys]'
     LABSYS_MAIL_SENDER = 'LabSys Admin <{}>'.format(LABSYS_ADMIN)
-
     BOOTSTRAP_SERVE_LOCAL = True
 
 
@@ -25,6 +24,7 @@ class DevelopmentConfig(Config):
     BOOTSTRAP_SERVE_LOCAL = True
     DATABASE_URI_ENV_KEY = 'DEV_DATABASE_URL'
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
+    DATABASE_URL = os.environ.get(DATABASE_URI_ENV_KEY)
 
 
 class TestingConfig(Config):
@@ -33,12 +33,14 @@ class TestingConfig(Config):
     DATABASE_URI_ENV_KEY = 'TEST_DATABASE_URL'
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
     WTF_CSRF_ENABLED = False
+    DATABASE_URL = os.environ.get(DATABASE_URI_ENV_KEY)
 
 
 class ProductionConfig(Config):
     BOOTSTRAP_SERVE_LOCAL = False
     DATABASE_URI_ENV_KEY = 'DATABASE_URL'
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
+    DATABASE_URL = os.environ.get(DATABASE_URI_ENV_KEY)
 
 
 class HerokuConfig(ProductionConfig):
@@ -46,6 +48,7 @@ class HerokuConfig(ProductionConfig):
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
     DATABASE_URI_ENV_KEY = 'DATABASE_URL'
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
+    DATABASE_URL = os.environ.get(DATABASE_URI_ENV_KEY)
 
 
 config = {
