@@ -57,8 +57,6 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
     stock_mail_alert = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    transactions = db.relationship(
-        'Transaction', backref='user', lazy='dynamic')
 
     @classmethod
     def get_stock_alert_emails(cls):
