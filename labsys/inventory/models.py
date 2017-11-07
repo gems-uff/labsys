@@ -14,16 +14,16 @@ class Base(db.Model):
 
 
 class Product(Base):
-    def __init__(self, **kwargs):
-        super().__init(**kwargs)
-
     __tablename__ = 'products'
+
+    def __init__(self, name, **kwargs):
+        super().__init__(**kwargs)
+        self.name = name
+
     # Columns
     name = db.Column(db.String(128), nullable=False)
     stock_minimum = db.Column(db.Integer, default=1, nullable=False)
     # Relationships
-    stock_products = db.relationship(
-        'StockProduct', backref='product')
     specifications = db.relationship(
         'Specification', backref='product')
 
@@ -35,6 +35,8 @@ class StockProduct(Base):
     # Columns
     product_id = db.Column(
         db.Integer, db.ForeignKey('products.id'), nullable=False)
+    product = db.relationship(
+        'Product', backref=db.backref('stock_products', lazy=True))
     lot_number = db.Column(db.String(64), nullable=False)
     expiration_date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Integer)
