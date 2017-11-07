@@ -19,9 +19,8 @@ class Product(Base):
 
     __tablename__ = 'products'
     # Columns
-    name = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False)
     stock_minimum = db.Column(db.Integer, default=1, nullable=False)
-    min_stock = db.Column(db.Integer, default=1, nullable=False)
     # Relationships
     stock_products = db.relationship(
         'StockProduct', backref='product')
@@ -32,7 +31,7 @@ class Product(Base):
 class StockProduct(Base):
     __tablename__ = 'stock_products'
     __table_args__ = (UniqueConstraint(
-        'product_id', 'lot_number', name='stock_product_unique'), )
+        'product_id', 'lot_number', name='product_lot'), )
     # Columns
     product_id = db.Column(
         db.Integer, db.ForeignKey('products.id'), nullable=False)
@@ -44,7 +43,7 @@ class StockProduct(Base):
 class Specification(Base):
     __tablename__ = 'specifications'
     __table_args__ = (UniqueConstraint(
-        'manufacturer', 'catalog_number', name='specification'), )
+        'manufacturer', 'catalog_number', name='manufacturer_catalog'), )
     # Columns
     product_id = db.Column(
         db.Integer, db.ForeignKey('products.id'), nullable=False)
@@ -55,6 +54,8 @@ class Specification(Base):
 
 class OrderItem(Base):
     __tablename__ = 'order_items'
+    __tableargs__ = (UniqueConstraint(
+        'item_id', 'order_id', name='order_item'), )
     # Columns
     item_id = db.Column(
         db.Integer, db.ForeignKey('specifications.id'), nullable=False)
