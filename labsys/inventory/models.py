@@ -28,20 +28,6 @@ class Product(Base):
         'Specification', backref='product')
 
 
-class StockProduct(Base):
-    __tablename__ = 'stock_products'
-    __table_args__ = (UniqueConstraint(
-        'product_id', 'lot_number', name='product_lot'), )
-    # Columns
-    product_id = db.Column(
-        db.Integer, db.ForeignKey('products.id'), nullable=False)
-    product = db.relationship(
-        'Product', backref=db.backref('stock_products', lazy=True))
-    lot_number = db.Column(db.String(64), nullable=False)
-    expiration_date = db.Column(db.Date, nullable=False)
-    amount = db.Column(db.Integer)
-
-
 class Specification(Base):
     __tablename__ = 'specifications'
     __table_args__ = (UniqueConstraint(
@@ -51,7 +37,27 @@ class Specification(Base):
         db.Integer, db.ForeignKey('products.id'), nullable=False)
     manufacturer = db.Column(db.String(128), nullable=False)
     catalog_number = db.Column(db.String(128), nullable=False)
-    stock_unit = db.Column(db.Integer, default=1, nullable=False)
+    units = db.Column(db.Integer, default=1, nullable=False)
+
+
+class Stock(Base):
+    __tablename__ = 'stocks'
+    # Columns
+    name = db.Column(db.String(128), nullable=False)
+
+
+class StockProduct(Base):
+    __tablename__ = 'stock_products'
+    __table_args__ = (UniqueConstraint(
+        'specification_id', 'stock_id', 'lot_number', name='product_lot'), )
+    # Columns
+    specification_id = db.Column(
+        db.Integer, db.ForeignKey('specifications.id'), nullable=False)
+    stock_id = db.Column(
+        db.Integer, db.ForeignKey('stocks.id'), nullable=False)
+    lot_number = db.Column(db.String(64), nullable=False)
+    expiration_date = db.Column(db.Date, nullable=False)
+    amount = db.Column(db.Integer)
 
 
 class OrderItem(Base):
