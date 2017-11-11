@@ -3,12 +3,20 @@ from datetime import datetime
 from sqlalchemy import asc, desc, UniqueConstraint
 
 from ..extensions import db
+from labsys.auth.models import User
 
 
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
 
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 class TimeStampedModelMixin(db.Model):
     __abstract__ = True
@@ -62,7 +70,7 @@ class StockProduct(Base):
     lot_number = db.Column(db.String(64), nullable=False)
     expiration_date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Integer, default=0, nullable=False)
-    # Relationhsips
+    # Relationships
     specification = db.relationship('Specification')
 
 
@@ -92,7 +100,7 @@ class Order(Base, TimeStampedModelMixin):
         'OrderItem', backref='order', cascade='all, delete-orphan')
     # lazy=True: accessing orders will load them from db (user.orders)
     user = db.relationship(
-        'User', backref=db.backref('orders', lazy=True))
+        User, backref=db.backref('orders', lazy=True))
 
 
 class Transaction(Base, TimeStampedModelMixin):
@@ -104,4 +112,4 @@ class Transaction(Base, TimeStampedModelMixin):
         db.DateTime, default=datetime.utcnow, nullable=False)
     # Relationships
     user = db.relationship(
-        'User', backref=db.backref('transactions', lazy=True))
+        User, backref=db.backref('transactions', lazy=True))
