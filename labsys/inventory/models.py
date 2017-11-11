@@ -61,7 +61,9 @@ class StockProduct(Base):
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
     lot_number = db.Column(db.String(64), nullable=False)
     expiration_date = db.Column(db.Date, nullable=False)
-    amount = db.Column(db.Integer)
+    amount = db.Column(db.Integer, default=0, nullable=False)
+    # Relationhsips
+    specification = db.relationship('Specification')
 
 
 class OrderItem(Base):
