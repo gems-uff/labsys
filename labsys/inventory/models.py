@@ -8,6 +8,10 @@ from ..extensions import db
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
+
+
+class TimeStampedModelMixin(db.Model):
+    __abstract__ = True
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     updated_on = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -72,7 +76,7 @@ class OrderItem(Base):
     amount = db.Column(db.Integer, default=1, nullable=False)
 
 
-class Order(Base):
+class Order(Base, TimeStampedModelMixin):
     __tablename__ = 'orders'
     # Columns
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -89,7 +93,7 @@ class Order(Base):
         'User', backref=db.backref('orders', lazy=True))
 
 
-class Transaction(Base):
+class Transaction(Base, TimeStampedModelMixin):
     __tablename__ = 'transactions'
     # Columns
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
