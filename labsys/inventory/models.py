@@ -18,6 +18,15 @@ class Base(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    # TODO: make query object
+    """
+    def query(self, obj):
+        for each attribute in self and obj
+        if attribute in obj is not null
+            compare with attribute
+    """
+
+
 class TimeStampedModelMixin(db.Model):
     __abstract__ = True
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
@@ -56,12 +65,46 @@ class Stock(Base):
     __tablename__ = 'stocks'
     # Columns
     name = db.Column(db.String(128), nullable=False)
+    # Relationships
+    products = db.relationship('StockProduct', backref='stock')
+
+    def get_in_stock(self, product):
+        for stock_product in self.products:
+            if stock_product.compare(product):
+                return stock_product
+        return None
+
+
+    def add_product(self, product, lot_number, expiration_date, amount):
+        stock_product = StockProduct(self, product, lot_number,
+                                     expiration_date, amount)
+        in_stock = get_in_stock(stock_product, lot_number)
+        if in_stock is None:
+            stock_product.create()
+        else:
+            stock_product.add(amount * product.units)
 
 
 class StockProduct(Base):
     __tablename__ = 'stock_products'
     __table_args__ = (UniqueConstraint(
         'specification_id', 'stock_id', 'lot_number', name='product_lot'), )
+
+    def __init__(self, stock, specification, lot_number, expiration_date, 
+                 amount=0, **kwargs):
+        super().__init__(**kwargs)
+        self.stock = stock
+        self.specification = specification
+        self.lot_number = lot_number
+        self.expiration_date = expiration_date
+        self.amount = amount
+
+    def compare(self, other):
+        if self.specification == other.specification and \
+           self.lot_number == other.lot_number:
+            return True
+        return False
+
     # Columns
     specification_id = db.Column(
         db.Integer, db.ForeignKey('specifications.id'), nullable=False)
