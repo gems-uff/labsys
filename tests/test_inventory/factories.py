@@ -8,6 +8,15 @@ from labsys.inventory.models import (
 from tests.factories import BaseFactory
 
 
+class StockFactory(BaseFactory):
+
+    class Meta:
+        model = Stock
+        abstract = False
+
+    name = Sequence(lambda n: 'stock-{}'.format(n))
+
+
 class ProductFactory(BaseFactory):
 
     class Meta:
@@ -24,14 +33,10 @@ class SpecificationFactory(BaseFactory):
         model = Specification
         abstract = False
 
-
-class StockFactory(BaseFactory):
-
-    class Meta:
-        model = Stock
-        abstract = False
-
-    name = Sequence(lambda n: 'stock-{}'.format(n))
+    product = SubFactory(ProductFactory)
+    manufacturer = 'Manufacturer'
+    catalog_number = '123123'
+    units = 1
 
 
 class StockProductFactory(BaseFactory):
@@ -44,6 +49,5 @@ class StockProductFactory(BaseFactory):
     stock = SubFactory(StockFactory)
     lot_number = Sequence(lambda n: 'lot-{}'.format(n))
     expiration_date = fuzzy.FuzzyDate(
-        dt.date.today(), 
+        dt.date.today(),
         dt.date.today() + dt.timedelta(days=10))
-

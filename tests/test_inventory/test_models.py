@@ -4,7 +4,9 @@ from tests.test_inventory.factories import (
     StockProductFactory, StockFactory, SpecificationFactory, ProductFactory,
 )
 
-class TestStockProduct(object):
+
+@pytest.mark.usefixtures('db')
+class TestStockProduct:
     def test_compare(self):
         '''
         Edge cases:
@@ -13,6 +15,31 @@ class TestStockProduct(object):
             - speicifcations NOK lot_number OK => False
             - speicifcations NOK lot_number NOK => False
         '''
+        specification = SpecificationFactory(product=ProductFactory())
+        self_stock_product = StockProductFactory(
+            specification=specification,
+            lot_number='123'
+        )
+        other_stock_product = StockProductFactory(
+            specification=specification,
+            lot_number='123'
+        )
+        assert self_stock_product.compare(other_stock_product) is True
+        other_stock_product = StockProductFactory(
+            specification=SpecificationFactory(),
+            lot_number='123'
+        )
+        assert self_stock_product.compare(other_stock_product) is False
+        other_stock_product = StockProductFactory(
+            specification=specification,
+            lot_number='321'
+        )
+        assert self_stock_product.compare(other_stock_product) is False
+        other_stock_product = StockProductFactory(
+            specification=SpecificationFactory(),
+            lot_number='123321'
+        )
+        assert self_stock_product.compare(other_stock_product) is False
 
     def test_init_amount_default(self):
         '''
@@ -23,7 +50,7 @@ class TestStockProduct(object):
         '''
 
 
-class TestStock(object):
+class TestStock:
     def test_get_in_stock(self):
         '''
         Edge cases:

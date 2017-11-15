@@ -74,11 +74,10 @@ class Stock(Base):
                 return stock_product
         return None
 
-
     def add_product(self, product, lot_number, expiration_date, amount):
         stock_product = StockProduct(self, product, lot_number,
                                      expiration_date, amount)
-        in_stock = get_in_stock(stock_product, lot_number)
+        in_stock = self.get_in_stock(stock_product)
         if in_stock is None:
             stock_product.create()
         else:
@@ -90,7 +89,7 @@ class StockProduct(Base):
     __table_args__ = (UniqueConstraint(
         'specification_id', 'stock_id', 'lot_number', name='product_lot'), )
 
-    def __init__(self, stock, specification, lot_number, expiration_date, 
+    def __init__(self, stock, specification, lot_number, expiration_date,
                  amount=0, **kwargs):
         super().__init__(**kwargs)
         self.stock = stock
@@ -137,7 +136,8 @@ class Order(Base, TimeStampedModelMixin):
     invoice_type = db.Column(db.String(128), nullable=True)
     financier = db.Column(db.String(128), nullable=True)
     notes = db.Column(db.String(256), nullable=True)
-    order_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    order_date = db.Column(
+        db.DateTime, default=datetime.utcnow, nullable=False)
     # Relationships
     items = db.relationship(
         'OrderItem', backref='order', cascade='all, delete-orphan')
