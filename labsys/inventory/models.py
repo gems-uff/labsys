@@ -96,7 +96,7 @@ class StockProduct(Base):
         self.specification = specification
         self.lot_number = lot_number
         self.expiration_date = expiration_date
-        self.amount = amount
+        self.amount = amount if amount > 0 else 0
 
     def compare(self, other):
         if self.specification == other.specification and \
