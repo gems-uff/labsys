@@ -13,10 +13,12 @@ class Base(db.Model):
     def create(self):
         db.session.add(self)
         db.session.commit()
+        return self
 
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+        return self
 
     # TODO: make query object
     """
@@ -69,20 +71,33 @@ class Stock(Base):
     products = db.relationship('StockProduct', backref='stock')
 
     def get_in_stock(self, product):
+        if product is None:
+            return None
         for stock_product in self.products:
             if stock_product.compare(product):
                 return stock_product
         return None
 
-    def add_product(self, product, lot_number, expiration_date, amount):
-        stock_product = StockProduct(self, product, lot_number,
-                                     expiration_date, amount)
+    def has_enough(self, product, amount):
+        if amount < 1:
+            raise ValueError('Amount must be greater than 0')
+        in_stock = self.get_in_stock(product)
+        if in_stock is None or in_stock.amount < amount:
+            return False
+        return True
+
+    def add_to_stock(self, stock_product, amount):
         in_stock = self.get_in_stock(stock_product)
         if in_stock is None:
-            stock_product.create()
-        else:
-            stock_product.add(amount * product.units)
+            in_stock = stock_product.create()
+        in_stock.add(amount)
 
+    def subtract_from_stock(self, stock_product, amount):
+        in_stock = self.get_in_stock(stock_product)
+        if in_stock is None:
+            return False
+        # If there is in stock, check if there's enough. If so, subtract it
+        # Emit signal? Check product in stock is below minimum...
 
 class StockProduct(Base):
     __tablename__ = 'stock_products'

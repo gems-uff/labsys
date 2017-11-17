@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 from tests.test_inventory.factories import (
     StockProductFactory, StockFactory, SpecificationFactory, ProductFactory,
 )
-from labsys.inventory.models import StockProduct
+from labsys.inventory.models import StockProduct, Stock
 
 
 @pytest.mark.usefixtures('db')
@@ -64,6 +64,7 @@ class TestStock:
             - self.products is empty => None
             - self.products is not empty and prod.compare is False => None
             - self.products is not empty and prod.compare is True => prod
+            - product is None
         '''
         stock = StockFactory()
         stock_product = StockProductFactory()
@@ -78,8 +79,30 @@ class TestStock:
             found_product = stock.get_in_stock(stock_product)
             assert found_product is not None
             assert found_product == stock.products[0]
+        stock_product = None
+        assert stock.get_in_stock(stock_product) is None
 
-    def test_add_product(self):
+    def test_has_enough(self):
+        '''
+        Edge cases:
+            - in_stock is None and amount is not < amount: return False
+            - in_stock is None and amount is < amount: False
+            - in_stock is not None and in_stock.amount < amount: False
+            - in_stock is not None and in_stock.amount is not < amount: True
+        '''
+        stock = StockFactory()
+        stock_product = StockProductFactory(amount=10)
+        with patch.object(Stock, 'get_in_stock', return_value=None):
+            assert stock.has_enough(stock_product, 11) is False
+            assert stock.has_enough(stock_product, 1) is False
+        with patch.object(Stock, 'get_in_stock', return_value=stock_product):
+            assert stock.has_enough(stock_product, 11) is False
+            assert stock.has_enough(stock_product, 10) is True
+        with pytest.raises(ValueError) as excinfo:
+            stock.has_enough(stock_product, 0)
+        assert 'Amount must be greater than 0' in str(excinfo)
+
+    def test_add_to_stock(self):
         '''
         Edge cases:
             - get_in_stock is None
@@ -87,4 +110,13 @@ class TestStock:
             - get_in_stock is NOT None
                 - mock stock_product.add(value)
                 - check if value = amount * product.units
+        '''
+        stock_product = StockProductFactory()
+        with patch.object(Stock, 'get_in_stock', return_value=None):
+            pass
+
+    def test_subtract_from_stock(self):
+        pass
+        '''
+        Edge cases:
         '''
