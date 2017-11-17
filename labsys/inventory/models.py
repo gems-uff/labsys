@@ -87,17 +87,31 @@ class Stock(Base):
         return True
 
     def add_to_stock(self, stock_product, amount):
+        """
+        amount: total units to be added
+        """
+        if amount < 1 or isinstance(amount, int) is False:
+            raise ValueError('Amount must be a positive integer')
         in_stock = self.get_in_stock(stock_product)
         if in_stock is None:
             in_stock = stock_product.create()
-        in_stock.add(amount)
+        in_stock.amount += amount
+        return True
 
     def subtract_from_stock(self, stock_product, amount):
+        """
+        amount: total units to be subtracted
+        """
+        if amount < 1 or isinstance(amount, int) is False:
+            raise ValueError('Amount must be a positive integer')
         in_stock = self.get_in_stock(stock_product)
         if in_stock is None:
-            return False
-        # If there is in stock, check if there's enough. If so, subtract it
-        # Emit signal? Check product in stock is below minimum...
+            return None
+        if self.has_enough(stock_product, amount):
+            in_stock.amount -= amount
+            return True
+        return False
+
 
 class StockProduct(Base):
     __tablename__ = 'stock_products'

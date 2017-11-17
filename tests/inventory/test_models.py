@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from tests.test_inventory.factories import (
+from tests.inventory.factories import (
     StockProductFactory, StockFactory, SpecificationFactory, ProductFactory,
 )
 from labsys.inventory.models import StockProduct, Stock
@@ -103,20 +103,49 @@ class TestStock:
         assert 'Amount must be greater than 0' in str(excinfo)
 
     def test_add_to_stock(self):
-        '''
-        Edge cases:
-            - get_in_stock is None
-                - mock stock_product.create()
-            - get_in_stock is NOT None
-                - mock stock_product.add(value)
-                - check if value = amount * product.units
-        '''
-        stock_product = StockProductFactory()
+        stock = StockFactory()
+        stock_product = StockProductFactory(amount=0)
         with patch.object(Stock, 'get_in_stock', return_value=None):
-            pass
+            with patch.object(StockProduct, 'create',
+                              return_value=stock_product):
+                assert stock.add_to_stock(stock_product, 10) is True
+                stock_product.create.assert_called_with()
+                assert stock_product.amount is 10
+        stock_product = StockProductFactory(amount=0)
+        with patch.object(Stock, 'get_in_stock', return_value=stock_product):
+            assert stock.add_to_stock(stock_product, 10) is True
+            assert stock_product.amount is 10
+        with pytest.raises(ValueError) as excinfo:
+            stock = StockFactory()
+            stock_product = StockProductFactory()
+            stock.add_to_stock(stock_product, amount=0)
+        assert 'Amount must be a positive integer' in str(excinfo)
+        with pytest.raises(ValueError) as excinfo:
+            stock = StockFactory()
+            stock_product = StockProductFactory()
+            stock.add_to_stock(stock_product, amount=1.0)
+        assert 'Amount must be a positive integer' in str(excinfo)
 
     def test_subtract_from_stock(self):
-        pass
-        '''
-        Edge cases:
-        '''
+        stock = StockFactory()
+        stock_product = StockProductFactory(amount=10)
+        with patch.object(Stock, 'get_in_stock', return_value=None):
+            assert stock.subtract_from_stock(stock_product, 10) is None
+            assert stock_product.amount is 10
+        with patch.object(Stock, 'get_in_stock', return_value=stock_product):
+            with patch.object(Stock, 'has_enough', return_value=False):
+                assert stock.subtract_from_stock(stock_product, 10) is False
+                assert stock_product.amount is 10
+            with patch.object(Stock, 'has_enough', return_value=True):
+                assert stock.subtract_from_stock(stock_product, 10) is True
+                assert stock_product.amount is 0
+        with pytest.raises(ValueError) as excinfo:
+            stock = StockFactory()
+            stock_product = StockProductFactory()
+            stock.subtract_from_stock(stock_product, amount=0)
+        assert 'Amount must be a positive integer' in str(excinfo)
+        with pytest.raises(ValueError) as excinfo:
+            stock = StockFactory()
+            stock_product = StockProductFactory()
+            stock.subtract_from_stock(stock_product, amount=1.0)
+        assert 'Amount must be a positive integer' in str(excinfo)
