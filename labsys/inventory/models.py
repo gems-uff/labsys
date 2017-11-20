@@ -68,46 +68,47 @@ class Stock(Base):
     # Columns
     name = db.Column(db.String(128), nullable=False)
     # Relationships
-    products = db.relationship('StockProduct', backref='stock')
+    stock_products = db.relationship('StockProduct', backref='stock')
 
-    def get_in_stock(self, product):
-        if product is None:
-            return None
-        for stock_product in self.products:
-            if stock_product.compare(product):
+    def get_in_stock(self, product, lot_number):
+        for stock_product in self.stock_products:
+            other_stock_product = StockProduct(
+                self, product, lot_number, None)
+            if stock_product.compare(other_stock_product):
                 return stock_product
         return None
 
-    def has_enough(self, product, amount):
+    def has_enough(self, product, lot_number, amount):
         if amount < 1:
             raise ValueError('Amount must be greater than 0')
-        in_stock = self.get_in_stock(product)
+        in_stock = self.get_in_stock(product, lot_number)
         if in_stock is None or in_stock.amount < amount:
             return False
         return True
 
-    def add_to_stock(self, stock_product, amount):
+    def add(self, product, lot_number, expiration_date, amount):
         """
         amount: total units to be added
         """
         if amount < 1 or isinstance(amount, int) is False:
             raise ValueError('Amount must be a positive integer')
-        in_stock = self.get_in_stock(stock_product)
-        if in_stock is None:
-            in_stock = stock_product.create()
-        in_stock.amount += amount
+        stock_product = self.get_in_stock(product, lot_number)
+        if stock_product is None:
+            stock_product = StockProduct(
+                self, product, lot_number, expiration_date)
+        stock_product.amount += amount
         return True
 
-    def subtract_from_stock(self, stock_product, amount):
+    def subtract(self, product, lot_number, amount):
         """
         amount: total units to be subtracted
         """
         if amount < 1 or isinstance(amount, int) is False:
             raise ValueError('Amount must be a positive integer')
-        in_stock = self.get_in_stock(stock_product)
+        in_stock = self.get_in_stock(product, lot_number)
         if in_stock is None:
             return None
-        if self.has_enough(stock_product, amount):
+        if self.has_enough(product, lot_number, amount):
             in_stock.amount -= amount
             return True
         return False
@@ -116,33 +117,33 @@ class Stock(Base):
 class StockProduct(Base):
     __tablename__ = 'stock_products'
     __table_args__ = (UniqueConstraint(
-        'specification_id', 'stock_id', 'lot_number', name='product_lot'), )
+        'product_id', 'stock_id', 'lot_number', name='stock_product'), )
 
-    def __init__(self, stock, specification, lot_number, expiration_date,
+    def __init__(self, stock, product, lot_number, expiration_date,
                  amount=0, **kwargs):
         super().__init__(**kwargs)
         self.stock = stock
-        self.specification = specification
+        self.product = product
         self.lot_number = lot_number
         self.expiration_date = expiration_date
         self.amount = amount if amount > 0 else 0
 
-    def compare(self, other):
-        if self.specification == other.specification and \
-           self.lot_number == other.lot_number:
-            return True
-        return False
-
     # Columns
-    specification_id = db.Column(
-        db.Integer, db.ForeignKey('specifications.id'), nullable=False)
     stock_id = db.Column(
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
+    product_id = db.Column(
+        db.Integer, db.ForeignKey('products.id'), nullable=False)
     lot_number = db.Column(db.String(64), nullable=False)
     expiration_date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Integer, default=0, nullable=False)
     # Relationships
-    specification = db.relationship('Specification')
+    product = db.relationship('Product')
+
+    def compare(self, other):
+        if self.product == other.product \
+               and self.lot_number == other.lot_number:
+            return True
+        return False
 
 
 class OrderItem(Base):

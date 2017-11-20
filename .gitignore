@@ -153,3 +153,5 @@ docs/ignored-queries/
 
 # VSCode
 .vscode/
+
+*.vim

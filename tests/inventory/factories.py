@@ -15,6 +15,7 @@ class StockFactory(BaseFactory):
         abstract = False
 
     name = Sequence(lambda n: 'stock-{}'.format(n))
+    stock_products = []
 
 
 class ProductFactory(BaseFactory):
@@ -24,7 +25,7 @@ class ProductFactory(BaseFactory):
         abstract = False
 
     name = Sequence(lambda n: 'product-{}'.format(n))
-    stock_minimum = 2
+    stock_minimum = 1
 
 
 class SpecificationFactory(BaseFactory):
@@ -45,8 +46,8 @@ class StockProductFactory(BaseFactory):
         model = StockProduct
         abstract = False
 
-    specification = SubFactory(SpecificationFactory)
     stock = SubFactory(StockFactory)
+    product = SubFactory(ProductFactory)
     lot_number = Sequence(lambda n: 'lot-{}'.format(n))
     expiration_date = fuzzy.FuzzyDate(
         dt.date.today(),
