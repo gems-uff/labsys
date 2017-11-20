@@ -112,34 +112,33 @@ class TestStock:
             assert stock.has_enough(product, lot_number, 11) is False
             assert stock.has_enough(product, lot_number, 1) is False
         with patch.object(Stock, 'get_in_stock', return_value=stock_product):
-            assert stock.has_enough(stock_product, 11) is False
-            assert stock.has_enough(stock_product, 10) is True
+            assert stock.has_enough(product, lot_number, 11) is False
+            assert stock.has_enough(product, lot_number, 10) is True
         with pytest.raises(ValueError) as excinfo:
-            stock.has_enough(stock_product, 0)
+            stock.has_enough(product, lot_number, 0)
         assert 'Amount must be greater than 0' in str(excinfo)
 
     def test_add_to_stock(self):
         stock = StockFactory()
-        stock_product = StockProductFactory(amount=0)
+        product = ProductFactory()
         with patch.object(Stock, 'get_in_stock', return_value=None):
-            with patch.object(StockProduct, 'create',
-                              return_value=stock_product):
-                assert stock.add_to_stock(stock_product, 10) is True
-                stock_product.create.assert_called_with()
-                assert stock_product.amount is 10
-        stock_product = StockProductFactory(amount=0)
-        with patch.object(Stock, 'get_in_stock', return_value=stock_product):
-            assert stock.add_to_stock(stock_product, 10) is True
-            assert stock_product.amount is 10
+            assert len(stock.stock_products) is 0
+            assert stock.add(product, 123, None, 10) is True
+            assert stock.stock_products[0].amount is 10
+            assert len(stock.stock_products) is 1
+        with patch.object(
+                Stock, 'get_in_stock', return_value=stock.stock_products[0]):
+            assert len(stock.stock_products) is 1
+            assert stock.add(product, 123, None, 10) is True
+            assert stock.stock_products[0].amount is 20
+            assert len(stock.stock_products) is 1
         with pytest.raises(ValueError) as excinfo:
             stock = StockFactory()
-            stock_product = StockProductFactory()
-            stock.add_to_stock(stock_product, amount=0)
+            stock.add(product, 123, None, amount=0)
         assert 'Amount must be a positive integer' in str(excinfo)
         with pytest.raises(ValueError) as excinfo:
             stock = StockFactory()
-            stock_product = StockProductFactory()
-            stock.add_to_stock(stock_product, amount=1.0)
+            stock.add(product, 123, None, amount=1.0)
         assert 'Amount must be a positive integer' in str(excinfo)
 
     def test_subtract_from_stock(self):
