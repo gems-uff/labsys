@@ -67,31 +67,29 @@ class TestStock:
             - product is None => return None
         '''
         empty_stock = StockFactory()
-        product = ProductFactory()
-        assert empty_stock.get_in_stock(product, 123) is None
+        assert empty_stock.get_in_stock(None, 123) is None
         # compare is True
         with patch.object(
                 StockProduct, 'compare', return_value=True):
-            product = ProductFactory()
-            in_stock = StockProductFactory(product=product, lot_number=123)
+            product = ProductFactory(name='FoundProduct')
             non_empty_stock = StockFactory()
-            non_empty_stock.stock_products.append(in_stock)
+            in_stock = StockProductFactory(
+                stock=non_empty_stock, product=product, lot_number=123)
             found_product = non_empty_stock.get_in_stock(product, 123)
             assert found_product is not None
+            assert found_product.product.name is 'FoundProduct'
             assert found_product == non_empty_stock.stock_products[0]
         # TODO: compare is False must return None
-        '''
         # Couldn't test this part
         with patch.object(
                 StockProduct, 'compare', return_value=False):
             product = ProductFactory()
-            in_stock = StockProductFactory(product=product, lot_number=123)
             non_empty_stock = StockFactory()
-            non_empty_stock.stock_products.append(in_stock)
-            found_product = non_empty_stock.get_in_stock(product, 123)
-            assert found_product is None
-            # in_stock.compare.assert_called_with()
-        '''
+            in_stock = StockProductFactory(
+                stock=non_empty_stock, product=product, lot_number=123)
+            non_empty_stock.get_in_stock(product, 123)
+            not_found_product = non_empty_stock.get_in_stock(product, 123)
+            assert not_found_product is None
 
         product = None
         stock = StockFactory()
@@ -105,11 +103,14 @@ class TestStock:
             - in_stock is not None and in_stock.amount < amount: False
             - in_stock is not None and in_stock.amount is not < amount: True
         '''
+        product = ProductFactory(name='Find me')
         stock = StockFactory()
-        stock_product = StockProductFactory(amount=10)
+        stock_product = StockProductFactory(
+            stock=stock, product=product, amount=10)
+        lot_number = 123
         with patch.object(Stock, 'get_in_stock', return_value=None):
-            assert stock.has_enough(stock_product, 11) is False
-            assert stock.has_enough(stock_product, 1) is False
+            assert stock.has_enough(product, lot_number, 11) is False
+            assert stock.has_enough(product, lot_number, 1) is False
         with patch.object(Stock, 'get_in_stock', return_value=stock_product):
             assert stock.has_enough(stock_product, 11) is False
             assert stock.has_enough(stock_product, 10) is True

@@ -73,7 +73,7 @@ class Stock(Base):
     def get_in_stock(self, product, lot_number):
         for stock_product in self.stock_products:
             other_stock_product = StockProduct(
-                self, product, lot_number, None)
+                None, product, lot_number, None)
             if stock_product.compare(other_stock_product):
                 return stock_product
         return None
