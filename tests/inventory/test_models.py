@@ -143,24 +143,26 @@ class TestStock:
 
     def test_subtract_from_stock(self):
         stock = StockFactory()
-        stock_product = StockProductFactory(amount=10)
+        product = ProductFactory()
+        stock_product = StockProductFactory(
+            stock=stock, product=product, amount=10, lot_number=123)
         with patch.object(Stock, 'get_in_stock', return_value=None):
-            assert stock.subtract_from_stock(stock_product, 10) is None
+            assert stock.subtract(product, 123, 10) is None
             assert stock_product.amount is 10
         with patch.object(Stock, 'get_in_stock', return_value=stock_product):
             with patch.object(Stock, 'has_enough', return_value=False):
-                assert stock.subtract_from_stock(stock_product, 10) is False
+                assert stock.subtract(product, 123, 10) is False
                 assert stock_product.amount is 10
             with patch.object(Stock, 'has_enough', return_value=True):
-                assert stock.subtract_from_stock(stock_product, 10) is True
+                assert stock.subtract(product, 123, 10) is True
                 assert stock_product.amount is 0
         with pytest.raises(ValueError) as excinfo:
             stock = StockFactory()
-            stock_product = StockProductFactory()
-            stock.subtract_from_stock(stock_product, amount=0)
+            product = ProductFactory()
+            stock.subtract(product, 123, amount=0)
         assert 'Amount must be a positive integer' in str(excinfo)
         with pytest.raises(ValueError) as excinfo:
             stock = StockFactory()
-            stock_product = StockProductFactory()
-            stock.subtract_from_stock(stock_product, amount=1.0)
+            product = ProductFactory()
+            stock.subtract(product, 123, amount=1.0)
         assert 'Amount must be a positive integer' in str(excinfo)
