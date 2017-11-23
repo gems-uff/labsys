@@ -25,6 +25,7 @@ class DevelopmentConfig(Config):
     BOOTSTRAP_SERVE_LOCAL = True
     DATABASE_URI_ENV_KEY = 'DEV_DATABASE_URL'
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
+    SQLALCHEMY_ECHO = True # For Flask-SQLAlchemy
 
 
 class TestingConfig(Config):
@@ -33,6 +34,7 @@ class TestingConfig(Config):
     DATABASE_URI_ENV_KEY = 'TEST_DATABASE_URL'
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
     WTF_CSRF_ENABLED = False
+    SQLALCHEMY_ECHO = True # For Flask-SQLAlchemy
 
 
 class ProductionConfig(Config):
