@@ -6,6 +6,9 @@ from ..extensions import db
 from labsys.auth.models import User
 
 
+ADD = 1
+SUB = 2
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
@@ -107,10 +110,12 @@ class Stock(Base):
             raise ValueError('Amount must be a positive integer')
         in_stock = self.get_in_stock(product, lot_number)
         if in_stock is None:
+            # raise ValueError('There is no {} in stock'.format(product.name))
             return None
         if self.has_enough(product, lot_number, amount):
             in_stock.amount -= amount
             return True
+        # raise ValueError('Not enough in stock')
         return False
 
 
@@ -134,7 +139,7 @@ class StockProduct(Base):
     product_id = db.Column(
         db.Integer, db.ForeignKey('products.id'), nullable=False)
     lot_number = db.Column(db.String(64), nullable=False)
-    expiration_date = db.Column(db.Date, nullable=False)
+    expiration_date = db.Column(db.Date, nullable=True)
     amount = db.Column(db.Integer, default=0, nullable=False)
     # Relationships
     product = db.relationship('Product')
@@ -156,6 +161,11 @@ class OrderItem(Base):
     order_id = db.Column(
         db.Integer, db.ForeignKey('orders.id'), nullable=False)
     amount = db.Column(db.Integer, default=1, nullable=False)
+    lot_number = db.Column(db.String(64), nullable=False)
+    expiration_date = db.Column(
+        db.Date, default=datetime.utcnow().date, nullable=True)
+    # Relationships
+    item = db.relationship(Specification)
 
 
 class Order(Base, TimeStampedModelMixin):
@@ -170,19 +180,60 @@ class Order(Base, TimeStampedModelMixin):
         db.DateTime, default=datetime.utcnow, nullable=False)
     # Relationships
     items = db.relationship(
-        'OrderItem', backref='order', cascade='all, delete-orphan')
+        OrderItem, backref='order', cascade='all, delete-orphan')
     # lazy=True: accessing orders will load them from db (user.orders)
     user = db.relationship(
         User, backref=db.backref('orders', lazy=True))
+
+    def execute(self, stock):
+        for order_item in self.items:
+            total_units = order_item.amount * order_item.item.units
+            transaction = Transaction(
+                self.user,
+                order_item.item.product,
+                order_item.lot_number,
+                total_units,
+                stock,
+                ADD,
+                order_item.expiration_date,
+            )
+            transaction.create()
+        self.create()
 
 
 class Transaction(Base, TimeStampedModelMixin):
     __tablename__ = 'transactions'
     # Columns
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    amount = db.Column(db.Integer, default=1, nullable=False)
-    transaction_date = db.Column(
-        db.DateTime, default=datetime.utcnow, nullable=False)
+    product_id = db.Column(
+        db.Integer, db.ForeignKey('products.id'), nullable=False)
+    stock_id = db.Column(
+        db.Integer, db.ForeignKey('stocks.id'), nullable=False)
+    amount = db.Column(db.Integer, nullable=False)
+    category = db.Column(db.Integer, nullable=False)
     # Relationships
     user = db.relationship(
         User, backref=db.backref('transactions', lazy=True))
+    product = db.relationship(
+        Product, backref=db.backref('transactions', lazy=True))
+    stock = db.relationship(
+        Stock, backref=db.backref('transactions', lazy=True))
+
+    def __init__(self, user, product, lot_number, amount, stock, category,
+                 expiration_date=None):
+        self.user = user
+        self.product = product
+        self.amount = amount
+        self.stock = stock
+        self.category = category
+
+        print(amount)
+        if category is ADD:
+            stock.add(
+                product,
+                lot_number,
+                expiration_date,
+                amount,
+            )
+        else:
+            sub = stock.subtract(product, lot_number, amount)

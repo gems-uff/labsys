@@ -10,7 +10,7 @@ from labsys.app import create_app
 from labsys.extensions import db
 from labsys.auth.models import User, Role, PreAllowedUser
 from labsys.auth.views import ProtectedModelView
-from labsys.inventory.models import Product, Transaction, StockProduct
+import labsys.inventory.models as im
 from labsys.admissions.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
@@ -27,9 +27,9 @@ admin.add_views(
     ProtectedModelView(User, db.session),
     ProtectedModelView(Role, db.session),
     ProtectedModelView(PreAllowedUser, db.session),
-    ProtectedModelView(Product, db.session),
-    ProtectedModelView(Transaction, db.session),
-    ProtectedModelView(StockProduct, db.session), )
+    ProtectedModelView(im.Product, db.session),
+    ProtectedModelView(im.Transaction, db.session),
+    ProtectedModelView(im.StockProduct, db.session), )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion
 
@@ -37,6 +37,11 @@ admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 def make_shell_context():
     return dict(
         app=app, db=db, User=User, Role=Role,
+        product=im.Product.query.first(),
+        spec=im.Product.query.first().specifications[0],
+        stock=im.Stock.query.first(),
+        order=im.Order.query.first(),
+        order_item=im.OrderItem.query.first(),
     )
 
 
