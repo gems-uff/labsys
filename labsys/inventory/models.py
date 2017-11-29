@@ -178,6 +178,7 @@ class Order(Base, TimeStampedModelMixin):
     notes = db.Column(db.String(256), nullable=True)
     order_date = db.Column(
         db.DateTime, default=datetime.utcnow, nullable=False)
+    executed = db.Column(db.Boolean, default=False, nullable=False)
     # Relationships
     items = db.relationship(
         OrderItem, backref='order', cascade='all, delete-orphan')
@@ -186,19 +187,23 @@ class Order(Base, TimeStampedModelMixin):
         User, backref=db.backref('orders', lazy=True))
 
     def execute(self, stock):
-        for order_item in self.items:
-            total_units = order_item.amount * order_item.item.units
-            transaction = Transaction(
-                self.user,
-                order_item.item.product,
-                order_item.lot_number,
-                total_units,
-                stock,
-                ADD,
-                order_item.expiration_date,
-            )
-            transaction.create()
-        self.create()
+        if not self.executed:
+            for order_item in self.items:
+                total_units = order_item.amount * order_item.item.units
+                transaction = Transaction(
+                    self.user,
+                    order_item.item.product,
+                    order_item.lot_number,
+                    total_units,
+                    stock,
+                    ADD,
+                    order_item.expiration_date,
+                )
+                transaction.create()
+            self.create()
+            self.executed = True
+        else:
+            raise ValueError('Order has already been executed')
 
 
 class Transaction(Base, TimeStampedModelMixin):
@@ -227,7 +232,6 @@ class Transaction(Base, TimeStampedModelMixin):
         self.stock = stock
         self.category = category
 
-        print(amount)
         if category is ADD:
             stock.add(
                 product,
@@ -237,3 +241,5 @@ class Transaction(Base, TimeStampedModelMixin):
             )
         else:
             sub = stock.subtract(product, lot_number, amount)
+            if sub is True:
+                self.create()
