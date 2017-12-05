@@ -9,6 +9,7 @@ from labsys.auth.models import User
 ADD = 1
 SUB = 2
 
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
@@ -199,7 +200,7 @@ class Order(Base, TimeStampedModelMixin):
                     ADD,
                     order_item.expiration_date,
                 )
-                transaction.create()
+
             self.create()
             self.executed = True
         else:
@@ -239,6 +240,8 @@ class Transaction(Base, TimeStampedModelMixin):
                 expiration_date,
                 amount,
             )
+            # TODO: move create() to a service
+            self.create()
         else:
             sub = stock.subtract(product, lot_number, amount)
             if sub is True:
