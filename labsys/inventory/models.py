@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import asc, desc, UniqueConstraint
 
 from ..extensions import db
+from .services import create_add_transaction_from_order
 from labsys.auth.models import User
 
 
@@ -111,13 +112,10 @@ class Stock(Base):
             raise ValueError('Amount must be a positive integer')
         in_stock = self.get_in_stock(product, lot_number)
         if in_stock is None:
-            # raise ValueError('There is no {} in stock'.format(product.name))
-            return None
+            raise ValueError('There is no {} in stock'.format(product.name))
         if self.has_enough(product, lot_number, amount):
             in_stock.amount -= amount
-            return True
-        # raise ValueError('Not enough in stock')
-        return False
+        raise ValueError('Not enough in stock')
 
 
 class StockProduct(Base):
@@ -189,19 +187,7 @@ class Order(Base, TimeStampedModelMixin):
 
     def execute(self, stock):
         if not self.executed:
-            for order_item in self.items:
-                total_units = order_item.amount * order_item.item.units
-                transaction = Transaction(
-                    self.user,
-                    order_item.item.product,
-                    order_item.lot_number,
-                    total_units,
-                    stock,
-                    ADD,
-                    order_item.expiration_date,
-                )
-
-            self.create()
+            create_add_transaction_from_order(self, stock)
             self.executed = True
         else:
             raise ValueError('Order has already been executed')
@@ -240,9 +226,8 @@ class Transaction(Base, TimeStampedModelMixin):
                 expiration_date,
                 amount,
             )
-            # TODO: move create() to a service
-            self.create()
         else:
             sub = stock.subtract(product, lot_number, amount)
-            if sub is True:
-                self.create()
+            if sub is not True:
+                # raise sub
+                raise ValueError('Could not subtract from stock')
