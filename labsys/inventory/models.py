@@ -51,7 +51,6 @@ class Product(Base):
     def __str__(self):
         return self.name
 
-
     # Columns
     name = db.Column(db.String(128), nullable=False)
     stock_minimum = db.Column(db.Integer, default=1, nullable=False)

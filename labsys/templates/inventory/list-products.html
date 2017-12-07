@@ -17,12 +17,30 @@
     </tr>
   </thead>
   <tbody>
-    {% for product in products %}
-      <tr>
-        <td>{{ product.name }}</td>
-        <td>{{ product.stock_minimum }}</td>
-      </tr>
-    {% endfor %}
+  {% for product in products %}
+    <tr>
+      <td>{{ product.name }}</td>
+      <td>{{ product.stock_minimum }}</td>
+      <tr><td colspan="2"><table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Fabricante</th>
+            <th>Catálogo</th>
+            <th>Unidades</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for spec in product.specifications %}
+          <tr>
+            <td>{{ spec.manufacturer }}</td>
+            <td>{{ spec.catalog_number }}</td>
+            <td>{{ spec.units }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table></td></tr>
+    </tr>
+  {% endfor %}
   </tbody>
 </table>
 
