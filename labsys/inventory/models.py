@@ -115,6 +115,7 @@ class Stock(Base):
             raise ValueError('There is no {} in stock'.format(product.name))
         if self.has_enough(product, lot_number, amount):
             in_stock.amount -= amount
+            return True
         raise ValueError('Not enough in stock')
 
 

@@ -147,11 +147,17 @@ class TestStock:
         stock_product = StockProductFactory(
             stock=stock, product=product, amount=10, lot_number=123)
         with patch.object(Stock, 'get_in_stock', return_value=None):
-            assert stock.subtract(product, 123, 10) is None
+            with pytest.raises(ValueError) as excinfo:
+                stock.subtract(product, 123, 10)
+            err_msg = 'There is no {} in stock'.format(product.name)
+            assert  err_msg in str(excinfo)
             assert stock_product.amount is 10
         with patch.object(Stock, 'get_in_stock', return_value=stock_product):
             with patch.object(Stock, 'has_enough', return_value=False):
-                assert stock.subtract(product, 123, 10) is False
+                with pytest.raises(ValueError) as excinfo:
+                    stock.subtract(product, 123, 10)
+                err_msg = 'Not enough in stock'
+                assert err_msg in str(excinfo)
                 assert stock_product.amount is 10
             with patch.object(Stock, 'has_enough', return_value=True):
                 assert stock.subtract(product, 123, 10) is True

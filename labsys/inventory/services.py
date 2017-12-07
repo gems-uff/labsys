@@ -1,5 +1,5 @@
 from ..extensions import db
-from .models import Transaction, ADD, SUB
+from labsys.inventory import models as m
 
 
 def create_add_transaction_from_order(order, stock):
@@ -10,13 +10,13 @@ def create_add_transaction_from_order(order, stock):
         lot_number = order_item.lot_number
         total_units = order_item.amount * order_item.item.units
         expiration_date = order_item.expiration_date
-        transaction = Transaction(
+        transaction = m.Transaction(
             user,
             product,
             lot_number,
             total_units,
             stock,
-            ADD,
+            m.ADD,
             expiration_date,
         )
         db.session.add(transaction)
@@ -24,13 +24,13 @@ def create_add_transaction_from_order(order, stock):
 
 def create_sub_transaction(user, product, lot_number, amount, stock):
     try:
-        transaction = Transaction(
+        transaction = m.Transaction(
             user,
             product,
             lot_number,
             amount,
             stock,
-            SUB,
+            m.SUB,
         )
         db.session.add(transaction)
         db.session.commit()
