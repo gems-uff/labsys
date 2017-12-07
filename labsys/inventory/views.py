@@ -4,10 +4,10 @@ from flask_login import current_user, login_required
 from ..extensions import db
 from ..auth.decorators import permission_required
 from ..auth.models import Permission, User
-from .models import Transaction, Product
 from ..utils.email import send_email
 from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 from .utils import stock_is_at_minimum, export_table
+from .models import Transaction, Product, Stock, StockProduct
 
 
 blueprint = Blueprint('inventory', __name__)
@@ -16,18 +16,15 @@ blueprint = Blueprint('inventory', __name__)
 @login_required
 @permission_required(Permission.VIEW)
 def index():
-    products = Product.get_products(unitary_only=True)
-    for p in products:
-        p.aggregate_amount = p.count_amount_stock_products()
-    return render_template('inventory/index.html', products=products)
+    return render_template('inventory/index.html')
 
 
-@blueprint.route('/catalog', methods=['GET'])
+@blueprint.route('/products', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def list_catalog():
-    catalog = Product.get_products()
-    return render_template('inventory/list-catalog.html', catalog=catalog)
+    products = Product.query.all()
+    return render_template('inventory/list-products.html', products=products)
 
 
 @blueprint.route('/reactives/add', methods=['GET', 'POST'])
