@@ -79,8 +79,6 @@ class TestStock:
             assert found_product is not None
             assert found_product.product.name is 'FoundProduct'
             assert found_product == non_empty_stock.stock_products[0]
-        # TODO: compare is False must return None
-        # Couldn't test this part
         with patch.object(
                 StockProduct, 'compare', return_value=False):
             product = ProductFactory()
