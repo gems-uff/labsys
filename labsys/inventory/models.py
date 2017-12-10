@@ -1,3 +1,4 @@
+import jsonpickle
 from datetime import datetime
 
 from sqlalchemy import asc, desc, UniqueConstraint
@@ -32,6 +33,8 @@ class Base(db.Model):
         if attribute in obj is not null
             compare with attribute
     """
+    def toJSON(self):
+        return jsonpickle.encode(self)
 
 
 class TimeStampedModelMixin(db.Model):
