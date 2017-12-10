@@ -1,4 +1,9 @@
-from flask import render_template, redirect, url_for, flash, abort, Blueprint
+import logging
+
+from flask import (
+    render_template, redirect, url_for, flash, abort, Blueprint, session,
+    request,
+)
 from flask_login import current_user, login_required
 
 from ..extensions import db
@@ -7,8 +12,11 @@ from ..auth.models import Permission, User
 from ..utils.email import send_email
 from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 from .utils import stock_is_at_minimum, export_table
-from .models import Transaction, Product, Stock, StockProduct
+from .models import (
+    Transaction, Product, Stock, StockProduct, Specification, OrderItem,
+)
 
+import labsys.inventory.forms as forms
 
 blueprint = Blueprint('inventory', __name__)
 
@@ -25,6 +33,61 @@ def index():
 def list_catalog():
     products = Product.query.all()
     return render_template('inventory/list-products.html', products=products)
+
+
+@blueprint.route('/orders/add', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
+def create_order():
+    logging.info('create_order()')
+    products = Product.query.all()
+    specifications = Specification.query.all()
+    form_context = {
+        'products': products,
+        'specs': specifications,
+    }
+    form = forms.OrderForm(**form_context)
+    if session.get('order_items') is None:
+        session['order_items'] = []
+
+    if request.method == 'POST':
+        logging.info('POSTing to create_order')
+        if form.finish_order.data is True:
+            logging.info('checking if there is at least 1 o_item in session')
+            if len(session.get('order_items')) > 0:
+                logging.info('Finishing order => redirect to checkout()')
+                return redirect(url_for('inventory.checkout'))
+            logging.info('None order item added to session')
+            flash('Pelo menos 1 produto deve ser adicionado ao carrinho.')
+            return render_template('inventory/create-order.html', form=form)
+        if form.validate():
+            logging.info('Create order form is valid')
+            order_item = OrderItem()
+            form.populate_obj(order_item)
+            logging.info('order_item obj was populated')
+            if len(session.get('order_items')) is 0:
+                logging.info('order_items not found in session => create [oi]')
+                session['order_items'] = [order_item.toJSON()]
+            else:
+                logging.info('order_items found in session => append(oi)')
+                session['order_items'].append(order_item.toJSON())
+                # See http://flask.pocoo.org/docs/0.12/api/#sessions
+                # Must be manually set
+                session.modified = True
+
+            logging.info('finishing form.validate')
+        logging.info('returning render template with or w/out errors and form')
+        return render_template('inventory/create-order.html', form=form)
+    logging.info('GETting create_order')
+    return render_template('inventory/create-order.html', form=form)
+
+
+@blueprint.route('/orders/checkout', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
+def checkout():
+    session['order_items'] = []
+    return 'Checkout pages'
 
 
 @blueprint.route('/reactives/add', methods=['GET', 'POST'])
