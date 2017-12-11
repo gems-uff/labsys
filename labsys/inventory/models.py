@@ -196,6 +196,8 @@ class Order(Base, TimeStampedModelMixin):
         if not self.executed:
             create_add_transaction_from_order(self, stock)
             self.executed = True
+            db.session.add(self)
+            db.session.commit()
         else:
             raise ValueError('Order has already been executed')
 
