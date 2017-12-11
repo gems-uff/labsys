@@ -3,9 +3,8 @@ from labsys.inventory import models as m
 
 
 def create_add_transaction_from_order(order, stock):
-    db.session.add(order)
-    for order_item in order:
-        user = order.user
+    user = order.user
+    for order_item in order.items:
         product = order_item.item.product
         lot_number = order_item.lot_number
         total_units = order_item.amount * order_item.item.units
