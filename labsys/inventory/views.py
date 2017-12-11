@@ -50,6 +50,7 @@ def create_order():
     if session.get('order_items') is None:
         session['order_items'] = []
 
+    # TODO: finishing order requires that non-empty fields be filled
     if request.method == 'POST':
         logging.info('POSTing to create_order')
         if form.finish_order.data is True:
@@ -77,7 +78,6 @@ def create_order():
 
             logging.info('finishing form.validate')
         logging.info('returning render template with or w/out errors and form')
-        return render_template('inventory/create-order.html', form=form)
     logging.info('GETting create_order')
     return render_template('inventory/create-order.html', form=form)
 
@@ -87,21 +87,50 @@ def create_order():
 @permission_required(Permission.EDIT)
 def checkout():
     '''
-    1. Get order_items from session (jsonpickle)
-    2. Create a new Order with order_items
-    3. Start a new db.transaction
-    4. commit the transaction
-    5. Add option to cancel the order (resets session, goes back to index)
-    6. redirect to index and flash success/cancel message
+    OK 1. Get order_items from session (jsonpickle)
+    OK 2. Create a new Order with order_items
+    N-OK 3. Start a new db.transaction
+    OK 4. commit the transaction
+    OK 5. Add option to cancel the order (resets session, goes back to index, flash)
+    OK 6. redirect to stock and flash success message
+    7. Show items in cart
     '''
     form = forms.OrderForm()
     order_items = [jsonpickle.decode(item)
                    for item in session.get('order_items')]
     logging.info('Retrieve unpickled order_items from session')
-    order = Order()
-    order.items = order_items
-    logging.info('Add order_items to order')
-
+    if request.method == 'POST':
+        logging.info('POSTing to checkout')
+        if form.cancel.data is True:
+            logging.info('Cancel order, cleaning session')
+            session['order_items'] = []
+            return redirect(url_for('inventory.create_order'))
+        if len(order_items) > 0:
+            if form.validate():
+                logging.info('starting check out...')
+                stock = Stock.query.first()
+                order = Order()
+                logging.info('populating order with form data and order_items...')
+                form.populate_obj(order)
+                order.items = order_items
+                order.user = current_user
+                db.session.add(order)
+                db.session.commit()
+                try:
+                    logging.info('Saving order to database...')
+                    order.execute(stock)
+                    logging.info('Flashing success and returning to index')
+                    flash('Ordem executada com sucesso')
+                    session['order_items'] = []
+                    return redirect(url_for('inventory.index'))
+                except Exception:
+                    logging.error('Could not save the order to database.')
+                    flash('Algo deu errado, contate um administrador!')
+                    return render_template('inventory/index.html')
+        else:
+            logging.info('No item added to cart')
+            flash('É necessário adicionar pelo menos 1 item ao carrinho.')
+            return redirect(url_for('inventory.create_order'))
     return render_template('inventory/checkout.html', form=form)
 
 
