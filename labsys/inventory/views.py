@@ -1,4 +1,4 @@
-import logging
+import logging, jsonpickle
 
 from flask import (
     render_template, redirect, url_for, flash, abort, Blueprint, session,
@@ -13,7 +13,7 @@ from ..utils.email import send_email
 from .forms import AddTransactionForm, SubTransactionForm, ProductForm
 from .utils import stock_is_at_minimum, export_table
 from .models import (
-    Transaction, Product, Stock, StockProduct, Specification, OrderItem,
+    Transaction, Product, Stock, StockProduct, Specification, OrderItem, Order,
 )
 
 import labsys.inventory.forms as forms
@@ -46,7 +46,7 @@ def create_order():
         'products': products,
         'specs': specifications,
     }
-    form = forms.OrderForm(**form_context)
+    form = forms.OrderItemForm(**form_context)
     if session.get('order_items') is None:
         session['order_items'] = []
 
@@ -86,8 +86,23 @@ def create_order():
 @login_required
 @permission_required(Permission.EDIT)
 def checkout():
-    session['order_items'] = []
-    return 'Checkout pages'
+    '''
+    1. Get order_items from session (jsonpickle)
+    2. Create a new Order with order_items
+    3. Start a new db.transaction
+    4. commit the transaction
+    5. Add option to cancel the order (resets session, goes back to index)
+    6. redirect to index and flash success/cancel message
+    '''
+    form = forms.OrderForm()
+    order_items = [jsonpickle.decode(item)
+                   for item in session.get('order_items')]
+    logging.info('Retrieve unpickled order_items from session')
+    order = Order()
+    order.items = order_items
+    logging.info('Add order_items to order')
+
+    return render_template('inventory/checkout.html', form=form)
 
 
 @blueprint.route('/reactives/add', methods=['GET', 'POST'])

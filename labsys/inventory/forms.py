@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 
 from flask_wtf import FlaskForm
 import wtforms as wtf
@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, DataRequired, Optional
 from labsys.inventory.models import Product, StockProduct, Transaction
 
 
-class OrderForm(FlaskForm):
+class OrderItemForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         products = kwargs.get('products', [])
@@ -29,6 +29,27 @@ class OrderForm(FlaskForm):
                                     validators=[InputRequired()])
     add_product = wtf.SubmitField('Adicionar outro produto')
     finish_order = wtf.SubmitField('Finalizar compra')
+
+
+class OrderForm(FlaskForm):
+    invoice = wtf.StringField('Nota Fiscal', validators=[Optional()])
+    invoice_type = wtf.SelectField(
+        'Tipo de Nota',
+        coerce=str,
+        choices=(
+            ('Nota Fiscal',
+             'Nota Fiscal'),
+            ('Nota de Fornecimento (FIOCRUZ)',
+             'Nota de Fornecimento (FIOCRUZ)'),
+            ('Nota de Fornecimento (Ministério da Saúde)',
+             'Nota de Fornecimento (Ministério da Saúde)'),
+            ('Outros', 'Outros')),
+        default='Nota Fiscal',
+        validators=[Optional()])
+    financier = wtf.StringField('Financiador', validators=[Optional()])
+    notes = wtf.StringField('Observações', validators=[Optional()])
+    submit = wtf.SubmitField('Finalizar')
+    cancel = wtf.SubmitField('Cancelar')
 
 
 class AddTransactionForm(FlaskForm):
