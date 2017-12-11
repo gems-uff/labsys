@@ -27,12 +27,11 @@ class OrderItemForm(FlaskForm):
     expiration_date = wtf.DateField('Data de Validade',
                                     format='%d/%m/%Y',
                                     validators=[InputRequired()])
-    add_product = wtf.SubmitField('Adicionar outro produto')
+    add_product = wtf.SubmitField('Adicionar produto')
     finish_order = wtf.SubmitField('Finalizar compra')
 
 
 class OrderForm(FlaskForm):
-    invoice = wtf.StringField('Nota Fiscal', validators=[Optional()])
     invoice_type = wtf.SelectField(
         'Tipo de Nota',
         coerce=str,
@@ -46,6 +45,7 @@ class OrderForm(FlaskForm):
             ('Outros', 'Outros')),
         default='Nota Fiscal',
         validators=[Optional()])
+    invoice = wtf.StringField('Nota', validators=[Optional()])
     financier = wtf.StringField('Financiador', validators=[Optional()])
     notes = wtf.StringField('Observações', validators=[Optional()])
     submit = wtf.SubmitField('Finalizar')
