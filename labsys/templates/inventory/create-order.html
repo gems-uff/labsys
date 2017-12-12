@@ -9,3 +9,13 @@
   {{ wtf.quick_form(form) }}
   <p>Total de itens no carrinho: {{ session['order_items'] | length }}</p>
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  console.log('oi');
+  document.getElementById("amount").required = false;
+  document.getElementById("lot_number").required = false;
+  document.getElementById("expiration_date").required = false;
+</script>
+{% endblock %}

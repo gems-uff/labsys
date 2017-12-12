@@ -38,8 +38,8 @@ def list_catalog():
 @blueprint.route('/orders/add', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
-def create_order():
-    logging.info('create_order()')
+def add_product():
+    logging.info('add_product()')
     products = Product.query.all()
     specifications = Specification.query.all()
     form_context = {
@@ -50,17 +50,16 @@ def create_order():
     if session.get('order_items') is None:
         session['order_items'] = []
 
-    # TODO: finishing order requires that non-empty fields be filled
     if request.method == 'POST':
-        logging.info('POSTing to create_order')
+        logging.info('POSTing to add_product')
         if form.finish_order.data is True:
             logging.info('checking if there is at least 1 o_item in session')
             if len(session.get('order_items')) > 0:
                 logging.info('Finishing order => redirect to checkout()')
-                return redirect(url_for('inventory.checkout'))
+                return redirect(url_for('.checkout'))
             logging.info('None order item added to session')
             flash('Pelo menos 1 produto deve ser adicionado ao carrinho.')
-            return render_template('inventory/create-order.html', form=form)
+            return redirect(url_for('.add_product'))
         if form.validate():
             logging.info('Create order form is valid')
             order_item = OrderItem()
@@ -77,8 +76,10 @@ def create_order():
                 session.modified = True
 
             logging.info('finishing form.validate')
-        logging.info('returning render template with or w/out errors and form')
-    logging.info('GETting create_order')
+            flash('Produto adicionado ao carrinho')
+            return redirect(url_for('.add_product'))
+        logging.info('redirecting to route with or w/out errors and form')
+    logging.info('GETting add_product')
     return render_template('inventory/create-order.html', form=form)
 
 
@@ -106,7 +107,7 @@ def checkout():
         if form.cancel.data is True:
             logging.info('Cancel order, cleaning session')
             session['order_items'] = []
-            return redirect(url_for('inventory.create_order'))
+            return redirect(url_for('.add_product'))
         if len(order_items) > 0:
             if form.validate():
                 logging.info('starting check out...')
@@ -124,7 +125,7 @@ def checkout():
                     logging.info('Flashing success and returning to index')
                     flash('Ordem executada com sucesso')
                     session['order_items'] = []
-                    return redirect(url_for('inventory.index'))
+                    return redirect(url_for('.index'))
                 except Exception:
                     logging.error('Could not save the order to database.')
                     flash('Algo deu errado, contate um administrador!')
@@ -132,7 +133,7 @@ def checkout():
         else:
             logging.info('No item added to cart')
             flash('É necessário adicionar pelo menos 1 item ao carrinho.')
-            return redirect(url_for('inventory.create_order'))
+            return redirect(url_for('.add_product'))
     return render_template('inventory/checkout.html',
                            form=form,
                            order_items=order_items,)

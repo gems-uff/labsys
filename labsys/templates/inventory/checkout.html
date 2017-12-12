@@ -13,13 +13,15 @@
         <th>Produto</th>
         <th>Especificação</th>
         <th>Quantidade</th>
+        <th>Total de unidades de estoque</th>
       </thead>
       <tbody>
       {% for item in order_items %}
         <tr>
           <td>{{ item.item.product.name }}</td>
-          <td>{{ item.item.catalog_number }} | {{ item.item.units }}x</td>
+          <td>Catálogo: {{ item.item.catalog_number }} | {{ item.item.units }} unidades/produto</td>
           <td>{{ item.amount }}</td>
+          <td>{{ item.amount * item.item.units }}</td>
         </tr>
       {% endfor %}
       </tbody>
