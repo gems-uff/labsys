@@ -4,8 +4,26 @@
 {% block page_content %}
   {% include "inventory/_navigation.html" %}
   <div class="page-header">
-      <h1>Checkout</h1>
+    <h1>Checkout</h1>
+  </div>
+  <div class="order-items-checkout">
+    <p>Total de itens no carrinho: {{ order_items | length }}</p>
+    <table class="table table-responsive">
+      <thead>
+        <th>Produto</th>
+        <th>Especificação</th>
+        <th>Quantidade</th>
+      </thead>
+      <tbody>
+      {% for item in order_items %}
+        <tr>
+          <td>{{ item.item.product.name }}</td>
+          <td>{{ item.item.catalog_number }} | {{ item.item.units }}x</td>
+          <td>{{ item.amount }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
   </div>
   {{ wtf.quick_form(form) }}
-  <p>Total de itens no carrinho: {{ session['order_items'] | length }}</p>
 {% endblock %}

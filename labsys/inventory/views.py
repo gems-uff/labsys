@@ -98,6 +98,8 @@ def checkout():
     form = forms.OrderForm()
     order_items = [jsonpickle.decode(item)
                    for item in session.get('order_items')]
+    for order_item in order_items:
+        order_item.item = Specification.query.get(order_item.item_id)
     logging.info('Retrieve unpickled order_items from session')
     if request.method == 'POST':
         logging.info('POSTing to checkout')
@@ -131,7 +133,9 @@ def checkout():
             logging.info('No item added to cart')
             flash('É necessário adicionar pelo menos 1 item ao carrinho.')
             return redirect(url_for('inventory.create_order'))
-    return render_template('inventory/checkout.html', form=form)
+    return render_template('inventory/checkout.html',
+                           form=form,
+                           order_items=order_items,)
 
 
 @blueprint.route('/reactives/add', methods=['GET', 'POST'])
