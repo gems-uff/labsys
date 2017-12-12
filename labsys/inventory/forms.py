@@ -52,6 +52,26 @@ class OrderForm(FlaskForm):
     cancel = wtf.SubmitField('Cancelar')
 
 
+class ConsumeProductForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        products = kwargs.get('products', [])
+        stock_products = kwargs.get('stock_products', [])
+        lot_numbers = kwargs.get('lot_numbers', [])
+        self.product_id.choices = [(p.id, p.name) for p in products]
+        self.lot_number.choices = [
+            (sp.id, 'Número: {} | Validade: {} | Quantidade: {}'.format(
+                sp.lot_number, sp.expiration_date, sp.amount))
+            for sp in stock_products]
+
+    product_id = wtf.SelectField(
+        'Produto', coerce=int, validators=[InputRequired()])
+    lot_number = wtf.SelectField(
+        'Lote', coerce=int, validators=[InputRequired()])
+    amount = wtf.IntegerField('Quantidade', validators=[InputRequired()])
+    submit = wtf.SubmitField('Confirmar')
+
+
 class AddTransactionForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

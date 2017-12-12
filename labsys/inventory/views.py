@@ -138,11 +138,39 @@ def checkout():
                            form=form,
                            order_items=order_items,)
 
+@blueprint.route('/products/consume', methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
+def consume_product():
+    '''
+    - Retrieve all products and stock_products
+    - Show consume form
+    -
+    '''
+    logging.info('consume_product()')
+    # TODO: move this to services
+    stock = Stock.query.first()
+    products = [p for p in Product.query.join(
+                    StockProduct, Product.id==StockProduct.product_id)
+                    .filter(StockProduct.stock_id==stock.id)]
+    stock_products = [sp for sp in stock.stock_products]
+    lot_numbers = [sp.lot_number for sp in stock.stock_products]
+    form_context = {
+        'products': products,
+        'stock_products': stock_products,
+        'lot_numbers': lot_numbers,
+    }
+    form = forms.ConsumeProductForm(**form_context)
+    return render_template('inventory/consume-product.html', form=form)
+
 
 @blueprint.route('/products/add', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
 def add_product():
+    '''
+    1. Render the add product/spec form
+    '''
     return 'oi'
 
 
