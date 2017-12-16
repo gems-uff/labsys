@@ -60,8 +60,8 @@ class ConsumeProductForm(FlaskForm):
         lot_numbers = kwargs.get('lot_numbers', [])
         self.product_id.choices = [(p.id, p.name) for p in products]
         self.lot_number.choices = [
-            (sp.id, 'Número: {} | Validade: {} | Quantidade: {}'.format(
-                sp.lot_number, sp.expiration_date, sp.amount))
+            (sp.id, 'Lote: {} | Quantidade: {} | Validade: {}'.format(
+                sp.lot_number, sp.amount, sp.expiration_date))
             for sp in stock_products]
 
     product_id = wtf.SelectField(

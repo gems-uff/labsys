@@ -47,9 +47,10 @@ class TimeStampedModelMixin(db.Model):
 class Product(Base):
     __tablename__ = 'products'
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, name, specification, **kwargs):
         super().__init__(**kwargs)
         self.name = name
+        self.specifications.append(specification)
 
     def __str__(self):
         return self.name
@@ -63,6 +64,13 @@ class Product(Base):
 
 
 class Specification(Base):
+
+    def __init__(self, catalog_number, manufacturer, units=1, **kwargs):
+        super().__init__(**kwargs)
+        self.catalog_number = catalog_number
+        self.manufacturer = manufacturer
+        self.units = units
+
     __tablename__ = 'specifications'
     __table_args__ = (UniqueConstraint(
         'manufacturer', 'catalog_number', name='manufacturer_catalog'), )
