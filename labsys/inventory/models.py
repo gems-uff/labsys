@@ -110,6 +110,13 @@ class Stock(Base):
             return False
         return True
 
+    def total(self, product):
+        total = 0
+        for sp in self.stock_products:
+            if sp.product_id == product.id:
+                total += sp.amount
+        return total
+
     def add(self, product, lot_number, expiration_date, amount):
         """
         amount: total units to be added

@@ -148,7 +148,7 @@ class TestStock:
             with pytest.raises(ValueError) as excinfo:
                 stock.subtract(product, 123, 10)
             err_msg = 'There is no {} in stock'.format(product.name)
-            assert  err_msg in str(excinfo)
+            assert err_msg in str(excinfo)
             assert stock_product.amount is 10
         with patch.object(Stock, 'get_in_stock', return_value=stock_product):
             with patch.object(Stock, 'has_enough', return_value=False):
@@ -170,3 +170,33 @@ class TestStock:
             product = ProductFactory()
             stock.subtract(product, 123, amount=1.0)
         assert 'Amount must be a positive integer' in str(excinfo)
+
+    def test_total(self):
+        product_1 = ProductFactory(id=1)
+        product_2 = ProductFactory(id=2)
+        stock_product_1_1 = StockProductFactory(
+            product_id=product_1.id,
+            lot_number='123',
+            amount=10,
+        )
+        stock_product_1_2 = StockProductFactory(
+            product_id=product_1.id,
+            lot_number='321',
+            amount=10,
+        )
+        stock_product_2_1 = StockProductFactory(
+            product_id=product_2.id,
+            lot_number='1111',
+            amount=10,
+        )
+        stock = StockFactory()
+        assert stock.total(product_1) is 0
+        stock.stock_products.append(stock_product_1_1)
+        assert stock.total(product_1) is 10
+        stock.stock_products.append(stock_product_1_2)
+        assert stock.total(product_1) is 20
+        stock.stock_products.append(stock_product_2_1)
+        assert stock.total(product_1) is 20
+        assert stock.total(product_2) is 10
+
+
