@@ -7,7 +7,7 @@ jedi==0.10.2
 psycopg2==2.7.1
 Pygments==2.2.0
 neovim==0.2.0
-flask-debug-toolbar==0.10.1
+flask-debugtoolbar==0.10.1
 
 # Testing
 pytest==3.2.1
