@@ -2,7 +2,7 @@ import datetime as dt
 
 from flask_wtf import FlaskForm
 import wtforms as wtf
-from wtforms.validators import InputRequired, DataRequired, Optional
+from wtforms.validators import InputRequired, DataRequired, Optional, NumberRange
 
 from labsys.inventory.models import Product, StockProduct, Transaction
 
@@ -22,7 +22,10 @@ class OrderItemForm(FlaskForm):
         'Reativo', coerce=int, validators=[InputRequired()])
     item_id = wtf.SelectField(
         'Especificação', coerce=int, validators=[InputRequired()])
-    amount = wtf.IntegerField('Quantidade', validators=[InputRequired()])
+    amount = wtf.IntegerField('Quantidade', validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Quantidade deve ser maior que zero!')])
     lot_number = wtf.StringField('Lote', validators=[InputRequired()])
     expiration_date = wtf.DateField('Data de Validade',
                                     format='%d/%m/%Y',
@@ -69,7 +72,10 @@ class ConsumeProductForm(FlaskForm):
 
     stock_product_id = wtf.SelectField(
         'Produto', coerce=int, validators=[InputRequired()])
-    amount = wtf.IntegerField('Quantidade', validators=[InputRequired()])
+    amount = wtf.IntegerField('Quantidade', validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Quantidade deve ser maior que zero!')])
     submit = wtf.SubmitField('Confirmar')
 
 
@@ -84,7 +90,10 @@ class AddTransactionForm(FlaskForm):
     lot_number = wtf.StringField('Lote', validators=[InputRequired()])
     expiration_date = wtf.DateField(
         'Data de Validade', format='%d/%m/%Y', validators=[InputRequired()])
-    amount = wtf.IntegerField('Quantidade Recebida', validators=[InputRequired()])
+    amount = wtf.IntegerField('Quantidade Recebida', validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Quantidade deve ser maior que zero!')])
     invoice_type = wtf.SelectField(
         'Tipo de Nota',
         coerce=str,
@@ -118,7 +127,11 @@ class SubTransactionForm(FlaskForm):
 
     stock_product_id = wtf.SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
-    amount = wtf.IntegerField('Quantidade Consumida', validators=[InputRequired()])
+    amount = wtf.IntegerField('Quantidade Consumida', validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Quantidade deve ser maior que zero!')])
+
     details = wtf.StringField('Observações', validators=[Optional()])
     submit = wtf.SubmitField('Enviar')
 
