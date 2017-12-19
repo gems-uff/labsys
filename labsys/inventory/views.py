@@ -17,6 +17,7 @@ from .models import (
     Transaction, Product, Stock, StockProduct, Specification, OrderItem, Order,
 )
 
+import labsys.inventory.services as services
 import labsys.inventory.forms as forms
 
 blueprint = Blueprint('inventory', __name__)
@@ -158,6 +159,27 @@ def consume_product():
         'stock_products': stock_products,
     }
     form = forms.ConsumeProductForm(**form_context)
+
+    if form.validate_on_submit():
+        logging.info('POSTing a valid form to consume_product')
+        logging.info('Creating a new SUB Transaction')
+        try:
+            selected_stock_product = StockProduct.query.get(
+                form.stock_product_id.data)
+            services.create_sub_transaction(
+                current_user,
+                selected_stock_product.product,
+                selected_stock_product.lot_number,
+                form.amount.data,
+                stock
+            )
+            flash('{} unidades removidas do estoque com sucesso!'.format(
+                form.amount.data))
+
+            return redirect(url_for('.consume_product'))
+        except ValueError:
+            form.errors.append('Não há o suficiente desse produto em estoque.')
+
     return render_template('inventory/consume-product.html', form=form)
 
 

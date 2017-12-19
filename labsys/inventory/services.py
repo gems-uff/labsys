@@ -21,6 +21,7 @@ def create_add_transaction_from_order(order, stock):
         db.session.add(transaction)
     db.session.commit()
 
+
 def create_sub_transaction(user, product, lot_number, amount, stock):
     try:
         transaction = m.Transaction(
