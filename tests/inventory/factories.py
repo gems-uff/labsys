@@ -18,26 +18,27 @@ class StockFactory(BaseFactory):
     stock_products = []
 
 
-class ProductFactory(BaseFactory):
-
-    class Meta:
-        model = Product
-        abstract = False
-
-    name = Sequence(lambda n: 'product-{}'.format(n))
-    stock_minimum = 1
-
-
 class SpecificationFactory(BaseFactory):
 
     class Meta:
         model = Specification
         abstract = False
 
-    product = SubFactory(ProductFactory)
     manufacturer = 'Manufacturer'
     catalog_number = '123123'
     units = 1
+
+
+class ProductFactory(BaseFactory):
+
+    class Meta:
+        model = Product
+        abstract = False
+        inline_args = ('name', 'specification')
+
+    specification = SubFactory(SpecificationFactory)
+    name = Sequence(lambda n: 'product-{}'.format(n))
+    stock_minimum = 1
 
 
 class StockProductFactory(BaseFactory):

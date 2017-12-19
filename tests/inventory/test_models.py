@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from tests.inventory.factories import (
-    StockProductFactory, StockFactory, SpecificationFactory, ProductFactory,
+    StockProductFactory, StockFactory, ProductFactory,
 )
 from labsys.inventory.models import StockProduct, Stock
 
