@@ -62,6 +62,11 @@ class Product(Base):
     specifications = db.relationship(
         'Specification', backref='product')
 
+    def get_base_spec(self):
+        if len(self.specifications) > 0:
+            return self.specifications[0]
+        return None
+
 
 class Specification(Base):
 

@@ -1,4 +1,5 @@
-import logging, jsonpickle
+import logging
+import jsonpickle
 
 from flask import (
     render_template, redirect, url_for, flash, abort, Blueprint, session,
@@ -19,6 +20,7 @@ from .models import (
 import labsys.inventory.forms as forms
 
 blueprint = Blueprint('inventory', __name__)
+
 
 @blueprint.route('/', methods=['GET'])
 @login_required
@@ -138,6 +140,7 @@ def checkout():
                            form=form,
                            order_items=order_items,)
 
+
 @blueprint.route('/products/consume', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
@@ -150,15 +153,9 @@ def consume_product():
     logging.info('consume_product()')
     # TODO: move this to services
     stock = Stock.query.first()
-    products = [p for p in Product.query.join(
-                    StockProduct, Product.id==StockProduct.product_id)
-                    .filter(StockProduct.stock_id==stock.id)]
     stock_products = [sp for sp in stock.stock_products]
-    lot_numbers = [sp.lot_number for sp in stock.stock_products]
     form_context = {
-        'products': products,
         'stock_products': stock_products,
-        'lot_numbers': lot_numbers,
     }
     form = forms.ConsumeProductForm(**form_context)
     return render_template('inventory/consume-product.html', form=form)

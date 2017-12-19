@@ -55,19 +55,20 @@ class OrderForm(FlaskForm):
 class ConsumeProductForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        products = kwargs.get('products', [])
         stock_products = kwargs.get('stock_products', [])
-        lot_numbers = kwargs.get('lot_numbers', [])
-        self.product_id.choices = [(p.id, p.name) for p in products]
-        self.lot_number.choices = [
-            (sp.id, 'Lote: {} | Quantidade: {} | Validade: {}'.format(
-                sp.lot_number, sp.amount, sp.expiration_date))
+        self.stock_product_id.choices = [
+            (sp.id,
+                'Nome: {} | Catálogo: {} | Lote: {} | Quantidade: {}'
+                .format(
+                    sp.product.name,
+                    sp.product.get_base_spec().catalog_number,
+                    sp.lot_number,
+                    sp.amount,
+                ))
             for sp in stock_products]
 
-    product_id = wtf.SelectField(
+    stock_product_id = wtf.SelectField(
         'Produto', coerce=int, validators=[InputRequired()])
-    lot_number = wtf.SelectField(
-        'Lote', coerce=int, validators=[InputRequired()])
     amount = wtf.IntegerField('Quantidade', validators=[InputRequired()])
     submit = wtf.SubmitField('Confirmar')
 
