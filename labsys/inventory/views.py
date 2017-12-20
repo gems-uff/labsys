@@ -173,8 +173,8 @@ def consume_product():
                 form.amount.data,
                 stock
             )
-            flash('{} unidades removidas do estoque com sucesso!'.format(
-                form.amount.data))
+            flash('{} unidades de {} removidas do estoque com sucesso!'.format(
+                form.amount.data, selected_stock_product.product.name))
 
             return redirect(url_for('.consume_product'))
         except ValueError:

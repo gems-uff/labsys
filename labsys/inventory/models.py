@@ -1,7 +1,7 @@
 import jsonpickle
 from datetime import datetime
 
-from sqlalchemy import asc, desc, UniqueConstraint
+from sqlalchemy import asc, desc, UniqueConstraint, CheckConstraint
 
 from ..extensions import db
 from .services import create_add_transaction_from_order
@@ -232,6 +232,10 @@ class Transaction(Base, TimeStampedModelMixin):
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     category = db.Column(db.Integer, nullable=False)
+    # TODO: make sure alembic migrations recognizes this
+    __table_args__ = (
+        CheckConstraint(amount > 0, name='amount_is_positive'), {})
+
     # Relationships
     user = db.relationship(
         User, backref=db.backref('transactions', lazy=True))
