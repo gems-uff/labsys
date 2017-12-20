@@ -13,9 +13,22 @@
 {% block scripts %}
 {{ super() }}
 <script>
-  console.log('oi');
   document.getElementById("amount").required = false;
   document.getElementById("lot_number").required = false;
   document.getElementById("expiration_date").required = false;
+</script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+<script type="text/javascript">
+$('#item_id').select2({
+    "language": {
+        "noResults": function() {
+            return "Produto não encontrado. <a href='{{ url_for('inventory.add_product_to_catalog') }}'>Cadastrar no Catálogo?</a>"
+        }
+    },
+    escapeMarkup: function (markup) {
+        return markup;
+    }
+});
 </script>
 {% endblock %}

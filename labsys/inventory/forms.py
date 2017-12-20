@@ -2,26 +2,24 @@ import datetime as dt
 
 from flask_wtf import FlaskForm
 import wtforms as wtf
-from wtforms.validators import InputRequired, DataRequired, Optional, NumberRange
-
+from wtforms.validators import (
+    InputRequired, DataRequired, Optional, NumberRange
+)
 from labsys.inventory.models import Product, StockProduct, Transaction
 
 
 class OrderItemForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        products = kwargs.get('products', [])
         specs = kwargs.get('specs', [])
-        self.product_id.choices = [(p.id, p.name) for p in products]
         self.item_id.choices = [
-            (s.id, '{}x | Cat: {}'.format(s.units, s.catalog_number))
+            (s.id, '{} | Catálogo: {} | {} unidades/produto'.format(
+                s.product.name, s.catalog_number, s.units))
             for s in specs]
 
     # TODO: make my own select field for foreign keys
-    product_id = wtf.SelectField(
-        'Reativo', coerce=int, validators=[InputRequired()])
     item_id = wtf.SelectField(
-        'Especificação', coerce=int, validators=[InputRequired()])
+        'Produto', coerce=int, validators=[InputRequired()])
     amount = wtf.IntegerField('Quantidade', validators=[
         InputRequired(),
         NumberRange(

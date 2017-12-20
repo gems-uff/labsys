@@ -30,7 +30,7 @@ def index():
     return render_template('inventory/index.html')
 
 
-@blueprint.route('/products', methods=['GET'])
+@blueprint.route('/catalog', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def list_catalog():
@@ -43,10 +43,8 @@ def list_catalog():
 @permission_required(Permission.EDIT)
 def purchase_product():
     logging.info('purchase_product()')
-    products = Product.query.all()
     specifications = Specification.query.all()
     form_context = {
-        'products': products,
         'specs': specifications,
     }
     form = forms.OrderItemForm(**form_context)
@@ -146,11 +144,6 @@ def checkout():
 @login_required
 @permission_required(Permission.EDIT)
 def consume_product():
-    '''
-    - Retrieve all products and stock_products
-    - Show consume form
-    -
-    '''
     logging.info('consume_product()')
     # TODO: move this to services
     stock = Stock.query.first()
@@ -189,7 +182,7 @@ def consume_product():
 @blueprint.route('/products/add', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
-def add_product():
+def add_product_to_catalog():
     '''
     1. Render the add product/spec form
     '''
