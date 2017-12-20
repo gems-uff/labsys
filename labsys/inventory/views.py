@@ -154,7 +154,7 @@ def consume_product():
     logging.info('consume_product()')
     # TODO: move this to services
     stock = Stock.query.first()
-    stock_products = [sp for sp in stock.stock_products]
+    stock_products = [sp for sp in stock.stock_products if sp.amount > 0]
     form_context = {
         'stock_products': stock_products,
     }
