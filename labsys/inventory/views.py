@@ -177,8 +177,11 @@ def consume_product():
                 form.amount.data, selected_stock_product.product.name))
 
             return redirect(url_for('.consume_product'))
-        except ValueError:
-            form.errors.append('Não há o suficiente desse produto em estoque.')
+        except ValueError as error:
+            form.amount.errors.append(
+                'Não há o suficiente desse produto em estoque.')
+        except:
+            flash('Erro inesperado, contate o administrador.')
 
     return render_template('inventory/consume-product.html', form=form)
 

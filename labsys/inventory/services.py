@@ -1,3 +1,4 @@
+from flask import jsonify
 from ..extensions import db
 from labsys.inventory import models as m
 
@@ -34,5 +35,6 @@ def create_sub_transaction(user, product, lot_number, amount, stock):
         )
         db.session.add(transaction)
         db.session.commit()
-    except ValueError as error:
-        print(error)
+    except:
+        db.session.rollback()
+        raise

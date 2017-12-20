@@ -260,7 +260,7 @@ class Transaction(Base, TimeStampedModelMixin):
                 amount,
             )
         else:
-            sub = stock.subtract(product, lot_number, amount)
-            if sub is not True:
-                # raise sub
-                raise ValueError('Could not subtract from stock')
+            try:
+                sub = stock.subtract(product, lot_number, amount)
+            except ValueError as error:
+                raise error
