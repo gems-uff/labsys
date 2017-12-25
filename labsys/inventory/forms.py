@@ -6,6 +6,7 @@ from wtforms.validators import (
     InputRequired, DataRequired, Optional, NumberRange
 )
 from labsys.inventory.models import Product, StockProduct, Transaction
+import labsys.inventory.models as models
 
 
 class OrderItemForm(FlaskForm):
@@ -58,8 +59,7 @@ class ConsumeProductForm(FlaskForm):
         super().__init__(*args, **kwargs)
         stock_products = kwargs.get('stock_products', [])
         self.stock_product_id.choices = [
-            (sp.id,
-                'Nome: {} | Catálogo: {} | Lote: {} | Quantidade: {}'
+            (sp.id, 'Nome: {} | Catálogo: {} | Lote: {} | Quantidade: {}'
                 .format(
                     sp.product.name,
                     sp.product.get_base_spec().catalog_number,
@@ -75,6 +75,27 @@ class ConsumeProductForm(FlaskForm):
         NumberRange(
             min=1, max=None, message='Quantidade deve ser maior que zero!')])
     submit = wtf.SubmitField('Confirmar')
+
+
+class AddProductForm(FlaskForm):
+    product_name = wtf.StringField(
+        'Nome do reativo', validators=[InputRequired()])
+    product_min_stock = wtf.IntegerField(
+        'Estoque mínimo', default=1, validators=[InputRequired()])
+    spec_manufacturer = wtf.StringField(
+        'Fabricante', validators=[Optional()])
+    spec_catalog = wtf.StringField(
+        'Número de catálogo', validators=[InputRequired()])
+    spec_units_in_stock = wtf.IntegerField(
+        'Unidades de estoque', default=1, validators=[InputRequired()])
+    submit = wtf.SubmitField('Cadastrar Produto')
+
+    def validate_spec_catalog(form, field):
+        spec = models.Specification.query.filter_by(catalog_number=field.data)
+        if spec is not None \
+                and spec.manufacturer is form.spec_manufacturer.data:
+            raise wtf.ValidationError(
+                'Essa especificação já está cadastrada (catálogo e fabricante')
 
 
 class AddTransactionForm(FlaskForm):

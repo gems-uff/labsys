@@ -186,7 +186,8 @@ def add_product_to_catalog():
     '''
     1. Render the add product/spec form
     '''
-    return 'oi'
+    form = forms.AddProductForm()
+    return render_template('inventory/create-product.html', form=form)
 
 
 @blueprint.route('/export/<string:table>')
