@@ -170,7 +170,7 @@ def consume_product():
                 form.amount.data, selected_stock_product.product.name))
 
             return redirect(url_for('.consume_product'))
-        except ValueError as error:
+        except ValueError as _:
             form.amount.errors.append(
                 'Não há o suficiente desse produto em estoque.')
         except:
@@ -185,6 +185,17 @@ def consume_product():
 def add_product_to_catalog():
     form = forms.AddProductForm()
     return render_template('inventory/create-product.html', form=form)
+
+
+@blueprint.route('/products/<product_id>/specifications',
+                 methods=['GET', 'POST'])
+@login_required
+@permission_required(Permission.EDIT)
+def add_specification_to_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    form = forms.AddSpecificationForm(product.id)
+    return render_template('inventory/create-specification.html',
+                           form=form, product=product)
 
 
 @blueprint.route('/products/<product_id>', methods=['GET'])

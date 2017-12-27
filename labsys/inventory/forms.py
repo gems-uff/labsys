@@ -1,12 +1,12 @@
 import datetime as dt
 
-from flask_wtf import FlaskForm
 import wtforms as wtf
-from wtforms.validators import (
-    InputRequired, DataRequired, Optional, NumberRange
-)
-from labsys.inventory.models import Product, StockProduct, Transaction
+from flask_wtf import FlaskForm
+from wtforms.validators import (DataRequired, InputRequired, NumberRange,
+                                Optional)
+
 import labsys.inventory.models as models
+from labsys.inventory.models import Product, StockProduct, Transaction
 
 
 class OrderItemForm(FlaskForm):
@@ -96,6 +96,19 @@ class AddProductForm(FlaskForm):
                 and spec.manufacturer is form.spec_manufacturer.data:
             raise wtf.ValidationError(
                 'Essa especificação já está cadastrada (catálogo e fabricante')
+
+
+class AddSpecificationForm(FlaskForm):
+    def __init__(self, product_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.product_id.data = product_id
+
+    product_id = wtf.HiddenField()
+    manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
+    catalog_number = wtf.IntegerField('Catálogo', validators=[InputRequired()])
+    units = wtf.IntegerField('Unidades de estoque', default=1,
+                             validators=[InputRequired()])
+    submit = wtf.SubmitField('Adicionar Especificação')
 
 
 class AddTransactionForm(FlaskForm):
