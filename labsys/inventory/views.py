@@ -183,11 +183,16 @@ def consume_product():
 @login_required
 @permission_required(Permission.EDIT)
 def add_product_to_catalog():
-    '''
-    1. Render the add product/spec form
-    '''
     form = forms.AddProductForm()
     return render_template('inventory/create-product.html', form=form)
+
+
+@blueprint.route('/products/<product_id>', methods=['GET'])
+@login_required
+@permission_required(Permission.EDIT)
+def detail_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    return render_template('inventory/details-product.html', product=product)
 
 
 @blueprint.route('/export/<string:table>')
