@@ -20,7 +20,7 @@ class OrderItemForm(FlaskForm):
 
     # TODO: make my own select field for foreign keys
     item_id = wtf.SelectField(
-        'Produto', coerce=int, validators=[InputRequired()])
+        'Reativo', coerce=int, validators=[InputRequired()])
     amount = wtf.IntegerField('Quantidade', validators=[
         InputRequired(),
         NumberRange(
@@ -69,7 +69,7 @@ class ConsumeProductForm(FlaskForm):
             for sp in stock_products]
 
     stock_product_id = wtf.SelectField(
-        'Produto', coerce=int, validators=[InputRequired()])
+        'Reativo', coerce=int, validators=[InputRequired()])
     amount = wtf.IntegerField('Quantidade', validators=[
         InputRequired(),
         NumberRange(
@@ -88,7 +88,7 @@ class AddProductForm(FlaskForm):
         'Número de catálogo', validators=[InputRequired()])
     spec_units_in_stock = wtf.IntegerField(
         'Unidades de estoque', default=1, validators=[InputRequired()])
-    submit = wtf.SubmitField('Cadastrar Produto')
+    submit = wtf.SubmitField('Cadastrar Reativo')
 
     def validate_spec_catalog(form, field):
         spec = models.Specification.query.filter_by(catalog_number=field.data)
@@ -108,7 +108,7 @@ class AddSpecificationForm(FlaskForm):
     catalog_number = wtf.IntegerField('Catálogo', validators=[InputRequired()])
     units = wtf.IntegerField('Unidades de estoque', default=1,
                              validators=[InputRequired()])
-    submit = wtf.SubmitField('Adicionar Especificação')
+    submit = wtf.SubmitField('Confirmar')
 
 
 class AddTransactionForm(FlaskForm):

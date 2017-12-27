@@ -59,7 +59,7 @@ def purchase_product():
                 logging.info('Finishing order => redirect to checkout()')
                 return redirect(url_for('.checkout'))
             logging.info('None order item added to session')
-            flash('Pelo menos 1 produto deve ser adicionado ao carrinho.')
+            flash('Pelo menos 1 reativo deve ser adicionado ao carrinho.')
             return redirect(url_for('.purchase_product'))
         if form.validate():
             logging.info('Create order form is valid')
@@ -77,7 +77,7 @@ def purchase_product():
                 session.modified = True
 
             logging.info('finishing form.validate')
-            flash('Produto adicionado ao carrinho')
+            flash('Reativo adicionado ao carrinho')
             return redirect(url_for('.purchase_product'))
         logging.info('redirecting to route with or w/out errors and form')
     logging.info('GETting purchase_product')
@@ -172,7 +172,7 @@ def consume_product():
             return redirect(url_for('.consume_product'))
         except ValueError as _:
             form.amount.errors.append(
-                'Não há o suficiente desse produto em estoque.')
+                'Não há o suficiente desse reativo em estoque.')
         except:
             flash('Erro inesperado, contate o administrador.')
 
