@@ -1,4 +1,5 @@
 import logging
+import sqlalchemy
 import jsonpickle
 
 from flask import (
@@ -194,6 +195,21 @@ def add_product_to_catalog():
 def add_specification_to_product(product_id):
     product = Product.query.get_or_404(product_id)
     form = forms.AddSpecificationForm(product.id)
+
+    if form.validate_on_submit():
+        try:
+            specification = Specification(
+                form.product_id.data,
+                form.catalog_number.data,
+                form.manufacturer.data,
+                form.units.data
+            )
+            specification.create()
+            flash('Especificação adicionada com sucesso.')
+            return redirect(url_for('.detail_product', product_id=product.id))
+        except sqlalchemy.exc.IntegrityError as error:
+            db.session.rollback()
+            flash('Já existe uma especificação com esse catálogo e fabricante')
     return render_template('inventory/create-specification.html',
                            form=form, product=product)
 

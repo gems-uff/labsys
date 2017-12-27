@@ -70,8 +70,10 @@ class Product(Base):
 
 class Specification(Base):
 
-    def __init__(self, catalog_number, manufacturer, units=1, **kwargs):
+    def __init__(self, product_id, catalog_number, manufacturer, units=1,
+                 **kwargs):
         super().__init__(**kwargs)
+        self.product_id = product_id
         self.catalog_number = catalog_number
         self.manufacturer = manufacturer
         self.units = units

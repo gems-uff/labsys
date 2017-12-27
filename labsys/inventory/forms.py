@@ -87,7 +87,10 @@ class AddProductForm(FlaskForm):
     spec_catalog = wtf.StringField(
         'Número de catálogo', validators=[InputRequired()])
     spec_units_in_stock = wtf.IntegerField(
-        'Unidades de estoque', default=1, validators=[InputRequired()])
+        'Unidades de estoque', default=1, validators=[
+            InputRequired(),
+            NumberRange(
+                min=1, max=None, message='Deve ser maior que zero!')]),
     submit = wtf.SubmitField('Cadastrar Reativo')
 
     def validate_spec_catalog(form, field):
@@ -106,8 +109,10 @@ class AddSpecificationForm(FlaskForm):
     product_id = wtf.HiddenField()
     manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
     catalog_number = wtf.IntegerField('Catálogo', validators=[InputRequired()])
-    units = wtf.IntegerField('Unidades de estoque', default=1,
-                             validators=[InputRequired()])
+    units = wtf.IntegerField('Unidades de estoque', default=1, validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Deve ser maior que zero!')])
     submit = wtf.SubmitField('Confirmar')
 
 
