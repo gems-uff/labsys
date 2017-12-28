@@ -78,25 +78,26 @@ class ConsumeProductForm(FlaskForm):
 
 
 class AddProductForm(FlaskForm):
-    product_name = wtf.StringField(
+    name = wtf.StringField(
         'Nome do reativo', validators=[InputRequired()])
-    product_min_stock = wtf.IntegerField(
+    stock_minimum = wtf.IntegerField(
         'Estoque mínimo', default=1, validators=[InputRequired()])
-    spec_manufacturer = wtf.StringField(
-        'Fabricante', validators=[Optional()])
-    spec_catalog = wtf.StringField(
+    manufacturer = wtf.StringField(
+        'Fabricante', validators=[InputRequired()])
+    catalog_number = wtf.StringField(
         'Número de catálogo', validators=[InputRequired()])
-    spec_units_in_stock = wtf.IntegerField(
+    units = wtf.IntegerField(
         'Unidades de estoque', default=1, validators=[
             InputRequired(),
             NumberRange(
-                min=1, max=None, message='Deve ser maior que zero!')]),
+                min=1, max=None, message='Deve ser maior que zero!')])
     submit = wtf.SubmitField('Cadastrar Reativo')
 
     def validate_spec_catalog(form, field):
-        spec = models.Specification.query.filter_by(catalog_number=field.data)
-        if spec is not None \
-                and spec.manufacturer is form.spec_manufacturer.data:
+        spec = models.Specification.query.filter_by(
+            catalog_number=field.data,
+            manufacturer=form.manufacturer.data).first()
+        if spec is not None:
             raise wtf.ValidationError(
                 'Essa especificação já está cadastrada (catálogo e fabricante')
 
@@ -108,7 +109,7 @@ class AddSpecificationForm(FlaskForm):
 
     product_id = wtf.HiddenField()
     manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
-    catalog_number = wtf.IntegerField('Catálogo', validators=[InputRequired()])
+    catalog_number = wtf.StringField('Catálogo', validators=[InputRequired()])
     units = wtf.IntegerField('Unidades de estoque', default=1, validators=[
         InputRequired(),
         NumberRange(

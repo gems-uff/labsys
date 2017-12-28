@@ -185,6 +185,32 @@ def consume_product():
 @permission_required(Permission.EDIT)
 def add_product_to_catalog():
     form = forms.AddProductForm()
+
+    if form.validate_on_submit():
+        try:
+            specification = Specification(
+                form.catalog_number.data,
+                form.manufacturer.data,
+                form.units.data,
+            )
+            product = Product(
+                name=form.name.data,
+                stock_minimum=form.stock_minimum.data,
+                specification=specification,
+            )
+            db.session.add(product)
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            flash('Já existe uma especificação com esse catálogo e fabricante')
+            return render_template('inventory/create-product.html', form=form)
+        except Exception as exc:
+            db.session.rollback()
+            print(exc)
+            flash('Ocorreu um erro inesperado, contate um admministrador.')
+            return render_template('inventory/create-product.html', form=form)
+        return render_template('inventory/details-product.html',
+                               product=product)
     return render_template('inventory/create-product.html', form=form)
 
 
@@ -199,15 +225,16 @@ def add_specification_to_product(product_id):
     if form.validate_on_submit():
         try:
             specification = Specification(
-                form.product_id.data,
                 form.catalog_number.data,
                 form.manufacturer.data,
-                form.units.data
+                form.units.data,
             )
-            specification.create()
+            specification.product_id = product_id
+            db.session.add(specification)
+            db.session.commit()
             flash('Especificação adicionada com sucesso.')
             return redirect(url_for('.detail_product', product_id=product.id))
-        except sqlalchemy.exc.IntegrityError as error:
+        except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
             flash('Já existe uma especificação com esse catálogo e fabricante')
     return render_template('inventory/create-specification.html',
