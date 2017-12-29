@@ -6,6 +6,7 @@
   <div class="page-header">
     <h1>Detalhes do Reativo</h1>
   </div>
+  <a href="{{ url_for('inventory.add_specification_to_product', product_id=product.id) }}" class="btn btn-default">Adicionar Especificação</a>
   <div class="product-details">
     <h2>{{ product.name }}</h2>
     <hr />
@@ -18,5 +19,4 @@
     </div>
     {% endfor %}
   </div>
-  <a href="{{ url_for('inventory.add_specification_to_product', product_id=product.id) }}" class="btn btn-default">Adicionar Especificação</a>
 {% endblock %}

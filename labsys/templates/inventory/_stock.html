@@ -7,10 +7,14 @@
   <thead>
     <tr>
       <th width="30%">Reativo</th>
-      <th width="20%">Data de Validade</th>
       <th width="10%">Lote</th>
+      <th width="20%">Data de Validade</th>
       <th width="10%">Quantidade em Estoque</th>
-      <th width="10%">Estoque Mínimo</th>
+      <!--
+        As we are listing every stock product not nested, it does not make sense to
+        show the minimum stock. When they're grouped it makes sense
+      -->
+      <!--<th width="10%">Estoque Mínimo</th>-->
     </tr>
   </thead>
   <tbody>
@@ -18,10 +22,10 @@
       {% if stock_product.amount > 0 %}
         <tr>
           <td>{{ stock_product.product.name }}</td>
-          <td>{{ stock_product.expiration_date }}</td>
           <td>{{ stock_product.lot_number }}</td>
+          <td>{{ stock_product.expiration_date }}</td>
           <td>{{ stock_product.amount }}</td>
-          <td>{{ stock_product.product.stock_minimum }}</td>
+          <!--<td>{{ stock_product.product.stock_minimum }}</td>-->
         </tr>
       {% endif %}
     {% endfor %}
