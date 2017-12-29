@@ -66,6 +66,17 @@ def list_transactions():
                            transactions=transactions)
 
 
+# TODO: Implement this method:
+@blueprint.route('/transactions/<int:transaction_id>/delete', methods=['GET'])
+@login_required
+@permission_required(Permission.DELETE)
+def delete_transaction(transaction_id):
+    transactions = Transaction.query.all()
+    flash('Essa funcionalidade ainda não foi implementada.')
+    return render_template('inventory/list-transactions.html',
+                           transactions=transactions)
+
+
 @blueprint.route('/orders/add', methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
@@ -241,7 +252,7 @@ def add_product_to_catalog():
     return render_template('inventory/create-product.html', form=form)
 
 
-@blueprint.route('/products/<product_id>/specifications',
+@blueprint.route('/products/<int:product_id>/specifications',
                  methods=['GET', 'POST'])
 @login_required
 @permission_required(Permission.EDIT)
@@ -268,7 +279,7 @@ def add_specification_to_product(product_id):
                            form=form, product=product)
 
 
-@blueprint.route('/products/<product_id>', methods=['GET'])
+@blueprint.route('/products/<int:product_id>', methods=['GET'])
 @login_required
 @permission_required(Permission.EDIT)
 def detail_product(product_id):
