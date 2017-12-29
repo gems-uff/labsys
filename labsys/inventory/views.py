@@ -28,15 +28,42 @@ blueprint = Blueprint('inventory', __name__)
 @login_required
 @permission_required(Permission.VIEW)
 def index():
-    return render_template('inventory/index.html')
+    stock = Stock.query.first()
+    stock_products = stock.stock_products
+    return render_template('inventory/index.html',
+                           stock_products=stock_products)
 
 
 @blueprint.route('/catalog', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
-def list_catalog():
+def show_catalog():
     products = Product.query.all()
     return render_template('inventory/list-products.html', products=products)
+
+
+@blueprint.route('/stock', methods=['GET'])
+@login_required
+@permission_required(Permission.VIEW)
+def show_stock():
+    stock = Stock.query.first()
+    stock_products = sorted(
+        stock.stock_products,
+        key=lambda sp: (sp.product.name,
+                        sp.expiration_date,
+                        sp.lot_number,
+                        sp.amount))
+    return render_template('inventory/index.html',
+                           stock_products=stock_products)
+
+
+@blueprint.route('/transactions', methods=['GET'])
+@login_required
+@permission_required(Permission.VIEW)
+def list_transactions():
+    transactions = Transaction.query.all()
+    return render_template('inventory/list-transactions.html',
+                           transactions=transactions)
 
 
 @blueprint.route('/orders/add', methods=['GET', 'POST'])
