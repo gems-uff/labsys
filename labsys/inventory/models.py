@@ -169,7 +169,7 @@ class StockProduct(Base):
     expiration_date = db.Column(db.Date, nullable=True)
     amount = db.Column(db.Integer, default=0, nullable=False)
     # Relationships
-    product = db.relationship('Product')
+    product = db.relationship('Product', backref=db.backref('stock_products', lazy=True))
 
     def compare(self, other):
         if self.product == other.product \

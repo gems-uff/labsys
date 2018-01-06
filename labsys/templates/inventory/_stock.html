@@ -4,30 +4,49 @@
     </h1>
 </div>
 <table class="table table-striped table-bordered">
-  <thead>
-    <tr>
-      <th width="30%">Reativo</th>
-      <th width="10%">Lote</th>
-      <th width="20%">Data de Validade</th>
-      <th width="10%">Quantidade em Estoque</th>
-      <!--
-        As we are listing every stock product not nested, it does not make sense to
-        show the minimum stock. When they're grouped it makes sense
-      -->
-      <!--<th width="10%">Estoque Mínimo</th>-->
-    </tr>
-  </thead>
-  <tbody>
-    {% for stock_product in stock_products %}
-      {% if stock_product.amount > 0 %}
+    <thead>
+      <tr>
+        <th width="40%">Reativo</th>
+        <th width="10%">Quantidade em Estoque</th>
+        <th width="10%">Estoque Mínimo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in products %}
         <tr>
-          <td>{{ stock_product.product.name }}</td>
-          <td>{{ stock_product.lot_number }}</td>
-          <td>{{ stock_product.expiration_date }}</td>
-          <td>{{ stock_product.amount }}</td>
-          <!--<td>{{ stock_product.product.stock_minimum }}</td>-->
+          <td>
+            <a data-toggle="collapse" href="#collapseStockProducts-{{loop.index}}" aria-expanded="false" aria-controls="collapseStockProducts">
+              {{ product.name }}
+            </a>
+          </td>
+          <td {% if product.total < product.stock_minimum %} class="danger" title="Estoque abaixo do mínimo"{% endif %}>
+              {{ product.total }}
+          </td>
+          <td>{{ product.stock_minimum }}</td>
         </tr>
-      {% endif %}
-    {% endfor %}
-  </tbody>
-</table>
+        {% if product.total > 0 %}
+          <tr class="collapse" id="collapseStockProducts-{{loop.index}}"><td colspan="4"><table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>Lote</th>
+                <th>Data de validade</th>
+                <th>Quantidade em estoque</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stock_product in product.stock_products %}
+                {% if stock_product.amount > 0 %}
+                  <tr>
+                    <td>{{ stock_product.lot_number }}</td>
+                    <td>{{ stock_product.expiration_date }}</td>
+                    <td>{{ stock_product.amount }}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table></td></tr>
+        {% endif %}
+        </div>
+      {% endfor %}
+    </tbody>
+  </table>

@@ -47,14 +47,15 @@ def show_catalog():
 @permission_required(Permission.VIEW)
 def show_stock():
     stock = Stock.query.first()
-    stock_products = sorted(
-        stock.stock_products,
-        key=lambda sp: (sp.product.name,
-                        sp.expiration_date,
-                        sp.lot_number,
-                        sp.amount))
+    products = db.session.query(Product).\
+        join(StockProduct).\
+        order_by(Product.name).\
+        all()
+
+    for p in products:
+        p.total = stock.total(p)
     return render_template('inventory/index.html',
-                           stock_products=stock_products)
+                           products=products)
 
 
 @blueprint.route('/transactions', methods=['GET'])
