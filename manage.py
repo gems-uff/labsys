@@ -77,7 +77,7 @@ def load_initial_data():
     """Load initial models data"""
     import labsys.utils.data_loader as dl
     dl.load_data(db)
-
+    Role.insert_roles()
 
 @manager.command
 def deploy():
