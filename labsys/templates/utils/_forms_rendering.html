@@ -122,7 +122,7 @@
 {% macro render_admission(form) -%}
   <fieldset>
     <legend>Admissão</legend>
-    {{ wtf.form_field(form.id_lvrs_intern) }}
+    {{ wtf.form_field(form.lvrs_intern_id) }}
     {{ wtf.form_field(form.first_symptoms_date) }}
     {{ wtf.form_field(form.semepi_symptom) }}
     {{ wtf.form_field(form.requesting_institution) }}

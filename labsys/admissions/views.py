@@ -82,7 +82,7 @@ def detail_admission(id):
                 sec_symptom['details'] = obs_symptom.details
 
     form = AdmissionForm(
-        id_lvrs_intern=admission.id_lvrs_intern,
+        lvrs_intern_id=admission.lvrs_intern_id,
         first_symptoms_date=admission.first_symptoms_date,
         semepi_symptom=admission.semepi_symptom,
         state_id=admission.state_id,
@@ -129,7 +129,7 @@ def edit_admission(id):
                 sec_symptom['details'] = obs_symptom.details
 
     form = AdmissionForm(
-        id_lvrs_intern=admission.id_lvrs_intern,
+        lvrs_intern_id=admission.lvrs_intern_id,
         first_symptoms_date=admission.first_symptoms_date,
         semepi_symptom=admission.semepi_symptom,
         state_id=admission.state_id,
@@ -148,8 +148,8 @@ def edit_admission(id):
     form.submit.label.text = 'Editar'
 
     if form.validate_on_submit():
-        if form.id_lvrs_intern.data != admission.id_lvrs_intern and \
-                Admission.query.filter_by(id_lvrs_intern=form.id_lvrs_intern.data).first() is not None:
+        if form.lvrs_intern_id.data != admission.lvrs_intern_id and \
+                Admission.query.filter_by(lvrs_intern_id=form.lvrs_intern_id.data).first() is not None:
             flash('Número Interno já cadastrado! Escolha outro!')
         else:
             admission.patient.name = form.patient.data['name']
@@ -172,7 +172,7 @@ def edit_admission(id):
             admission.patient.residence.details = form.patient.residence.data[
                 'details']
 
-            admission.id_lvrs_intern = form.id_lvrs_intern.data
+            admission.lvrs_intern_id = form.lvrs_intern_id.data
             admission.first_symptoms_date = form.first_symptoms_date.data
             admission.semepi_symptom = form.semepi_symptom.data
             admission.state_id = form.state_id.data \
@@ -304,7 +304,7 @@ def create_admission():
     # POST and valid
     if form.validate_on_submit():
         admission = Admission.query.filter_by(
-            id_lvrs_intern=form.id_lvrs_intern.data).first()
+            lvrs_intern_id=form.lvrs_intern_id.data).first()
         if admission is None:
             patient = Patient(
                 name=form.patient.data['name'],
@@ -326,7 +326,7 @@ def create_admission():
                 details=form.patient.residence.data['details'])
 
             admission = Admission(
-                id_lvrs_intern=form.id_lvrs_intern.data,
+                lvrs_intern_id=form.lvrs_intern_id.data,
                 first_symptoms_date=form.first_symptoms_date.data,
                 semepi_symptom=form.semepi_symptom.data,
                 state_id=form.state_id.data

@@ -21,7 +21,7 @@
   <tbody>
     {% for admission in admissions %}
       <tr>
-        <td>{{ admission.id_lvrs_intern }}</td>
+        <td>{{ admission.lvrs_intern_id }}</td>
         {% if admission.samples %}
           <td>{{ admission.samples[0].collection_date.strftime('%d/%m/%Y') }}</td>
         {% endif %}

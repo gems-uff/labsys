@@ -45,7 +45,8 @@ class Admission(db.Model):
     __tablename__ = 'admissions'
     id = db.Column(db.Integer, primary_key=True)
     # Attributes
-    id_lvrs_intern = db.Column(db.String(32), unique=True)
+    lvrs_intern_id = db.Column(db.String(32), unique=True)
+    gal_request = db.Column(db.Stirng(32), unique=True)
     first_symptoms_date = db.Column(db.Date)
     semepi_symptom = db.Column(db.Integer)
     health_unit = db.Column(db.String(128))
@@ -81,7 +82,7 @@ class Admission(db.Model):
         'Sample', backref='admission', lazy='dynamic')
 
     def __repr__(self):
-        return '<Admission[{}]: {}>'.format(self.id, self.id_lvrs_intern)
+        return '<Admission[{}]: {}>'.format(self.id, self.lvrs_intern_id)
 
 
 class Vaccine(db.Model):

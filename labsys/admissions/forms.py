@@ -184,7 +184,7 @@ class SampleForm(FlaskForm):
 
 
 class AdmissionForm(FlaskForm):
-    id_lvrs_intern = StringField(
+    lvrs_intern_id = StringField(
         'Número Interno', validators=[InputRequired()])
     first_symptoms_date = DateField(
         'Data dos Primeiros Sintomas',
