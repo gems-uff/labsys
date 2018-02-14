@@ -31,11 +31,11 @@ class Address(db.Model):
     neighborhood = db.Column(db.String(255))
     zone = db.Column(db.Integer)
     details = db.Column(db.String(255))
+    city = db.Column(db.String(255))
+    state = db.Column(db.String(128))
+    country = db.Column(db.String(128))
     # Relationships
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
-    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
 
     def __repr__(self):
         return '<Address[{}]: Pat{}>'.format(self.id, self.patient_id)
@@ -51,9 +51,9 @@ class Admission(db.Model):
     health_unit = db.Column(db.String(128))
     requesting_institution = db.Column(db.String(128))
     details = db.Column(db.String(255))
+    city = db.Column(db.String(255))
+    state = db.Column(db.String(128))
     # Relationships
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     vaccine = db.relationship(
         'Vaccine',
@@ -238,71 +238,3 @@ class CdcExam(db.Model):
 
     def __repr__(self):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)
-
-
-class Country(db.Model):
-    __tablename__ = 'countries'
-    id = db.Column(db.Integer, primary_key=True)
-    name_pt_br = db.Column(db.String(255))
-    abbreviation = db.Column(db.String(2))
-    name_en_us = db.Column(db.String(255))
-    bacen_code = db.Column(db.Integer)
-    regions = db.relationship('Region', backref='country', lazy='dynamic')
-    addresses = db.relationship('Address', backref='country', lazy='dynamic')
-
-    def __repr__(self):
-        return '<Country[{}/{}]>'.format(self.name_en_us, self.abbreviation)
-
-    def __str__(self):
-        return '{}/{}'.format(self.name_pt_br, self.abbreviation)
-
-
-class Region(db.Model):
-    __tablename__ = 'regions'
-    id = db.Column(db.Integer, primary_key=True)
-    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
-    name = db.Column(db.String(16))
-    region_code = db.Column(db.Integer)
-    states = db.relationship('State', backref='region', lazy='dynamic')
-
-    def __repr__(self):
-        return '<Region[{}: {}]>'.format(self.name, self.region_code)
-
-    def __str__(self):
-        return '{}'.format(self.name)
-
-
-class State(db.Model):
-    __tablename__ = 'states'
-    id = db.Column(db.Integer, primary_key=True)
-    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'))
-    name = db.Column(db.String(64))
-    uf_code = db.Column(db.String(2))
-    ibge_code = db.Column(db.Integer)
-    cities = db.relationship('City', backref='state', lazy='dynamic')
-    addresses = db.relationship('Address', backref='state', lazy='dynamic')
-    admissions = db.relationship('Admission', backref='state', lazy='dynamic')
-
-    def __repr__(self):
-        return '<State[{}/{}]>'.format(self.name, self.uf_code)
-
-    def __str__(self):
-        return '{}/{}'.format(self.name, self.uf_code)
-
-
-class City(db.Model):
-    __tablename__ = 'cities'
-    id = db.Column(db.Integer, primary_key=True)
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
-    ibge_code = db.Column(db.Integer)
-    name = db.Column(db.String(128))
-    addresses = db.relationship('Address', backref='city', lazy='dynamic')
-    admissions = db.relationship('Admission', backref='city', lazy='dynamic')
-
-    def __repr__(self):
-        return '<City[{}/{}]>'.format(self.name, self.state.uf_code
-                                      if self.state is not None else 'None')
-
-    def __str__(self):
-        return '{}/{}'.format(self.name, self.state.uf_code
-                              if self.state is not None else 'None')
