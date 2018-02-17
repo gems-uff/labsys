@@ -38,7 +38,7 @@ class Product(db.Model):
 
     @classmethod
     def get_products(cls, unitary_only=False):
-        products = cls.query.order_by(asc(cls.catalog)).all()
+        products = cls.query.order_by(asc(cls.name)).all()
         if unitary_only:
             return [p for p in products if p.is_unitary]
         return products
@@ -162,8 +162,9 @@ class StockProduct(db.Model):
 
         return sorted(
             stock_products,
-            key=
-            lambda stock_product: (stock_product.product.catalog, stock_product.expiration_date)
+            key=lambda stock_product: (
+                stock_product.product.name,
+                stock_product.expiration_date)
         )
 
     @classmethod
