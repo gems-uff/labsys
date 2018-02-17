@@ -25,6 +25,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     BOOTSTRAP_SERVE_LOCAL = True
     DATABASE_URI_ENV_KEY = 'DEV_DATABASE_URL'
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
 
 

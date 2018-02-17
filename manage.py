@@ -37,11 +37,6 @@ admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 def make_shell_context():
     return dict(
         app=app, db=db, User=User, Role=Role,
-        product=im.Product.query.first(),
-        spec=im.Product.query.first().specifications[0],
-        stock=im.Stock.query.first(),
-        order=im.Order.query.first(),
-        order_item=im.OrderItem.query.first(),
     )
 
 
