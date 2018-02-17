@@ -50,7 +50,6 @@ def list_admissions():
 def symptom_in_admission_symptoms(symptom_id, admission):
     found = None
     for obs_symptom in admission.symptoms.all():
-        print(obs_symptom.symptom_id)
         if obs_symptom.symptom_id == symptom_id:
             return obs_symptom
     return found
@@ -248,7 +247,6 @@ def edit_admission(id):
                 else:
                     os = ObservedSymptom.query.get(observed.id)
                     if sec_symptom_form.data['observed'] is False:
-                        print('must delete sec symptom marked as false')
                         db.session.delete(os)
                     else:
                         os.observed = sec_symptom_form.data['observed']
@@ -258,6 +256,7 @@ def edit_admission(id):
             index = 0
             for sample_form in form.samples.entries:
                 sample = admission.samples[index]
+                print(sample)
                 if sample is not None:
                     sample.admission_date = sample_form.data['admission_date']
                     sample.collection_date = sample_form.data[
@@ -267,12 +266,12 @@ def edit_admission(id):
                     sample.method_id = sample_form.data[
                         'method_id'] if sample_form.data['method_id'] is not -1 else None
                     sample_form.cdc_exam.form.populate_obj(sample.cdc_exam)
-
+                    print(sample.cdc_exam)
                 index += 1
 
             db.session.add(admission)
             flash('Admissão editada com sucesso!')
-        return redirect(url_for('main.edit_admission', id=admission.id))
+        return redirect(url_for('admissions.edit_admission', id=admission.id))
 
     return render_template('admissions/create-admission.html', form=form)
 
