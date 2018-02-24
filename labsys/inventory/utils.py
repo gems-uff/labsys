@@ -15,13 +15,15 @@ def filter_table_name(source):
 
 
 export_products_query = "SELECT \
-    id,\
-    name as reativo,\
-    manufacturer as fabricante,\
-    catalog as catalogo,\
-    stock_unit as unidade_de_estoque,\
-    min_stock as estoque_minimo\
-    FROM products"
+    p.id,\
+    p.name as reativo,\
+    spec.manufacturer as fabricante,\
+    spec.catalog_number as catalogo,\
+    spec.units as unidade_de_estoque,\
+    p.stock_minimum as estoque_minimo\
+    FROM products as p\
+        JOIN specifications as spec ON (p.id = spec.product_id)\
+    ORDER BY p.name ASC, spec.units ASC"
 
 export_stock_products_query = "SELECT \
     sp.id,\
