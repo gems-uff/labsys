@@ -29,7 +29,10 @@ export_stock_products_query = "SELECT \
     amount as quantidade,\
     lot_number as lote,\
     expiration_date as data_de_validade\
-    FROM stock_products as sp JOIN products as p ON (sp.product_id = p.id);"
+    FROM stock_products as sp\
+        JOIN products as p ON (sp.product_id = p.id)\
+        JOIN stocks as s ON (sp.stock_id = s.id)\
+    ORDER BY p.name, sp.expiration_date ASC;"
 
 export_transactions_query = "SELECT \
     t.id,\
