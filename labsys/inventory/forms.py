@@ -173,8 +173,8 @@ class SubTransactionForm(FlaskForm):
     details = wtf.StringField('Observações', validators=[Optional()])
     submit = wtf.SubmitField('Enviar')
 
-    def validate_amount(form, field):
-        stock_product = StockProduct.query.get(form.stock_product_id.data)
+    def validate_amount(self, field):
+        stock_product = StockProduct.query.get(self.stock_product_id.data)
         if field.data < 1:
             raise wtf.ValidationError(
                 'Quantidade Consumida deve ser maior ou igual a 1')
@@ -220,29 +220,29 @@ class ProductForm(FlaskForm):
                 return False
         return True
 
-    def validate_catalog(form, field):
+    def validate_catalog(self, field):
         products_by_catalog_and_manufacturer = \
             Product.query.filter_by(
-                catalog = field.data,
-                manufacturer = form.manufacturer.data).all()
+                catalog=field.data,
+                manufacturer=self.manufacturer.data).all()
         if len(products_by_catalog_and_manufacturer) != 0:
             raise wtf.ValidationError(
                 'Esse produto já está registrado no catálogo!')
 
-    def validate_stock_unit(form, field):
+    def validate_stock_unit(self, field):
         if field.data < 1:
             raise wtf.ValidationError(
                 'Unidade de Estoque deve ser maior ou igual a 1.')
 
-    def validate_min_stock(form, field):
+    def validate_min_stock(self, field):
         # Set min_stock = 0 for every non-unitary product
-        if form.stock_unit.data != 1:
+        if self.stock_unit.data != 1:
             field.data = 0
 
-    def validate_subproduct_catalog(form, field):
+    def validate_subproduct_catalog(self, field):
         if field.data != '' and field.data is not None:
             manufacturer_products = Product.get_products_by_manufacturer(
-                form.manufacturer.data)
+                self.manufacturer.data)
             subproducts = [
                 p.id for p in manufacturer_products if p.catalog == field.data
             ]
@@ -251,4 +251,4 @@ class ProductForm(FlaskForm):
             elif Product.query.get(subproducts[0]).stock_unit != 1:
                 raise wtf.ValidationError('Subproduto informado não é unitário.')
             else:
-                form.subproduct_id.data = subproducts[0]
+                self.subproduct_id.data = subproducts[0]
