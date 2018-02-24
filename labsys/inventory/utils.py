@@ -36,10 +36,14 @@ export_stock_products_query = "SELECT \
         JOIN stocks as s ON (sp.stock_id = s.id)\
     ORDER BY sp.expiration_date ASC, p.name ASC;"
 
+
+# select id, CASE WHEN t.category='1' THEN t.amount ELSE -t.amount END FROM transactions as t;
+    # CASE WHEN t.category='1' THEN t.amount ELSE -t.amount END\
+
 export_transactions_query = "SELECT \
     t.id,\
     p.name as reativo,\
-    t.amount as quantidade,\
+    CASE WHEN t.category='1' THEN t.amount ELSE -t.amount END as quantidade,\
     t.updated_on at time zone 'utc' at time zone 'America/Sao_Paulo'\
         as data_da_transacao,\
     u.email as email_usuario,\
