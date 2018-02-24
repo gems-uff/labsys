@@ -220,7 +220,6 @@ class Order(Base, TimeStampedModelMixin):
     notes = db.Column(db.String(256), nullable=True)
     order_date = db.Column(
         db.DateTime, default=datetime.utcnow, nullable=False)
-    executed = db.Column(db.Boolean, default=False, nullable=False)
     # Relationships
     items = db.relationship(
         OrderItem, backref='order', cascade='all, delete-orphan')
@@ -228,14 +227,15 @@ class Order(Base, TimeStampedModelMixin):
     user = db.relationship(
         User, backref=db.backref('orders', lazy=True))
 
-    def execute(self, stock):
-        if not self.executed:
-            create_add_transaction_from_order(self, stock)
-            self.executed = True
-            db.session.add(self)
-            db.session.commit()
-        else:
-            raise ValueError('Order has already been executed')
+    @property
+    def is_executed(self):
+        for order_item in self.items:
+            if not order_item.added_to_stock:
+                return False
+        return True
+
+    def get_pending_items(self):
+        return [item for item in self.items if not item.added_to_stock]
 
 
 class Transaction(Base, TimeStampedModelMixin):
