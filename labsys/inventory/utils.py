@@ -32,21 +32,21 @@ export_stock_products_query = "SELECT \
     FROM stock_products as sp\
         JOIN products as p ON (sp.product_id = p.id)\
         JOIN stocks as s ON (sp.stock_id = s.id)\
-    ORDER BY p.name, sp.expiration_date ASC;"
+    ORDER BY sp.expiration_date ASC, p.name ASC;"
 
 export_transactions_query = "SELECT \
     t.id,\
     p.name as reativo,\
     t.amount as quantidade,\
-    t.transaction_date as data_da_transacao,\
+    t.updated_on at time zone 'utc' at time zone 'America/Sao_Paulo'\
+        as data_da_transacao,\
     u.email as email_usuario,\
-    t.invoice_type as tipo_nota,\
-    t.invoice as nota,\
-    t.financier as financiador,\
-    t.details as observacao\
+    s.name as estoque\
     FROM transactions as t\
-    JOIN products as p ON (t.product_id = p.id)\
-    JOIN users as u ON (t.user_id = u.id);"
+        JOIN products as p ON (t.product_id = p.id)\
+        JOIN stocks as s ON (t.stock_id = s.id)\
+        JOIN users as u ON (t.user_id = u.id)\
+    ORDER BY t.updated_on DESC;"
 
 
 def get_query(table_name):
