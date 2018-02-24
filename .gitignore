@@ -157,3 +157,4 @@ docs/ignored-queries/
 *.vim
 
 .DS_Store
+tags
