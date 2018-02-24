@@ -3,6 +3,7 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_debugtoolbar import DebugToolbarExtension
 
 
 def setup_login_manager():
@@ -17,6 +18,7 @@ mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
 login_manager = setup_login_manager()
+toolbar = DebugToolbarExtension()
 
 
 

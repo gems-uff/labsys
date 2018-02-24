@@ -1,176 +1,269 @@
+import logging
+import jsonpickle
 from datetime import datetime
 
-from sqlalchemy import asc, desc, UniqueConstraint
+from sqlalchemy import asc, desc, UniqueConstraint, CheckConstraint
 
 from ..extensions import db
+from .services import create_add_transaction_from_order
+from labsys.auth.models import User
 
 
-class Product(db.Model):
-    # TODO: change parent_id to child_id in order to not allow a product to have
-    # more than one type of subproduct
-    __tablename__ = 'products'
-    __table_args__ = (UniqueConstraint(
-        'manufacturer', 'catalog', name='catalog_product'), )
+ADD = 1
+SUB = 2
+
+logging.basicConfig(level=logging.INFO)
+
+
+class Base(db.Model):
+    __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128))
-    manufacturer = db.Column(db.String(128))
-    catalog = db.Column(db.String(128))
-    stock_unit = db.Column(db.Integer, default=1)
-    min_stock = db.Column(db.Integer, default=1)
-    parent_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    subproduct = db.relationship(
-        'Product', backref='parent', uselist=False, remote_side=[id])
-    transactions = db.relationship(
-        'Transaction', backref='product', lazy='dynamic')
-    stock_products = db.relationship(
-        'StockProduct', backref='product', lazy='dynamic')
 
-    @property
-    def is_unitary(self):
-        return self.stock_unit == 1
+    def create(self):
+        db.session.add(self)
+        db.session.commit()
+        return self
 
-    @property
-    def unit_product(self):
-        if self.is_unitary:
-            return self
-        else:
-            return self.subproduct
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+        return self
 
-    @classmethod
-    def get_products(cls, unitary_only=False):
-        products = cls.query.order_by(asc(cls.name)).all()
-        if unitary_only:
-            return [p for p in products if p.is_unitary]
-        return products
+    # TODO: make query object
+    """
+    def query(self, obj):
+        for each attribute in self and obj
+        if attribute in obj is not null
+            compare with attribute
+    """
+    def toJSON(self):
+        return jsonpickle.encode(self)
 
-    @classmethod
-    def get_products_by_manufacturer(cls, manufacturer, unitary_only=False):
-        products = cls.query.order_by(asc(cls.name)).filter_by(
-            manufacturer=manufacturer).all()
-        if unitary_only:
-            return [p for p in products if p.is_unitary]
-        return products
 
-    @classmethod
-    def get_product_by_catalog(cls, catalog, unitary_only=False):
-        products = cls.query.order_by(asc(cls.name)).filter_by(
-            catalog=catalog).first()
-        if unitary_only:
-            return [p for p in products if p.is_unitary]
-        return products
+class TimeStampedModelMixin(db.Model):
+    __abstract__ = True
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_on = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def count_amount_stock_products(self):
-        amount_in_stock = 0
-        for stock_product in self.stock_products:
-            amount_in_stock += stock_product.amount
 
-        return amount_in_stock
+class Product(Base):
+    __tablename__ = 'products'
 
-    def __repr__(self):
-        return '<Product[({}) {}], cat: {}>'.format(
-            self.id, self.name, self.catalog)
+    def __init__(self, name, specification, **kwargs):
+        super().__init__(**kwargs)
+        self.name = name
+        self.specifications.append(specification)
 
     def __str__(self):
-        return '<Product[({}) {}], cat: {}>'.format(
-            self.id, self.name, self.catalog)
+        return self.name
+
+    # Columns
+    name = db.Column(db.String(128), nullable=False)
+    stock_minimum = db.Column(db.Integer, default=1, nullable=False)
+    # Relationships
+    specifications = db.relationship(
+        'Specification', backref='product')
+
+    def get_base_spec(self):
+        if len(self.specifications) > 0:
+            return self.specifications[0]
+        return None
 
 
-class Transaction(db.Model):
-    __tablename__ = 'transactions'
-    id = db.Column(db.Integer, primary_key=True)
-    transaction_date = db.Column(db.DateTime, default=datetime.utcnow)
-    amount = db.Column(db.Integer, default=0)
-    invoice_type = db.Column(db.String(64))
-    invoice = db.Column(db.String(64))
-    financier = db.Column(db.String(128))
-    details = db.Column(db.String(256))
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
-    stock_product_id = db.Column(db.Integer,
-                                 db.ForeignKey('stock_products.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+class Specification(Base):
 
-    @classmethod
-    def get_product_amount(cls, product):
-        id = product[0]
-        lot_number = product[1]
-        return cls.query.filter_by(
-            product_id=id, lot_number=lot_number).count()
+    def __init__(self, catalog_number, manufacturer, units=1,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.catalog_number = catalog_number
+        self.manufacturer = manufacturer
+        self.units = units
 
-    @classmethod
-    def get_transactions_ordered(cls):
-        return cls.query.order_by(desc(cls.transaction_date)).all()
-
-    def receive_product(self, lot_number, expiration_date=None):
-        self.product = Product.query.get(self.product_id)
-        self.stock_product = StockProduct.query.filter_by(
-            product_id=self.product.unit_product.id,
-            lot_number=lot_number).first()
-        # First product of this lot added => create a new StockProduct
-        if self.stock_product is None:
-            self.stock_product = StockProduct(
-                product_id=self.product.unit_product.id, amount=0)
-        # There's already one product of this lot => Add to its amount only
-        # Or update it
-        self.stock_product.amount += self.product.stock_unit * self.amount
-        self.stock_product.lot_number = lot_number
-        self.stock_product.expiration_date = expiration_date or \
-                                             self.expiration_date
-
-    def consume_product(self):
-        # I just need the product of a consume transaction
-        # to show it in the stock view
-        self.stock_product = StockProduct.query.get(self.stock_product_id)
-        self.product = self.stock_product.product
-        self.stock_product.amount += self.amount
-
-    @classmethod
-    def revert(cls, transaction):
-        transaction.stock_product.amount -= (
-            transaction.amount * transaction.product.stock_unit)
-        transaction.amount = 0
-        if transaction.stock_product.amount == 0:
-            StockProduct.erase_depleted()
-
-    def __repr__(self):
-        return '{} : {}'.format(self.id, self.transaction_date)
+    __tablename__ = 'specifications'
+    __table_args__ = (UniqueConstraint(
+        'manufacturer', 'catalog_number', name='manufacturer_catalog'), )
+    # Columns
+    product_id = db.Column(
+        db.Integer, db.ForeignKey('products.id'), nullable=False)
+    manufacturer = db.Column(db.String(128), nullable=False)
+    catalog_number = db.Column(db.String(128), nullable=False)
+    units = db.Column(db.Integer, default=1, nullable=False)
 
 
-class StockProduct(db.Model):
+class Stock(Base):
+    __tablename__ = 'stocks'
+    # Columns
+    name = db.Column(db.String(128), nullable=False)
+    # Relationships
+    stock_products = db.relationship('StockProduct', backref='stock')
+
+    def get_in_stock(self, product, lot_number):
+        for stock_product in self.stock_products:
+            if stock_product.product == product \
+                    and stock_product.lot_number == lot_number:
+                return stock_product
+        return None
+
+    def has_enough(self, product, lot_number, amount):
+        if amount < 1:
+            raise ValueError('Amount must be greater than 0')
+        in_stock = self.get_in_stock(product, lot_number)
+        if in_stock is None or in_stock.amount < amount:
+            return False
+        return True
+
+    def total(self, product):
+        total = 0
+        for sp in self.stock_products:
+            if sp.product_id == product.id:
+                total += sp.amount
+        return total
+
+    def add(self, product, lot_number, expiration_date, amount):
+        """
+        amount: total units to be added
+        """
+        if amount < 1 or isinstance(amount, int) is False:
+            raise ValueError('Amount must be a positive integer')
+        stock_product = self.get_in_stock(product, lot_number)
+        if stock_product is None:
+            stock_product = StockProduct(
+                self, product, lot_number, expiration_date)
+        else:
+            if expiration_date != stock_product.expiration_date:
+                logging.warning('Different expiration date, updating...')
+        stock_product.expiration_date = expiration_date
+        stock_product.amount += amount
+        db.session.add(stock_product)
+
+    def subtract(self, product, lot_number, amount):
+        """
+        amount: total units to be subtracted
+        """
+        if amount < 1 or isinstance(amount, int) is False:
+            raise ValueError('Amount must be a positive integer')
+        in_stock = self.get_in_stock(product, lot_number)
+        if in_stock is None:
+            raise ValueError('There is no {} in stock'.format(product.name))
+        if self.has_enough(product, lot_number, amount):
+            in_stock.amount -= amount
+            return True
+        raise ValueError('Not enough in stock')
+
+    @staticmethod
+    def get_reactive_stock():
+        return Stock.query.first()
+
+
+class StockProduct(Base):
     __tablename__ = 'stock_products'
     __table_args__ = (UniqueConstraint(
-        'product_id', 'lot_number', name='stock_product'), )
-    id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'))
+        'product_id', 'stock_id', 'lot_number', name='stock_product'), )
+
+    def __init__(self, stock, product, lot_number, expiration_date,
+                 amount=0, **kwargs):
+        super().__init__(**kwargs)
+        self.stock = stock
+        self.product = product
+        self.lot_number = lot_number
+        self.expiration_date = expiration_date
+        self.amount = amount if amount > 0 else 0
+
+    def __str__(self):
+        return '(Stock: {}, Product: {}, Lot: {}, Exp.: {}, Amount: {})'\
+            .format(
+                self.stock.name,
+                self.product.name,
+                self.lot_number,
+                self.expiration_date,
+                self.amount,
+            )
+
+    # Columns
+    stock_id = db.Column(
+        db.Integer, db.ForeignKey('stocks.id'), nullable=False)
+    product_id = db.Column(
+        db.Integer, db.ForeignKey('products.id'), nullable=False)
     lot_number = db.Column(db.String(64), nullable=False)
-    expiration_date = db.Column(db.Date(), nullable=False)
-    amount = db.Column(db.Integer)
-    transactions = db.relationship(
-        'Transaction', backref='stock_product', lazy='dynamic')
+    expiration_date = db.Column(db.Date, nullable=True)
+    amount = db.Column(db.Integer, default=0, nullable=False)
+    # Relationships
+    product = db.relationship('Product', backref=db.backref('stock_products', lazy=True))
 
-    def __repr__(self):
-        return '<StockProduct[{}]: {}, lote {}>'.format(
-            self.id, self.product.name[:10], self.lot_number)
 
-    @classmethod
-    def total_amount_in_stock(cls, stock_product):
-        # TODO: implement
-        pass
+class OrderItem(Base):
+    __tablename__ = 'order_items'
+    __tableargs__ = (UniqueConstraint(
+        'item_id', 'order_id', name='order_item'), )
+    # Columns
+    item_id = db.Column(
+        db.Integer, db.ForeignKey('specifications.id'), nullable=False)
+    order_id = db.Column(
+        db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    amount = db.Column(db.Integer, default=1, nullable=False)
+    lot_number = db.Column(db.String(64), nullable=False)
+    expiration_date = db.Column(
+        db.Date, default=datetime.utcnow().date, nullable=True)
+    added_to_stock = db.Column(db.Boolean, default=False, nullable=True)
+    # Relationships
+    item = db.relationship(Specification)
 
-    @classmethod
-    def list_products_in_stock(cls):
-        stock_products = cls.query.filter(cls.amount > 0).all()
 
-        return sorted(
-            stock_products,
-            key=lambda stock_product: (
-                stock_product.product.name,
-                stock_product.expiration_date)
-        )
+class Order(Base, TimeStampedModelMixin):
+    __tablename__ = 'orders'
+    # Columns
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    invoice = db.Column(db.String(128), nullable=True)
+    invoice_type = db.Column(db.String(128), nullable=True)
+    financier = db.Column(db.String(128), nullable=True)
+    notes = db.Column(db.String(256), nullable=True)
+    order_date = db.Column(
+        db.DateTime, default=datetime.utcnow, nullable=False)
+    # Relationships
+    items = db.relationship(
+        OrderItem, backref='order', cascade='all, delete-orphan')
+    # lazy=True: accessing orders will load them from db (user.orders)
+    user = db.relationship(
+        User, backref=db.backref('orders', lazy=True))
 
-    @classmethod
-    def erase_depleted(cls):
-        """Erase all lots of stock products which amount is zero"""
-        for sp in cls.query.all():
-            if sp.amount == 0:
-                db.session.delete(sp)
-        db.session.commit()
+    @property
+    def is_executed(self):
+        for order_item in self.items:
+            if not order_item.added_to_stock:
+                return False
+        return True
+
+    def get_pending_items(self):
+        return [item for item in self.items if not item.added_to_stock]
+
+
+class Transaction(Base, TimeStampedModelMixin):
+    __tablename__ = 'transactions'
+    # Columns
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(
+        db.Integer, db.ForeignKey('products.id'), nullable=False)
+    stock_id = db.Column(
+        db.Integer, db.ForeignKey('stocks.id'), nullable=False)
+    amount = db.Column(db.Integer, nullable=False)
+    category = db.Column(db.Integer, nullable=False)
+    # TODO: make sure alembic migrations recognizes this
+    __table_args__ = (
+        CheckConstraint(amount > 0, name='amount_is_positive'), {})
+
+    # Relationships
+    user = db.relationship(
+        User, backref=db.backref('transactions', lazy=True))
+    product = db.relationship(
+        Product, backref=db.backref('transactions', lazy=True))
+    stock = db.relationship(
+        Stock, backref=db.backref('transactions', lazy=True))
+
+    def __init__(self, user, product, lot_number, amount, stock, category,
+                 expiration_date=None):
+        self.user = user
+        self.product = product
+        self.amount = amount
+        self.stock = stock
+        self.category = category

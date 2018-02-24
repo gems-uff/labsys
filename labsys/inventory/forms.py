@@ -1,12 +1,120 @@
-import datetime
+import datetime as dt
 
+import wtforms as wtf
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, DateField, FieldList, FloatField, FormField,
-                     HiddenField, IntegerField, Label, RadioField, SelectField,
-                     StringField, SubmitField, ValidationError, widgets)
-from wtforms.validators import InputRequired, DataRequired, Optional
+from wtforms.validators import (DataRequired, InputRequired, NumberRange,
+                                Optional)
 
+import labsys.inventory.models as models
 from labsys.inventory.models import Product, StockProduct, Transaction
+
+
+class OrderItemForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        specs = kwargs.get('specs', [])
+        self.item_id.choices = [
+            (s.id, '{} | Catálogo: {} | {} unidades/produto'.format(
+                s.product.name, s.catalog_number, s.units))
+            for s in specs]
+
+    # TODO: make my own select field for foreign keys
+    item_id = wtf.SelectField(
+        'Reativo', coerce=int, validators=[InputRequired()])
+    amount = wtf.IntegerField('Quantidade', validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Quantidade deve ser maior que zero!')])
+    lot_number = wtf.StringField('Lote', validators=[InputRequired()])
+    expiration_date = wtf.DateField('Data de Validade',
+                                    format='%d/%m/%Y',
+                                    validators=[InputRequired()])
+    add_product = wtf.SubmitField('Adicionar produto')
+    finish_order = wtf.SubmitField('Finalizar compra')
+
+
+class OrderForm(FlaskForm):
+    invoice_type = wtf.SelectField(
+        'Tipo de Nota',
+        coerce=str,
+        choices=(
+            ('Nota Fiscal',
+             'Nota Fiscal'),
+            ('Nota de Fornecimento (FIOCRUZ)',
+             'Nota de Fornecimento (FIOCRUZ)'),
+            ('Nota de Fornecimento (Ministério da Saúde)',
+             'Nota de Fornecimento (Ministério da Saúde)'),
+            ('Outros', 'Outros')),
+        default='Nota Fiscal',
+        validators=[Optional()])
+    invoice = wtf.StringField('Nota', validators=[Optional()])
+    financier = wtf.StringField('Financiador', validators=[Optional()])
+    notes = wtf.StringField('Observações', validators=[Optional()])
+    submit = wtf.SubmitField('Finalizar')
+    cancel = wtf.SubmitField('Cancelar')
+
+
+class ConsumeProductForm(FlaskForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        stock_products = kwargs.get('stock_products', [])
+        self.stock_product_id.choices = [
+            (sp.id, 'Nome: {} | Catálogo: {} | Lote: {} | Quantidade: {}'
+                .format(
+                    sp.product.name,
+                    sp.product.get_base_spec().catalog_number,
+                    sp.lot_number,
+                    sp.amount,
+                ))
+            for sp in stock_products]
+
+    stock_product_id = wtf.SelectField(
+        'Reativo', coerce=int, validators=[InputRequired()])
+    amount = wtf.IntegerField('Quantidade', validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Quantidade deve ser maior que zero!')])
+    submit = wtf.SubmitField('Confirmar')
+
+
+class AddProductForm(FlaskForm):
+    name = wtf.StringField(
+        'Nome do reativo', validators=[InputRequired()])
+    stock_minimum = wtf.IntegerField(
+        'Estoque mínimo', default=1, validators=[InputRequired()])
+    manufacturer = wtf.StringField(
+        'Fabricante', validators=[InputRequired()])
+    catalog_number = wtf.StringField(
+        'Número de catálogo', validators=[InputRequired()])
+    units = wtf.IntegerField(
+        'Unidades de estoque', default=1, validators=[
+            InputRequired(),
+            NumberRange(
+                min=1, max=None, message='Deve ser maior que zero!')])
+    submit = wtf.SubmitField('Cadastrar Reativo')
+
+    def validate_spec_catalog(form, field):
+        spec = models.Specification.query.filter_by(
+            catalog_number=field.data,
+            manufacturer=form.manufacturer.data).first()
+        if spec is not None:
+            raise wtf.ValidationError(
+                'Essa especificação já está cadastrada (catálogo e fabricante')
+
+
+class AddSpecificationForm(FlaskForm):
+    def __init__(self, product_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.product_id.data = product_id
+
+    product_id = wtf.HiddenField()
+    manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
+    catalog_number = wtf.StringField('Catálogo', validators=[InputRequired()])
+    units = wtf.IntegerField('Unidades de estoque', default=1, validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Deve ser maior que zero!')])
+    submit = wtf.SubmitField('Confirmar')
 
 
 class AddTransactionForm(FlaskForm):
@@ -15,13 +123,16 @@ class AddTransactionForm(FlaskForm):
         self.product_id.choices = [(p.id, ' {} | {}'.format(p.catalog, p.name))
                                    for p in Product.get_products()]
 
-    product_id = SelectField(
+    product_id = wtf.SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
-    lot_number = StringField('Lote', validators=[InputRequired()])
-    expiration_date = DateField(
+    lot_number = wtf.StringField('Lote', validators=[InputRequired()])
+    expiration_date = wtf.DateField(
         'Data de Validade', format='%d/%m/%Y', validators=[InputRequired()])
-    amount = IntegerField('Quantidade Recebida', validators=[InputRequired()])
-    invoice_type = SelectField(
+    amount = wtf.IntegerField('Quantidade Recebida', validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Quantidade deve ser maior que zero!')])
+    invoice_type = wtf.SelectField(
         'Tipo de Nota',
         coerce=str,
         choices=(('Nota Fiscal',
@@ -32,14 +143,14 @@ class AddTransactionForm(FlaskForm):
                                                                   'Outros')),
         default='Nota Fiscal',
         validators=[Optional()])
-    invoice = StringField('Número da Nota', validators=[Optional()])
-    financier = StringField('Projeto/Financiador', validators=[Optional()])
-    details = StringField('Observações', validators=[Optional()])
-    submit = SubmitField('Enviar')
+    invoice = wtf.StringField('Número da Nota', validators=[Optional()])
+    financier = wtf.StringField('Projeto/Financiador', validators=[Optional()])
+    details = wtf.StringField('Observações', validators=[Optional()])
+    submit = wtf.SubmitField('Enviar')
 
     def validate_amount(form, field):
         if field.data < 1:
-            raise ValidationError(
+            raise wtf.ValidationError(
                 'Quantidade Recebida deve ser maior ou igual a 1')
 
 
@@ -52,19 +163,23 @@ class SubTransactionForm(FlaskForm):
             for sp in StockProduct.list_products_in_stock()
         ]
 
-    stock_product_id = SelectField(
+    stock_product_id = wtf.SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
-    amount = IntegerField('Quantidade Consumida', validators=[InputRequired()])
-    details = StringField('Observações', validators=[Optional()])
-    submit = SubmitField('Enviar')
+    amount = wtf.IntegerField('Quantidade Consumida', validators=[
+        InputRequired(),
+        NumberRange(
+            min=1, max=None, message='Quantidade deve ser maior que zero!')])
+
+    details = wtf.StringField('Observações', validators=[Optional()])
+    submit = wtf.SubmitField('Enviar')
 
     def validate_amount(self, field):
         stock_product = StockProduct.query.get(self.stock_product_id.data)
         if field.data < 1:
-            raise ValidationError(
+            raise wtf.ValidationError(
                 'Quantidade Consumida deve ser maior ou igual a 1')
         elif (stock_product.amount < field.data):
-            raise ValidationError(
+            raise wtf.ValidationError(
                 'Não há essa quantidade do reativo em estoque. O total é: {}'
                 .format(stock_product.amount))
         else:
@@ -72,19 +187,19 @@ class SubTransactionForm(FlaskForm):
 
 
 class ProductForm(FlaskForm):
-    name = StringField('Nome do Reativo', validators=[DataRequired()])
-    manufacturer = StringField('Fabricante', validators=[DataRequired()])
-    catalog = StringField('Número de Catálogo', validators=[DataRequired()])
-    stock_unit = IntegerField(
+    name = wtf.StringField('Nome do Reativo', validators=[DataRequired()])
+    manufacturer = wtf.StringField('Fabricante', validators=[DataRequired()])
+    catalog = wtf.StringField('Número de Catálogo', validators=[DataRequired()])
+    stock_unit = wtf.IntegerField(
         'Unidade de Estoque', default=1, validators=[DataRequired()])
-    min_stock = IntegerField(
+    min_stock = wtf.IntegerField(
         'Estoque Mínimo (se produto unitário)',
         default=2,
         validators=[Optional()])
-    subproduct_catalog = StringField(
+    subproduct_catalog = wtf.StringField(
         'Subproduto (Número de Catálogo)', validators=[Optional()])
-    subproduct_id = HiddenField()
-    submit = SubmitField('Cadastrar')
+    subproduct_id = wtf.HiddenField()
+    submit = wtf.SubmitField('Cadastrar')
 
     def validate(self):
         rv = FlaskForm.validate(self)
@@ -111,12 +226,12 @@ class ProductForm(FlaskForm):
                 catalog=field.data,
                 manufacturer=self.manufacturer.data).all()
         if len(products_by_catalog_and_manufacturer) != 0:
-            raise ValidationError(
+            raise wtf.ValidationError(
                 'Esse produto já está registrado no catálogo!')
 
     def validate_stock_unit(self, field):
         if field.data < 1:
-            raise ValidationError(
+            raise wtf.ValidationError(
                 'Unidade de Estoque deve ser maior ou igual a 1.')
 
     def validate_min_stock(self, field):
@@ -132,8 +247,8 @@ class ProductForm(FlaskForm):
                 p.id for p in manufacturer_products if p.catalog == field.data
             ]
             if len(subproducts) == 0:
-                raise ValidationError('Subproduto informado não existe.')
+                raise wtf.ValidationError('Subproduto informado não existe.')
             elif Product.query.get(subproducts[0]).stock_unit != 1:
-                raise ValidationError('Subproduto informado não é unitário.')
+                raise wtf.ValidationError('Subproduto informado não é unitário.')
             else:
                 self.subproduct_id.data = subproducts[0]

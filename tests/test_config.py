@@ -8,10 +8,12 @@ def test_production_config():
     assert app.config['DATABASE_URI_ENV_KEY'] == 'DATABASE_URL'
     assert app.config['DEBUG'] is False
 
+
 def test_development_config():
     app = create_app('development')
     assert app.config['DATABASE_URI_ENV_KEY'] == 'DEV_DATABASE_URL'
     assert app.config['DEBUG'] is True
+
 
 def test_testing_config():
     app = create_app('testing')

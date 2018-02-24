@@ -15,13 +15,15 @@ def filter_table_name(source):
 
 
 export_products_query = "SELECT \
-    id,\
-    name as reativo,\
-    manufacturer as fabricante,\
-    catalog as catalogo,\
-    stock_unit as unidade_de_estoque,\
-    min_stock as estoque_minimo\
-    FROM products"
+    p.id,\
+    p.name as reativo,\
+    spec.manufacturer as fabricante,\
+    spec.catalog_number as catalogo,\
+    spec.units as unidade_de_estoque,\
+    p.stock_minimum as estoque_minimo\
+    FROM products as p\
+        JOIN specifications as spec ON (p.id = spec.product_id)\
+    ORDER BY p.name ASC, spec.units ASC"
 
 export_stock_products_query = "SELECT \
     sp.id,\
@@ -29,21 +31,28 @@ export_stock_products_query = "SELECT \
     amount as quantidade,\
     lot_number as lote,\
     expiration_date as data_de_validade\
-    FROM stock_products as sp JOIN products as p ON (sp.product_id = p.id);"
+    FROM stock_products as sp\
+        JOIN products as p ON (sp.product_id = p.id)\
+        JOIN stocks as s ON (sp.stock_id = s.id)\
+    ORDER BY sp.expiration_date ASC, p.name ASC;"
+
+
+# select id, CASE WHEN t.category='1' THEN t.amount ELSE -t.amount END FROM transactions as t;
+    # CASE WHEN t.category='1' THEN t.amount ELSE -t.amount END\
 
 export_transactions_query = "SELECT \
     t.id,\
     p.name as reativo,\
-    t.amount as quantidade,\
-    t.transaction_date as data_da_transacao,\
+    CASE WHEN t.category='1' THEN t.amount ELSE -t.amount END as quantidade,\
+    t.updated_on at time zone 'utc' at time zone 'America/Sao_Paulo'\
+        as data_da_transacao,\
     u.email as email_usuario,\
-    t.invoice_type as tipo_nota,\
-    t.invoice as nota,\
-    t.financier as financiador,\
-    t.details as observacao\
+    s.name as estoque\
     FROM transactions as t\
-    JOIN products as p ON (t.product_id = p.id)\
-    JOIN users as u ON (t.user_id = u.id);"
+        JOIN products as p ON (t.product_id = p.id)\
+        JOIN stocks as s ON (t.stock_id = s.id)\
+        JOIN users as u ON (t.user_id = u.id)\
+    ORDER BY t.updated_on DESC;"
 
 
 def get_query(table_name):

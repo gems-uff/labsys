@@ -18,12 +18,14 @@ class Config:
     LABSYS_MAIL_SENDER = 'LabSys Admin <{}>'.format(LABSYS_ADMIN)
 
     BOOTSTRAP_SERVE_LOCAL = True
+    LOGIN_MESSAGE = 'É necessário realizar login para acessar essa página'
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
     BOOTSTRAP_SERVE_LOCAL = True
     DATABASE_URI_ENV_KEY = 'DEV_DATABASE_URL'
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
 
 

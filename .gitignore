@@ -153,3 +153,7 @@ docs/ignored-queries/
 
 # VSCode
 .vscode/
+
+*.vim
+
+.DS_Store
