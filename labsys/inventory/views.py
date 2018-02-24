@@ -22,16 +22,14 @@ import labsys.inventory.services as services
 import labsys.inventory.forms as forms
 
 blueprint = Blueprint('inventory', __name__)
+logging.basicConfig(level=logging.INFO)
 
 
 @blueprint.route('/', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def index():
-    stock = Stock.query.first()
-    stock_products = stock.stock_products
-    return render_template('inventory/index.html',
-                           stock_products=stock_products)
+    return redirect(url_for('.show_stock'))
 
 
 @blueprint.route('/catalog', methods=['GET'])
@@ -138,6 +136,7 @@ def checkout():
     OK 7. Show items in cart
     '''
     form = forms.OrderForm()
+    stock = Stock.get_reactive_stock()
     order_items = [jsonpickle.decode(item)
                    for item in session.get('order_items')]
     for order_item in order_items:
@@ -152,23 +151,40 @@ def checkout():
         if len(order_items) > 0:
             if form.validate():
                 logging.info('starting check out...')
-                stock = Stock.query.first()
                 order = Order()
-                logging.info('populating order with form data and order_items...')
+                logging.info('populating order with form data and order_items')
                 form.populate_obj(order)
                 order.items = order_items
                 order.user = current_user
                 db.session.add(order)
-                db.session.commit()
                 try:
                     logging.info('Saving order to database...')
-                    order.execute(stock)
+                    for order_item in order.items:
+                        logging.info('Adding %s to stock' % order_item)
+                        product = order_item.item.product
+                        lot_number = order_item.lot_number
+                        total_units = order_item.amount * order_item.item.units
+                        expiration_date = order_item.expiration_date
+                        logging.info('stock.add({}, {}, {}, {})'.format(
+                            product, lot_number, expiration_date, total_units))
+                        stock.add(
+                            product,
+                            lot_number,
+                            expiration_date,
+                            total_units)
+                        order_item.added_to_stock = True
+                        db.session.add(order_item)
+                    logging.info('Comitting session...')
+                    db.session.commit()
                     logging.info('Flashing success and returning to index')
                     flash('Ordem executada com sucesso')
                     session['order_items'] = []
                     return redirect(url_for('.index'))
-                except Exception:
-                    logging.error('Could not save the order to database.')
+                except (ValueError, Exception) as err:
+                    db.session.rollback()
+                    session['order_items'] = []
+                    logging.error('Could not save the order to db. Rollback.')
+                    logging.error(err)
                     flash('Algo deu errado, contate um administrador!')
                     return render_template('inventory/index.html')
         else:
@@ -245,7 +261,7 @@ def add_product_to_catalog():
             return render_template('inventory/create-product.html', form=form)
         except Exception as exc:
             db.session.rollback()
-            print(exc)
+            logging.info(exc)
             flash('Ocorreu um erro inesperado, contate um admministrador.')
             return render_template('inventory/create-product.html', form=form)
         return render_template('inventory/details-product.html',

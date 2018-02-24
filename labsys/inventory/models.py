@@ -1,3 +1,4 @@
+import logging
 import jsonpickle
 from datetime import datetime
 
@@ -11,6 +12,7 @@ from labsys.auth.models import User
 ADD = 1
 SUB = 2
 
+logging.basicConfig(level=logging.INFO)
 
 class Base(db.Model):
     __abstract__ = True
@@ -97,9 +99,8 @@ class Stock(Base):
 
     def get_in_stock(self, product, lot_number):
         for stock_product in self.stock_products:
-            other_stock_product = StockProduct(
-                None, product, lot_number, None)
-            if stock_product.compare(other_stock_product):
+            if stock_product.product == product \
+                    and stock_product.lot_number == lot_number:
                 return stock_product
         return None
 
@@ -128,8 +129,12 @@ class Stock(Base):
         if stock_product is None:
             stock_product = StockProduct(
                 self, product, lot_number, expiration_date)
+        else:
+            if expiration_date != stock_product.expiration_date:
+                logging.warning('Different expiration date, updating...')
+        stock_product.expiration_date = expiration_date
         stock_product.amount += amount
-        return True
+        db.session.add(stock_product)
 
     def subtract(self, product, lot_number, amount):
         """
@@ -144,6 +149,10 @@ class Stock(Base):
             in_stock.amount -= amount
             return True
         raise ValueError('Not enough in stock')
+
+    @staticmethod
+    def get_reactive_stock():
+        return Stock.query.first()
 
 
 class StockProduct(Base):
@@ -160,6 +169,16 @@ class StockProduct(Base):
         self.expiration_date = expiration_date
         self.amount = amount if amount > 0 else 0
 
+    def __str__(self):
+        return '(Stock: {}, Product: {}, Lot: {}, Exp.: {}, Amount: {})'\
+            .format(
+                self.stock.name,
+                self.product.name,
+                self.lot_number,
+                self.expiration_date,
+                self.amount,
+            )
+
     # Columns
     stock_id = db.Column(
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
@@ -170,12 +189,6 @@ class StockProduct(Base):
     amount = db.Column(db.Integer, default=0, nullable=False)
     # Relationships
     product = db.relationship('Product', backref=db.backref('stock_products', lazy=True))
-
-    def compare(self, other):
-        if self.product == other.product \
-               and self.lot_number == other.lot_number:
-            return True
-        return False
 
 
 class OrderItem(Base):
@@ -191,6 +204,7 @@ class OrderItem(Base):
     lot_number = db.Column(db.String(64), nullable=False)
     expiration_date = db.Column(
         db.Date, default=datetime.utcnow().date, nullable=True)
+    added_to_stock = db.Column(db.Boolean, default=False, nullable=True)
     # Relationships
     item = db.relationship(Specification)
 
