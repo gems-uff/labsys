@@ -14,6 +14,7 @@ SUB = 2
 
 logging.basicConfig(level=logging.INFO)
 
+
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
@@ -266,16 +267,3 @@ class Transaction(Base, TimeStampedModelMixin):
         self.amount = amount
         self.stock = stock
         self.category = category
-
-        if category is ADD:
-            stock.add(
-                product,
-                lot_number,
-                expiration_date,
-                amount,
-            )
-        else:
-            try:
-                sub = stock.subtract(product, lot_number, amount)
-            except ValueError as error:
-                raise error

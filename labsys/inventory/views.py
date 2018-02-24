@@ -60,7 +60,8 @@ def show_stock():
 @login_required
 @permission_required(Permission.VIEW)
 def list_transactions():
-    transactions = Transaction.query.all()
+    transactions = Transaction.query.order_by(
+        Transaction.updated_on.desc()).all()
     return render_template('inventory/list-transactions.html',
                            transactions=transactions)
 
@@ -176,6 +177,8 @@ def checkout():
                         db.session.add(order_item)
                     logging.info('Comitting session...')
                     db.session.commit()
+                    logging.info('Creating transactions from order...')
+                    services.create_add_transaction_from_order(order, stock)
                     logging.info('Flashing success and returning to index')
                     flash('Ordem executada com sucesso')
                     session['order_items'] = []
@@ -201,8 +204,8 @@ def checkout():
 @permission_required(Permission.EDIT)
 def consume_product():
     logging.info('consume_product()')
-    # TODO: move this to services
-    stock = Stock.query.first()
+    stock = Stock.get_reactive_stock()
+    # TODO: alphabetical order
     stock_products = [sp for sp in stock.stock_products if sp.amount > 0]
     form_context = {
         'stock_products': stock_products,
@@ -215,18 +218,27 @@ def consume_product():
         try:
             selected_stock_product = StockProduct.query.get(
                 form.stock_product_id.data)
+            logging.info('Retrieving info from selected_stock_product')
+            product = selected_stock_product.product
+            lot_number = selected_stock_product.lot_number
+            amount = form.amount.data
+            stock.subtract(product, lot_number, amount)
+            logging.info('Commiting subtraction')
+            db.session.commit()
+            logging.info('Creating sub-transaction')
             services.create_sub_transaction(
                 current_user,
-                selected_stock_product.product,
-                selected_stock_product.lot_number,
-                form.amount.data,
+                product,
+                lot_number,
+                amount,
                 stock
             )
             flash('{} unidades de {} removidas do estoque com sucesso!'.format(
                 form.amount.data, selected_stock_product.product.name))
 
             return redirect(url_for('.consume_product'))
-        except ValueError as _:
+        except ValueError as err:
+            logging.error(err)
             form.amount.errors.append(
                 'Não há o suficiente desse reativo em estoque.')
         except:

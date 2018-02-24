@@ -24,17 +24,13 @@ def create_add_transaction_from_order(order, stock):
 
 
 def create_sub_transaction(user, product, lot_number, amount, stock):
-    try:
-        transaction = m.Transaction(
-            user,
-            product,
-            lot_number,
-            amount,
-            stock,
-            m.SUB,
-        )
-        db.session.add(transaction)
-        db.session.commit()
-    except:
-        db.session.rollback()
-        raise
+    transaction = m.Transaction(
+        user,
+        product,
+        lot_number,
+        amount,
+        stock,
+        m.SUB,
+    )
+    db.session.add(transaction)
+    db.session.commit()
