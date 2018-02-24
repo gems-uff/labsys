@@ -12,12 +12,12 @@
 <p></p>
 <div class="row">
     <div class="col-md-2">
-        <a href="{{ url_for('inventory.show_catalog') }}" class="btn btn-default">Visualizar Estoque</a>
+        <a href="{{ url_for('inventory.show_stock') }}" class="btn btn-default">Visualizar Estoque</a>
         <a href="{{ url_for('inventory.export', table='stock_products') }}" class="btn btn-default" title="Exportar Estoque (CSV)" style="color: green;">
           <i class="glyphicon glyphicon-th" style="color: green;"></i>Exportar</a>
       </div>
   <div class="col-md-2">
-      <a href="{{ url_for('inventory.show_catalog') }}" class="btn btn-default">Visualizar Transações</a>
+      <a href="{{ url_for('inventory.list_transactions') }}" class="btn btn-default">Visualizar Transações</a>
       <a href="{{ url_for('inventory.export', table='transactions') }}" class="btn btn-default" title="Exportar Transações (CSV)" style="color: green;">
         <i class="glyphicon glyphicon-th" style="color: green;"></i>Exportar</a>
     </div>
