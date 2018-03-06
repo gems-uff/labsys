@@ -1,3 +1,5 @@
+import os
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -57,6 +59,18 @@ class User(UserMixin, db.Model):
     confirmed = db.Column(db.Boolean, default=False)
     stock_mail_alert = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    @staticmethod
+    def insert_admin():
+        admin_email = os.environ.get('LABSYS_ADMIN')
+        admin_user = User.query.filter_by(email=admin_email).first()
+        if admin_user is None:
+            admin_user = User(
+                email=admin_email,
+                password=os.environ.get('LABSYS_ADMIN_PASSWORD'),
+            )
+        db.session.add(admin_user)
+        db.session.commit()
 
     @classmethod
     def get_stock_alert_emails(cls):

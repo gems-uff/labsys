@@ -155,6 +155,14 @@ class Stock(Base):
     def get_reactive_stock():
         return Stock.query.first()
 
+    @staticmethod
+    def insert_stock(name):
+        stock = Stock.query.filter_by(name=name).first()
+        if stock is None:
+            stock = Stock(name=name)
+        db.session.add(stock)
+        db.session.commit()
+
 
 class StockProduct(Base):
     __tablename__ = 'stock_products'

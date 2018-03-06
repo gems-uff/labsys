@@ -60,14 +60,16 @@ def load_initial_data():
     """Load initial models data"""
     import labsys.utils.data_loader as dl
     dl.load_data(db)
-    Role.insert_roles()
+
 
 @manager.command
 def deploy():
     """Run deployment tasks"""
     from flask_migrate import upgrade
     upgrade()
-    load_initial_data()
+    Role.insert_roles()
+    User.insert_admin()
+    im.Stock.insert_stock('Reativos')
 
 
 if __name__ == '__main__':
