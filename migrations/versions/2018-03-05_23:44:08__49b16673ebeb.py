@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 02edae216303
+Revision ID: 49b16673ebeb
 Revises: 
-Create Date: 2017-11-11 13:27:38.399482
+Create Date: 2018-03-05 23:44:08.620582
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '02edae216303'
+revision = '49b16673ebeb'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -49,8 +49,6 @@ def upgrade():
     )
     op.create_table('products',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_on', sa.DateTime(), nullable=True),
-    sa.Column('updated_on', sa.DateTime(), nullable=True),
     sa.Column('name', sa.String(length=128), nullable=False),
     sa.Column('stock_minimum', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -66,8 +64,6 @@ def upgrade():
     op.create_index(op.f('ix_roles_default'), 'roles', ['default'], unique=False)
     op.create_table('stocks',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_on', sa.DateTime(), nullable=True),
-    sa.Column('updated_on', sa.DateTime(), nullable=True),
     sa.Column('name', sa.String(length=128), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
@@ -87,8 +83,6 @@ def upgrade():
     )
     op.create_table('specifications',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_on', sa.DateTime(), nullable=True),
-    sa.Column('updated_on', sa.DateTime(), nullable=True),
     sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('manufacturer', sa.String(length=128), nullable=False),
     sa.Column('catalog_number', sa.String(length=128), nullable=False),
@@ -96,6 +90,18 @@ def upgrade():
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('manufacturer', 'catalog_number', name='manufacturer_catalog')
+    )
+    op.create_table('stock_products',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('stock_id', sa.Integer(), nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('lot_number', sa.String(length=64), nullable=False),
+    sa.Column('expiration_date', sa.Date(), nullable=True),
+    sa.Column('amount', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
+    sa.ForeignKeyConstraint(['stock_id'], ['stocks.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('product_id', 'stock_id', 'lot_number', name='stock_product')
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -130,27 +136,18 @@ def upgrade():
     sa.ForeignKeyConstraint(['region_id'], ['regions.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('stock_products',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_on', sa.DateTime(), nullable=True),
-    sa.Column('updated_on', sa.DateTime(), nullable=True),
-    sa.Column('specification_id', sa.Integer(), nullable=False),
-    sa.Column('stock_id', sa.Integer(), nullable=False),
-    sa.Column('lot_number', sa.String(length=64), nullable=False),
-    sa.Column('expiration_date', sa.Date(), nullable=False),
-    sa.Column('amount', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['specification_id'], ['specifications.id'], ),
-    sa.ForeignKeyConstraint(['stock_id'], ['stocks.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('specification_id', 'stock_id', 'lot_number', name='product_lot')
-    )
     op.create_table('transactions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_on', sa.DateTime(), nullable=True),
     sa.Column('updated_on', sa.DateTime(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('stock_id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
-    sa.Column('transaction_date', sa.DateTime(), nullable=False),
+    sa.Column('category', sa.Integer(), nullable=False),
+    sa.CheckConstraint('amount > 0', name='amount_is_positive'),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
+    sa.ForeignKeyConstraint(['stock_id'], ['stocks.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -164,24 +161,25 @@ def upgrade():
     )
     op.create_table('order_items',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_on', sa.DateTime(), nullable=True),
-    sa.Column('updated_on', sa.DateTime(), nullable=True),
     sa.Column('item_id', sa.Integer(), nullable=False),
     sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
+    sa.Column('lot_number', sa.String(length=64), nullable=False),
+    sa.Column('expiration_date', sa.Date(), nullable=True),
+    sa.Column('added_to_stock', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['item_id'], ['specifications.id'], ),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('addresses',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('neighborhood', sa.String(length=255), nullable=True),
+    sa.Column('zone', sa.Integer(), nullable=True),
+    sa.Column('details', sa.String(length=255), nullable=True),
     sa.Column('patient_id', sa.Integer(), nullable=True),
     sa.Column('country_id', sa.Integer(), nullable=True),
     sa.Column('state_id', sa.Integer(), nullable=True),
     sa.Column('city_id', sa.Integer(), nullable=True),
-    sa.Column('neighborhood', sa.String(length=255), nullable=True),
-    sa.Column('zone', sa.Integer(), nullable=True),
-    sa.Column('details', sa.String(length=255), nullable=True),
     sa.ForeignKeyConstraint(['city_id'], ['cities.id'], ),
     sa.ForeignKeyConstraint(['country_id'], ['countries.id'], ),
     sa.ForeignKeyConstraint(['patient_id'], ['patients.id'], ),
@@ -193,11 +191,11 @@ def upgrade():
     sa.Column('id_lvrs_intern', sa.String(length=32), nullable=True),
     sa.Column('first_symptoms_date', sa.Date(), nullable=True),
     sa.Column('semepi_symptom', sa.Integer(), nullable=True),
-    sa.Column('state_id', sa.Integer(), nullable=True),
-    sa.Column('city_id', sa.Integer(), nullable=True),
     sa.Column('health_unit', sa.String(length=128), nullable=True),
     sa.Column('requesting_institution', sa.String(length=128), nullable=True),
     sa.Column('details', sa.String(length=255), nullable=True),
+    sa.Column('state_id', sa.Integer(), nullable=True),
+    sa.Column('city_id', sa.Integer(), nullable=True),
     sa.Column('patient_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['city_id'], ['cities.id'], ),
     sa.ForeignKeyConstraint(['patient_id'], ['patients.id'], ),
@@ -233,11 +231,11 @@ def upgrade():
     )
     op.create_table('samples',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('_ordering', sa.Integer(), nullable=True),
     sa.Column('admission_date', sa.Date(), nullable=True),
     sa.Column('collection_date', sa.Date(), nullable=True),
     sa.Column('semepi', sa.Integer(), nullable=True),
     sa.Column('details', sa.String(length=128), nullable=True),
-    sa.Column('_ordering', sa.Integer(), nullable=True),
     sa.Column('method_id', sa.Integer(), nullable=True),
     sa.Column('admission_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['admission_id'], ['admissions.id'], ),
@@ -287,11 +285,11 @@ def downgrade():
     op.drop_table('order_items')
     op.drop_table('cities')
     op.drop_table('transactions')
-    op.drop_table('stock_products')
     op.drop_table('states')
     op.drop_table('orders')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
+    op.drop_table('stock_products')
     op.drop_table('specifications')
     op.drop_table('regions')
     op.drop_table('symptoms')
