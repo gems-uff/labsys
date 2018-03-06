@@ -69,6 +69,8 @@ class User(UserMixin, db.Model):
                 email=admin_email,
                 password=os.environ.get('LABSYS_ADMIN_PASSWORD'),
             )
+        admin_user.confirmed = True
+        admin_user.stock_mail_alert = True
         db.session.add(admin_user)
         db.session.commit()
 
