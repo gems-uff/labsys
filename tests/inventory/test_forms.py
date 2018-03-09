@@ -11,6 +11,7 @@ from labsys.inventory.models import Product
 from ..factories import ProductFactory
 
 
+@pytest.mark.skip()
 @pytest.mark.usefixtures('db')
 class TestProductForm:
 

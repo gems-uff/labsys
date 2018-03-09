@@ -54,6 +54,8 @@ create_symptoms = "INSERT INTO symptoms(id, name, \"primary\") VALUES\
     (12, 'Outro (especificar)', FALSE)\
     ON CONFLICT (id) DO NOTHING;"
 
+create_stock = "INSERT INTO stocks(id, name) VALUES (1, 'Reativos')"
+
 
 def load_data(db):
     db.engine.execute(create_countries_sql)
@@ -62,3 +64,4 @@ def load_data(db):
     db.engine.execute(create_cities_sql)
     db.engine.execute(create_methods)
     db.engine.execute(create_symptoms)
+    db.engine.execute(create_stock)

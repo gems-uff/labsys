@@ -13,41 +13,26 @@
   <thead>
     <tr>
       <th width="25%">Reativo</th>
-      <th width="10%">Data da Transação</th>
-      <th width="10%">Responsável</th>
       <th width="10%">Tipo</th>
       <th width="5%">Quantidade</th>
-      <th width="15%">Número da Nota</th>
-      <th width="10%">Projeto/Financiador</th>
-      <th width="15%">Observações</th>
+      <th width="10%">Data da Transação</th>
+      <th width="10%">Responsável</th>
       <th width="10%">Ação</th>
     </tr>
   </thead>
   <tbody>
     {% for transaction in transactions %}
       <tr>
-        <td>({{ transaction.product.catalog }}) {{ transaction.product.name }}</td>
-        <td>{{ moment(transaction.transaction_date).format('DD/MM/YYYY [-] HH:mm') }}</td>
-        <td>{{ transaction.user.email }}</td>
-        {% if transaction.amount < 0 %}
-          <td class="danger">Retirada</td>
-        {% else %}
+        <td>{{ transaction.product.name }}</td>
+        {% if (transaction.category == 1) %}
           <td class="success">Recebimento</td>
+        {% else %}
+          <td class="danger">Retirada</td>
         {% endif %}
         <td>{{ transaction.amount }}</td>
-        {% if transaction.invoice %}
-          <td>{{ transaction.invoice }} - {{ transaction.invoice_type }}</td>
-        {% else %}
-          <td>Nota não informada</td>
-        {% endif %}
-        {% if transaction.financier %}
-          <td>{{ transaction.financier }}</td>
-        {% else %}
-          <td>Não informado</td>
-        {% endif %}
-
-        <td>{{ transaction.details }}</td>
-        <td><a href="{{ url_for('inventory.delete_transaction', id=transaction.id) }}">Deletar</a></td>
+        <td>{{ moment(transaction.created_on).format('DD/MM/YYYY [-] HH:mm') }}</td>
+        <td>{{ transaction.user.email }}</td>
+        <td><a href="{{ url_for('inventory.delete_transaction', transaction_id=transaction.id) }}">Desfazer (Não funciona ainda!)</a></td>
       </tr>
     {% endfor %}
   </tbody>

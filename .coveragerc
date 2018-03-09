@@ -1,0 +1,5 @@
+[run]
+omit =
+    labsys/admissions/*
+    labsys/auth/*
+    labsys/main/*

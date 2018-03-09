@@ -10,7 +10,7 @@ from labsys.app import create_app
 from labsys.extensions import db
 from labsys.auth.models import User, Role, PreAllowedUser
 from labsys.auth.views import ProtectedModelView
-from labsys.inventory.models import Product, Transaction, StockProduct
+import labsys.inventory.models as im
 from labsys.admissions.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
@@ -27,25 +27,9 @@ admin.add_views(
     ProtectedModelView(User, db.session),
     ProtectedModelView(Role, db.session),
     ProtectedModelView(PreAllowedUser, db.session),
-    ProtectedModelView(Admission, db.session),
-    ProtectedModelView(Patient, db.session),
-    ProtectedModelView(Address, db.session),
-    ProtectedModelView(Sample, db.session),
-    ProtectedModelView(CdcExam, db.session),
-    ProtectedModelView(Vaccine, db.session),
-    ProtectedModelView(Hospitalization, db.session),
-    ProtectedModelView(UTIHospitalization, db.session),
-    ProtectedModelView(ClinicalEvolution, db.session),
-    ProtectedModelView(ObservedSymptom, db.session),
-    ProtectedModelView(Method, db.session),
-    ProtectedModelView(Symptom, db.session),
-    ProtectedModelView(Country, db.session),
-    ProtectedModelView(Region, db.session),
-    ProtectedModelView(State, db.session),
-    ProtectedModelView(City, db.session),
-    ProtectedModelView(Product, db.session),
-    ProtectedModelView(Transaction, db.session),
-    ProtectedModelView(StockProduct, db.session), )
+    ProtectedModelView(im.Product, db.session),
+    ProtectedModelView(im.Transaction, db.session),
+    ProtectedModelView(im.StockProduct, db.session), )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion
 
@@ -53,7 +37,6 @@ admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 def make_shell_context():
     return dict(
         app=app, db=db, User=User, Role=Role,
-        Product=Product, StockProduct=StockProduct,
     )
 
 
@@ -84,7 +67,9 @@ def deploy():
     """Run deployment tasks"""
     from flask_migrate import upgrade
     upgrade()
-    load_initial_data()
+    Role.insert_roles()
+    User.insert_admin()
+    im.Stock.insert_stock('Reativos')
 
 
 if __name__ == '__main__':
