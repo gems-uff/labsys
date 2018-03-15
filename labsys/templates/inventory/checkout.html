@@ -13,6 +13,7 @@
         <th>Reativo</th>
         <th>Catálogo</th>
         <th>Lote</th>
+        <th>Data de Validade</th>
         <th>Unidade(s)/Produto</th>
         <th>Quantidade</th>
         <th>Total de Unidades</th>
@@ -23,6 +24,7 @@
           <td>{{ item.item.product.name }}</td>
           <td>{{ item.item.catalog_number }}</td>
           <td>{{ item.lot_number }}</td>
+          <td>{{ moment(item.expiration_date).format('DD/MM/YYYY') }}</td>
           <td>{{ item.item.units}}</td>
           <td>{{ item.amount }}</td>
           <td>{{ item.amount * item.item.units }}</td>

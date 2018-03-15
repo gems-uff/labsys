@@ -93,10 +93,10 @@ class AddProductForm(FlaskForm):
                 min=1, max=None, message='Deve ser maior que zero!')])
     submit = wtf.SubmitField('Cadastrar Reativo')
 
-    def validate_spec_catalog(form, field):
+    def validate_spec_catalog(self, field):
         spec = models.Specification.query.filter_by(
             catalog_number=field.data,
-            manufacturer=form.manufacturer.data).first()
+            manufacturer=self.manufacturer.data).first()
         if spec is not None:
             raise wtf.ValidationError(
                 'Essa especificação já está cadastrada (catálogo e fabricante')
@@ -148,7 +148,7 @@ class AddTransactionForm(FlaskForm):
     details = wtf.StringField('Observações', validators=[Optional()])
     submit = wtf.SubmitField('Enviar')
 
-    def validate_amount(form, field):
+    def validate_amount(self, field):
         if field.data < 1:
             raise wtf.ValidationError(
                 'Quantidade Recebida deve ser maior ou igual a 1')
