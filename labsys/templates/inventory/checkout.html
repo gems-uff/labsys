@@ -17,6 +17,7 @@
         <th>Unidade(s)/Produto</th>
         <th>Quantidade</th>
         <th>Total de Unidades</th>
+        <th>Ação</th>
       </thead>
       <tbody>
       {% for item in order_items %}
@@ -24,10 +25,14 @@
           <td>{{ item.item.product.name }}</td>
           <td>{{ item.item.catalog_number }}</td>
           <td>{{ item.lot_number }}</td>
-          <td>{{ moment(item.expiration_date).format('DD/MM/YYYY') }}</td>
+          <!--<td>{{ moment(item.expiration_date).format('DD/MM/YYYY') }}</td>-->
+          <td>{{ item.expiration_date.strftime('%d/%m/%Y') }}</td>
           <td>{{ item.item.units}}</td>
           <td>{{ item.amount }}</td>
           <td>{{ item.amount * item.item.units }}</td>
+          <td>
+            <a href="{{ url_for('inventory.remove_item_from_cart', item=item) }}">Remover</a> ||
+            <a href="">Editar</a></td>
         </tr>
       {% endfor %}
       </tbody>
