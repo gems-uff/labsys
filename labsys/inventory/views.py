@@ -198,6 +198,22 @@ def checkout():
                            form=form,
                            order_items=order_items,)
 
+# NOT WORKING
+@blueprint.route('/cart/remove/<string:item>', methods=['GET'])
+@login_required
+@permission_required(Permission.EDIT)
+def remove_item_from_cart(item):
+    encoded_item = jsonpickle.encode(item)
+    logging.info('Removing item from session...')
+    try:
+        print(session['order_items'][0])
+        print(jsonpickle.encode(item))
+        session['order_items'].remove(encoded_item)
+        logging.info('Item successfully removed!')
+    except ValueError as err:
+        logging.error(err)
+        flash('Não foi possível remover esse item do carrinho.')
+    return redirect(url_for('.checkout'))
 
 @blueprint.route('/products/consume', methods=['GET', 'POST'])
 @login_required
