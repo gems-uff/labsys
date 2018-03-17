@@ -39,7 +39,7 @@ class OrderItemForm(FlaskForm):
         widget=widgets.DateInput(),
         validators=[InputRequired()])
     add_product = wtf.SubmitField('Adicionar produto')
-    finish_order = wtf.SubmitField('Finalizar compra')
+    finish_order = wtf.SubmitField('Ir para checkout')
 
 
 class OrderForm(FlaskForm):
