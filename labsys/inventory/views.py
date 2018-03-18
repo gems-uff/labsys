@@ -98,7 +98,7 @@ def purchase_product():
                 logging.info('Finishing order => redirect to checkout()')
                 return redirect(url_for('.checkout'))
             logging.info('None order item added to session')
-            flash('Pelo menos 1 reativo deve ser adicionado ao carrinho.')
+            flash('Pelo menos 1 reativo deve ser adicionado ao carrinho.', 'danger')
             return redirect(url_for('.purchase_product'))
         if form.validate():
             logging.info('Create order form is valid')
