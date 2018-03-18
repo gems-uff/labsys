@@ -150,7 +150,7 @@ def edit_admission(id):
     if form.validate_on_submit():
         if form.id_lvrs_intern.data != admission.id_lvrs_intern and \
                 Admission.query.filter_by(id_lvrs_intern=form.id_lvrs_intern.data).first() is not None:
-            flash('Número Interno já cadastrado! Escolha outro!')
+            flash('Número Interno já cadastrado! Escolha outro!', 'danger')
         else:
             admission.patient.name = form.patient.data['name']
             admission.patient.birth_date = form.patient.data['birth_date']
@@ -270,7 +270,7 @@ def edit_admission(id):
                 index += 1
 
             db.session.add(admission)
-            flash('Admissão editada com sucesso!')
+            flash('Admissão editada com sucesso!', 'success')
         return redirect(url_for('admissions.edit_admission', id=admission.id))
 
     return render_template('admissions/create-admission.html', form=form)
@@ -282,7 +282,7 @@ def edit_admission(id):
 def delete_admission(id):
     admission = Admission.query.get(id)
     if admission is None:
-        flash('Admissão com esse id não existe.')
+        flash('Admissão com esse id não existe.', 'danger')
         abort(404)
     return ('Delete not implemented yet.')
 
@@ -395,9 +395,9 @@ def create_admission():
                     sample=sample, )
 
             db.session.add(admission)
-            flash('Admissão criada com sucesso!')
+            flash('Admissão criada com sucesso!', 'success')
         else:
-            flash('Número Interno já cadastrado! Escolha outro!')
+            flash('Número Interno já cadastrado! Escolha outro!', 'danger')
         return redirect(url_for('.create_admission'))
 
     return render_template(

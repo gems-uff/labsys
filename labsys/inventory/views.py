@@ -72,7 +72,7 @@ def list_transactions():
 @permission_required(Permission.DELETE)
 def delete_transaction(transaction_id):
     transactions = Transaction.query.all()
-    flash('Essa funcionalidade ainda não foi implementada.')
+    flash('Essa funcionalidade ainda não foi implementada.', 'warning')
     return render_template('inventory/list-transactions.html',
                            transactions=transactions)
 
@@ -116,7 +116,7 @@ def purchase_product():
                 session.modified = True
 
             logging.info('finishing form.validate')
-            flash('Reativo adicionado ao carrinho')
+            flash('Reativo adicionado ao carrinho', 'success')
             return redirect(url_for('.purchase_product'))
         logging.info('redirecting to route with or w/out errors and form')
     logging.info('GETting purchase_product')
@@ -180,7 +180,7 @@ def checkout():
                     logging.info('Creating transactions from order...')
                     services.create_add_transaction_from_order(order, stock)
                     logging.info('Flashing success and returning to index')
-                    flash('Ordem executada com sucesso')
+                    flash('Ordem executada com sucesso', 'success')
                     session['order_items'] = []
                     return redirect(url_for('.index'))
                 except (ValueError, Exception) as err:
@@ -192,7 +192,7 @@ def checkout():
                     return render_template('inventory/index.html')
         else:
             logging.info('No item added to cart')
-            flash('É necessário adicionar pelo menos 1 item ao carrinho.')
+            flash('É necessário adicionar pelo menos 1 item ao carrinho.', 'warning')
             return redirect(url_for('.purchase_product'))
     return render_template('inventory/checkout.html',
                            form=form,
@@ -212,7 +212,7 @@ def remove_item_from_cart(item):
         logging.info('Item successfully removed!')
     except ValueError as err:
         logging.error(err)
-        flash('Não foi possível remover esse item do carrinho.')
+        flash('Não foi possível remover esse item do carrinho.', 'danger')
     return redirect(url_for('.checkout'))
 
 @blueprint.route('/products/consume', methods=['GET', 'POST'])
@@ -250,7 +250,7 @@ def consume_product():
                 stock
             )
             flash('{} unidades de {} removidas do estoque com sucesso!'.format(
-                form.amount.data, selected_stock_product.product.name))
+                form.amount.data, selected_stock_product.product.name), 'success')
 
             return redirect(url_for('.consume_product'))
         except ValueError as err:
@@ -258,7 +258,7 @@ def consume_product():
             form.amount.errors.append(
                 'Não há o suficiente desse reativo em estoque.')
         except:
-            flash('Erro inesperado, contate o administrador.')
+            flash('Erro inesperado, contate o administrador.', 'danger')
 
     return render_template('inventory/consume-product.html', form=form)
 
@@ -285,12 +285,12 @@ def add_product_to_catalog():
             db.session.commit()
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
-            flash('Já existe uma especificação com esse catálogo e fabricante')
+            flash('Já existe uma especificação com esse catálogo e fabricante', 'danger')
             return render_template('inventory/create-product.html', form=form)
         except Exception as exc:
             db.session.rollback()
             logging.info(exc)
-            flash('Ocorreu um erro inesperado, contate um admministrador.')
+            flash('Ocorreu um erro inesperado, contate um admministrador.', 'danger')
             return render_template('inventory/create-product.html', form=form)
         return render_template('inventory/details-product.html',
                                product=product)
@@ -315,11 +315,11 @@ def add_specification_to_product(product_id):
             specification.product_id = product_id
             db.session.add(specification)
             db.session.commit()
-            flash('Especificação adicionada com sucesso.')
+            flash('Especificação adicionada com sucesso.', 'success')
             return redirect(url_for('.detail_product', product_id=product.id))
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
-            flash('Já existe uma especificação com esse catálogo e fabricante')
+            flash('Já existe uma especificação com esse catálogo e fabricante', 'danger')
     return render_template('inventory/create-specification.html',
                            form=form, product=product)
 
