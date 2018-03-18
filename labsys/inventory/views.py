@@ -330,7 +330,13 @@ def add_specification_to_product(product_id):
 @permission_required(Permission.EDIT)
 def detail_product(product_id):
     product = Product.query.get_or_404(product_id)
-    return render_template('inventory/details-product.html', product=product)
+    specifications = sorted(
+        [spec for spec in product.specifications],
+        key=lambda spec: spec.units,
+    )
+    return render_template('inventory/details-product.html',
+        product=product,
+        specifications=specifications)
 
 
 @blueprint.route('/export/<string:table>')

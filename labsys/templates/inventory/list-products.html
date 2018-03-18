@@ -13,6 +13,7 @@
   <thead>
     <tr>
       <th width="30%">Reativo</th>
+      <th width="15%">Especificações</th>
       <th width="15%">Estoque Mínimo</th>
     </tr>
   </thead>
@@ -27,6 +28,7 @@
           {{ product.name }}
         </a>
       </td>
+      <td>{{ product.specifications|length }}</td>
       <td>{{ product.stock_minimum }}</td>
   {% endfor %}
   </tbody>
