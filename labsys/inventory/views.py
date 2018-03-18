@@ -97,6 +97,10 @@ def purchase_product():
 
     if request.method == 'POST':
         logging.info('POSTing to purchase_product')
+        if form.cancel.data is True:
+            logging.info('Cancel order, cleaning session')
+            session['order_items'] = []
+            return redirect(url_for('.purchase_product'))
         if form.finish_order.data is True:
             logging.info('checking if there is at least 1 o_item in session')
             if len(session.get('order_items')) > 0:

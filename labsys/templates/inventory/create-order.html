@@ -19,6 +19,7 @@
         {{ wtf.form_field(form.add_product) }}
         {% if order_items %}
           {{ wtf.form_field(form.finish_order) }}
+          {{ wtf.form_field(form.cancel) }}
         {% endif %}
       </form>
     </div>
@@ -38,6 +39,8 @@
   document.getElementById("amount").required = false;
   document.getElementById("lot_number").required = false;
   document.getElementById("expiration_date").required = false;
+  document.getElementById("finish_order").className += " btn-success";
+  document.getElementById("cancel").className += " btn-danger";
 </script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>

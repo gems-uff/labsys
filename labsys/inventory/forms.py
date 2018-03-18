@@ -38,8 +38,9 @@ class OrderItemForm(FlaskForm):
         'Data de Validade',
         widget=widgets.DateInput(),
         validators=[InputRequired()])
-    add_product = wtf.SubmitField('Adicionar produto')
+    add_product = wtf.SubmitField('Adicionar produto ao carrinho')
     finish_order = wtf.SubmitField('Ir para checkout')
+    cancel = wtf.SubmitField('Limpar o carrinho')
 
 
 class OrderForm(FlaskForm):
