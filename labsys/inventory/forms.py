@@ -1,6 +1,7 @@
 import datetime as dt
 
 import wtforms as wtf
+import wtforms.widgets.html5 as widgets
 from flask_wtf import FlaskForm
 from wtforms.validators import (DataRequired, InputRequired, NumberRange,
                                 Optional)
@@ -21,16 +22,25 @@ class OrderItemForm(FlaskForm):
     # TODO: make my own select field for foreign keys
     item_id = wtf.SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
-    amount = wtf.IntegerField('Quantidade', validators=[
-        InputRequired(),
-        NumberRange(
-            min=1, max=None, message='Quantidade deve ser maior que zero!')])
-    lot_number = wtf.StringField('Lote', validators=[InputRequired()])
-    expiration_date = wtf.DateField('Data de Validade',
-                                    format='%d/%m/%Y',
-                                    validators=[InputRequired()])
-    add_product = wtf.SubmitField('Adicionar produto')
-    finish_order = wtf.SubmitField('Finalizar compra')
+    amount = wtf.IntegerField(
+        'Quantidade',
+        widget=widgets.NumberInput(),
+        render_kw={"autocomplete": "off"},
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=1, max=None, message='Quantidade deve ser maior que zero!')
+        ])
+    lot_number = wtf.StringField(
+        'Lote', render_kw={"autocomplete": "off"}, validators=[InputRequired()]
+    )
+    expiration_date = wtf.DateField(
+        'Data de Validade',
+        widget=widgets.DateInput(),
+        validators=[InputRequired()])
+    add_product = wtf.SubmitField('Adicionar produto ao carrinho')
+    finish_order = wtf.SubmitField('Ir para checkout')
+    cancel = wtf.SubmitField('Limpar o carrinho')
 
 
 class OrderForm(FlaskForm):
@@ -50,8 +60,8 @@ class OrderForm(FlaskForm):
     invoice = wtf.StringField('Nota', validators=[Optional()])
     financier = wtf.StringField('Financiador', validators=[Optional()])
     notes = wtf.StringField('Observações', validators=[Optional()])
-    submit = wtf.SubmitField('Finalizar')
-    cancel = wtf.SubmitField('Cancelar')
+    submit = wtf.SubmitField('Finalizar a compra', render_kw={'class': 'btn-danger'})
+    cancel = wtf.SubmitField('Limpar o carrinho')
 
 
 class ConsumeProductForm(FlaskForm):
@@ -73,7 +83,11 @@ class ConsumeProductForm(FlaskForm):
     amount = wtf.IntegerField('Quantidade', validators=[
         InputRequired(),
         NumberRange(
-            min=1, max=None, message='Quantidade deve ser maior que zero!')])
+            min=1, max=None, message='Quantidade deve ser maior que zero!')],
+        widget=widgets.NumberInput(),
+        render_kw={'autocomplete': 'off'},
+        default=1,
+    )
     submit = wtf.SubmitField('Confirmar')
 
 
@@ -81,7 +95,13 @@ class AddProductForm(FlaskForm):
     name = wtf.StringField(
         'Nome do reativo', validators=[InputRequired()])
     stock_minimum = wtf.IntegerField(
-        'Estoque mínimo', default=1, validators=[InputRequired()])
+        'Estoque mínimo', default=1, validators=[
+            InputRequired(),
+            NumberRange(
+                min=1, max=None, message='Deve ser maior que zero!')],
+        widget=widgets.NumberInput(),
+        render_kw={'autocomplete': 'off'},
+    )
     manufacturer = wtf.StringField(
         'Fabricante', validators=[InputRequired()])
     catalog_number = wtf.StringField(
@@ -90,13 +110,16 @@ class AddProductForm(FlaskForm):
         'Unidades de estoque', default=1, validators=[
             InputRequired(),
             NumberRange(
-                min=1, max=None, message='Deve ser maior que zero!')])
+                min=1, max=None, message='Deve ser maior que zero!')],
+        widget=widgets.NumberInput(),
+        render_kw={'autocomplete': 'off'},
+    )
     submit = wtf.SubmitField('Cadastrar Reativo')
 
-    def validate_spec_catalog(form, field):
+    def validate_spec_catalog(self, field):
         spec = models.Specification.query.filter_by(
             catalog_number=field.data,
-            manufacturer=form.manufacturer.data).first()
+            manufacturer=self.manufacturer.data).first()
         if spec is not None:
             raise wtf.ValidationError(
                 'Essa especificação já está cadastrada (catálogo e fabricante')
@@ -110,12 +133,18 @@ class AddSpecificationForm(FlaskForm):
     product_id = wtf.HiddenField()
     manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
     catalog_number = wtf.StringField('Catálogo', validators=[InputRequired()])
-    units = wtf.IntegerField('Unidades de estoque', default=1, validators=[
-        InputRequired(),
-        NumberRange(
-            min=1, max=None, message='Deve ser maior que zero!')])
+    units = wtf.IntegerField(
+        'Unidades de estoque', default=1, validators=[
+            InputRequired(),
+            NumberRange(
+                min=1, max=None, message='Deve ser maior que zero!')],
+        widget=widgets.NumberInput(),
+        render_kw={'autocomplete': 'off'},
+    )
     submit = wtf.SubmitField('Confirmar')
 
+
+# DEPRECATED
 
 class AddTransactionForm(FlaskForm):
     def __init__(self, *args, **kwargs):
@@ -148,7 +177,7 @@ class AddTransactionForm(FlaskForm):
     details = wtf.StringField('Observações', validators=[Optional()])
     submit = wtf.SubmitField('Enviar')
 
-    def validate_amount(form, field):
+    def validate_amount(self, field):
         if field.data < 1:
             raise wtf.ValidationError(
                 'Quantidade Recebida deve ser maior ou igual a 1')

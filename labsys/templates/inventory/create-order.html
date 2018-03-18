@@ -1,13 +1,36 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import "utils/_forms_rendering.html" as frender %}
 
 {% block page_content %}
   {% include "inventory/_navigation.html" %}
   <div class="page-header">
       <h1>Comprar Reativo</h1>
   </div>
-  {{ wtf.quick_form(form) }}
-  <p>Total de itens no carrinho: {{ session['order_items'] | length }}</p>
+  <div class="row">
+    <div class="col-md-12">
+      <form class="form" method="post">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+        {{ wtf.form_field(form.item_id) }}
+        {{ wtf.form_field(form.amount) }}
+        {{ wtf.form_field(form.lot_number) }}
+        {{ wtf.form_field(form.expiration_date) }}
+        {{ wtf.form_field(form.add_product) }}
+        {% if order_items %}
+          {{ wtf.form_field(form.finish_order) }}
+          {{ wtf.form_field(form.cancel) }}
+        {% endif %}
+      </form>
+    </div>
+  </div>
+  <hr />
+  <div class="row">
+    <div class="col-md-12">
+      {% include "inventory/_cart.html" %}
+    </div>
+  </div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -16,6 +39,8 @@
   document.getElementById("amount").required = false;
   document.getElementById("lot_number").required = false;
   document.getElementById("expiration_date").required = false;
+  document.getElementById("finish_order").className += " btn-success";
+  document.getElementById("cancel").className += " btn-danger";
 </script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>

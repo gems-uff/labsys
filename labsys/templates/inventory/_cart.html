@@ -1,0 +1,26 @@
+<div class="order-items-checkout">
+  <table class="table table-responsive">
+    <thead>
+      <th>Reativo</th>
+      <th>Catálogo</th>
+      <th>Lote</th>
+      <th>Data de Validade</th>
+      <th>Unidade(s)/Produto</th>
+      <th>Quantidade</th>
+      <th>Total de Unidades</th>
+    </thead>
+    <tbody>
+    {% for item in order_items %}
+      <tr>
+        <td>{{ item.item.product.name }}</td>
+        <td>{{ item.item.catalog_number }}</td>
+        <td>{{ item.lot_number }}</td>
+        <td>{{ item.expiration_date.strftime('%d/%m/%Y') }}</td>
+        <td>{{ item.item.units}}</td>
+        <td>{{ item.amount }}</td>
+        <td>{{ item.amount * item.item.units }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
