@@ -94,20 +94,20 @@ class ConsumeProductForm(FlaskForm):
 class AddProductForm(FlaskForm):
     name = wtf.StringField(
         'Nome do reativo', validators=[InputRequired()])
-    stock_minimum = wtf.IntegerField(
-        'Alertar quando estoque atingir', default=1, validators=[
+    catalog_number = wtf.StringField(
+        'Número de catálogo', validators=[InputRequired()])
+    manufacturer = wtf.StringField(
+        'Fabricante', validators=[InputRequired()])
+    units = wtf.IntegerField(
+        'Unidades de estoque', default=1, validators=[
             InputRequired(),
             NumberRange(
                 min=1, max=None, message='Deve ser maior que zero!')],
         widget=widgets.NumberInput(),
         render_kw={'autocomplete': 'off'},
     )
-    manufacturer = wtf.StringField(
-        'Fabricante', validators=[InputRequired()])
-    catalog_number = wtf.StringField(
-        'Número de catálogo', validators=[InputRequired()])
-    units = wtf.IntegerField(
-        'Unidades de estoque', default=1, validators=[
+    stock_minimum = wtf.IntegerField(
+        'Alertar quando estoque atingir', default=1, validators=[
             InputRequired(),
             NumberRange(
                 min=1, max=None, message='Deve ser maior que zero!')],
