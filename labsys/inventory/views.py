@@ -36,7 +36,7 @@ def index():
 @login_required
 @permission_required(Permission.VIEW)
 def show_catalog():
-    products = Product.query.all()
+    products = Product.query.order_by(Product.name).all()
     return render_template('inventory/list-products.html', products=products)
 
 
@@ -82,7 +82,10 @@ def delete_transaction(transaction_id):
 @permission_required(Permission.EDIT)
 def purchase_product():
     logging.info('purchase_product()')
-    specifications = Specification.query.all()
+    specifications = db.session.query(Specification).\
+        join(Product).\
+        order_by(Product.name).\
+        all()
     form_context = {
         'specs': specifications,
     }
@@ -208,22 +211,6 @@ def checkout():
                            form=form,
                            order_items=order_items,)
 
-# NOT WORKING
-@blueprint.route('/cart/remove/<string:item>', methods=['GET'])
-@login_required
-@permission_required(Permission.EDIT)
-def remove_item_from_cart(item):
-    encoded_item = jsonpickle.encode(item)
-    logging.info('Removing item from session...')
-    try:
-        print(session['order_items'][0])
-        print(jsonpickle.encode(item))
-        session['order_items'].remove(encoded_item)
-        logging.info('Item successfully removed!')
-    except ValueError as err:
-        logging.error(err)
-        flash('Não foi possível remover esse item do carrinho.', 'danger')
-    return redirect(url_for('.checkout'))
 
 @blueprint.route('/products/consume', methods=['GET', 'POST'])
 @login_required
@@ -232,7 +219,11 @@ def consume_product():
     logging.info('consume_product()')
     stock = Stock.get_reactive_stock()
     # TODO: alphabetical order
-    stock_products = [sp for sp in stock.stock_products if sp.amount > 0]
+    stock_products = sorted(
+        [sp for sp in stock.stock_products if sp.amount > 0],
+        key=lambda sp: sp.product.name,
+    )
+    # sorted(student_tuples, key=lambda student: student[2])
     form_context = {
         'stock_products': stock_products,
     }
