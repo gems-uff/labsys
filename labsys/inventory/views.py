@@ -87,6 +87,11 @@ def purchase_product():
         'specs': specifications,
     }
     form = forms.OrderItemForm(**form_context)
+    order_items = [jsonpickle.decode(item)
+                   for item in session.get('order_items')]
+    for order_item in order_items:
+        order_item.item = Specification.query.get(order_item.item_id)
+
     if session.get('order_items') is None:
         session['order_items'] = []
 
@@ -120,7 +125,8 @@ def purchase_product():
             return redirect(url_for('.purchase_product'))
         logging.info('redirecting to route with or w/out errors and form')
     logging.info('GETting purchase_product')
-    return render_template('inventory/create-order.html', form=form)
+    return render_template('inventory/create-order.html',
+        form=form, order_items=order_items)
 
 
 @blueprint.route('/orders/checkout', methods=['GET', 'POST'])
