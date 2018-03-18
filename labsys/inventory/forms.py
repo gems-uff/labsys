@@ -95,7 +95,7 @@ class AddProductForm(FlaskForm):
     name = wtf.StringField(
         'Nome do reativo', validators=[InputRequired()])
     stock_minimum = wtf.IntegerField(
-        'Estoque mínimo', default=1, validators=[
+        'Alertar quando estoque atingir', default=1, validators=[
             InputRequired(),
             NumberRange(
                 min=1, max=None, message='Deve ser maior que zero!')],
