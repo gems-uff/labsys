@@ -59,8 +59,8 @@ class OrderForm(FlaskForm):
     invoice = wtf.StringField('Nota', validators=[Optional()])
     financier = wtf.StringField('Financiador', validators=[Optional()])
     notes = wtf.StringField('Observações', validators=[Optional()])
-    submit = wtf.SubmitField('Finalizar')
-    cancel = wtf.SubmitField('Cancelar')
+    submit = wtf.SubmitField('Finalizar a compra', render_kw={'class': 'btn-danger'})
+    cancel = wtf.SubmitField('Limpar o carrinho')
 
 
 class ConsumeProductForm(FlaskForm):

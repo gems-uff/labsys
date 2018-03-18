@@ -9,3 +9,11 @@
   {% include "inventory/_cart.html" %}
   {{ wtf.quick_form(form) }}
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  document.getElementById("submit").className += " btn-success";
+  document.getElementById("cancel").className += " btn-danger";
+</script>
+{% endblock %}
