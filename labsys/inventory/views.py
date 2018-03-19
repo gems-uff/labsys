@@ -36,7 +36,7 @@ def index():
 @login_required
 @permission_required(Permission.VIEW)
 def show_catalog():
-    products = Product.query.all()
+    products = Product.query.order_by(Product.name).all()
     return render_template('inventory/list-products.html', products=products)
 
 
@@ -72,7 +72,7 @@ def list_transactions():
 @permission_required(Permission.DELETE)
 def delete_transaction(transaction_id):
     transactions = Transaction.query.all()
-    flash('Essa funcionalidade ainda não foi implementada.')
+    flash('Essa funcionalidade ainda não foi implementada.', 'warning')
     return render_template('inventory/list-transactions.html',
                            transactions=transactions)
 
@@ -82,23 +82,35 @@ def delete_transaction(transaction_id):
 @permission_required(Permission.EDIT)
 def purchase_product():
     logging.info('purchase_product()')
-    specifications = Specification.query.all()
+    specifications = db.session.query(Specification).\
+        join(Product).\
+        order_by(Product.name).\
+        all()
     form_context = {
         'specs': specifications,
     }
     form = forms.OrderItemForm(**form_context)
+    order_items = [jsonpickle.decode(item)
+                   for item in session.get('order_items')]
+    for order_item in order_items:
+        order_item.item = Specification.query.get(order_item.item_id)
+
     if session.get('order_items') is None:
         session['order_items'] = []
 
     if request.method == 'POST':
         logging.info('POSTing to purchase_product')
+        if form.cancel.data is True:
+            logging.info('Cancel order, cleaning session')
+            session['order_items'] = []
+            return redirect(url_for('.purchase_product'))
         if form.finish_order.data is True:
             logging.info('checking if there is at least 1 o_item in session')
             if len(session.get('order_items')) > 0:
                 logging.info('Finishing order => redirect to checkout()')
                 return redirect(url_for('.checkout'))
             logging.info('None order item added to session')
-            flash('Pelo menos 1 reativo deve ser adicionado ao carrinho.')
+            flash('Pelo menos 1 reativo deve ser adicionado ao carrinho.', 'danger')
             return redirect(url_for('.purchase_product'))
         if form.validate():
             logging.info('Create order form is valid')
@@ -116,11 +128,12 @@ def purchase_product():
                 session.modified = True
 
             logging.info('finishing form.validate')
-            flash('Reativo adicionado ao carrinho')
+            flash('Reativo adicionado ao carrinho', 'success')
             return redirect(url_for('.purchase_product'))
         logging.info('redirecting to route with or w/out errors and form')
     logging.info('GETting purchase_product')
-    return render_template('inventory/create-order.html', form=form)
+    return render_template('inventory/create-order.html',
+        form=form, order_items=order_items)
 
 
 @blueprint.route('/orders/checkout', methods=['GET', 'POST'])
@@ -180,7 +193,7 @@ def checkout():
                     logging.info('Creating transactions from order...')
                     services.create_add_transaction_from_order(order, stock)
                     logging.info('Flashing success and returning to index')
-                    flash('Ordem executada com sucesso')
+                    flash('Ordem executada com sucesso', 'success')
                     session['order_items'] = []
                     return redirect(url_for('.index'))
                 except (ValueError, Exception) as err:
@@ -192,7 +205,7 @@ def checkout():
                     return render_template('inventory/index.html')
         else:
             logging.info('No item added to cart')
-            flash('É necessário adicionar pelo menos 1 item ao carrinho.')
+            flash('É necessário adicionar pelo menos 1 item ao carrinho.', 'warning')
             return redirect(url_for('.purchase_product'))
     return render_template('inventory/checkout.html',
                            form=form,
@@ -206,7 +219,11 @@ def consume_product():
     logging.info('consume_product()')
     stock = Stock.get_reactive_stock()
     # TODO: alphabetical order
-    stock_products = [sp for sp in stock.stock_products if sp.amount > 0]
+    stock_products = sorted(
+        [sp for sp in stock.stock_products if sp.amount > 0],
+        key=lambda sp: sp.product.name,
+    )
+    # sorted(student_tuples, key=lambda student: student[2])
     form_context = {
         'stock_products': stock_products,
     }
@@ -234,7 +251,7 @@ def consume_product():
                 stock
             )
             flash('{} unidades de {} removidas do estoque com sucesso!'.format(
-                form.amount.data, selected_stock_product.product.name))
+                form.amount.data, selected_stock_product.product.name), 'success')
 
             return redirect(url_for('.consume_product'))
         except ValueError as err:
@@ -242,7 +259,7 @@ def consume_product():
             form.amount.errors.append(
                 'Não há o suficiente desse reativo em estoque.')
         except:
-            flash('Erro inesperado, contate o administrador.')
+            flash('Erro inesperado, contate o administrador.', 'danger')
 
     return render_template('inventory/consume-product.html', form=form)
 
@@ -269,12 +286,12 @@ def add_product_to_catalog():
             db.session.commit()
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
-            flash('Já existe uma especificação com esse catálogo e fabricante')
+            flash('Já existe uma especificação com esse catálogo e fabricante', 'danger')
             return render_template('inventory/create-product.html', form=form)
         except Exception as exc:
             db.session.rollback()
             logging.info(exc)
-            flash('Ocorreu um erro inesperado, contate um admministrador.')
+            flash('Ocorreu um erro inesperado, contate um admministrador.', 'danger')
             return render_template('inventory/create-product.html', form=form)
         return render_template('inventory/details-product.html',
                                product=product)
@@ -299,11 +316,11 @@ def add_specification_to_product(product_id):
             specification.product_id = product_id
             db.session.add(specification)
             db.session.commit()
-            flash('Especificação adicionada com sucesso.')
+            flash('Especificação adicionada com sucesso.', 'success')
             return redirect(url_for('.detail_product', product_id=product.id))
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
-            flash('Já existe uma especificação com esse catálogo e fabricante')
+            flash('Já existe uma especificação com esse catálogo e fabricante', 'danger')
     return render_template('inventory/create-specification.html',
                            form=form, product=product)
 
@@ -313,7 +330,13 @@ def add_specification_to_product(product_id):
 @permission_required(Permission.EDIT)
 def detail_product(product_id):
     product = Product.query.get_or_404(product_id)
-    return render_template('inventory/details-product.html', product=product)
+    specifications = sorted(
+        [spec for spec in product.specifications],
+        key=lambda spec: spec.units,
+    )
+    return render_template('inventory/details-product.html',
+        product=product,
+        specifications=specifications)
 
 
 @blueprint.route('/export/<string:table>')

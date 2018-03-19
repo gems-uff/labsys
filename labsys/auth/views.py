@@ -27,7 +27,7 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
             return redirect(next or url_for('inventory.index'))
-        flash('Usuário ou password inválido(s).')
+        flash('Usuário ou password inválido(s).', 'danger')
 
     return render_template('auth/login.html', form=form)
 
@@ -36,7 +36,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash('Log Out realizado com sucesso.')
+    flash('Log Out realizado com sucesso.', 'success')
     return redirect(url_for('auth.login'))
 
 
@@ -56,7 +56,7 @@ def register():
             'auth/email/confirm',
             user=user,
             token=token)
-        flash('Uma mensagem de confirmação foi enviado para seu email.')
+        flash('Uma mensagem de confirmação foi enviado para seu email.', 'success')
         return redirect(url_for('admissions.list_admissions'))
     return render_template('auth/register.html', form=form)
 
@@ -67,9 +67,9 @@ def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('admissions.list_admissions'))
     if current_user.confirm(token):
-        flash('Conta verificada. Obrigado!')
+        flash('Conta verificada. Obrigado!', 'warning')
     else:
-        flash('O link de confirmação não é válido ou expirou.')
+        flash('O link de confirmação não é válido ou expirou.', 'warning')
     return redirect(url_for('admissions.list_admissions'))
 
 
@@ -99,7 +99,7 @@ def resend_confirmation():
         'auth/email/confirm',
         user=current_user,
         token=token)
-    flash('Uma nova mensagem de confirmação foi enviada ao seu email.')
+    flash('Uma nova mensagem de confirmação foi enviada ao seu email.', 'success')
     return redirect(url_for('admissions.list_admissions'))
 
 
