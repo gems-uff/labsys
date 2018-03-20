@@ -4,7 +4,7 @@ import jsonpickle
 
 from flask import (
     render_template, redirect, url_for, flash, abort, Blueprint, session,
-    request,
+    request, current_app,
 )
 from flask_login import current_user, login_required
 
@@ -36,34 +36,49 @@ def index():
 @login_required
 @permission_required(Permission.VIEW)
 def show_catalog():
-    products = Product.query.order_by(Product.name).all()
-    return render_template('inventory/list-products.html', products=products)
+    page_size = current_app.config['PAGE_SIZE']
+    page = request.args.get('page', 1, type=int)
+    products = Product.query.order_by(Product.name).paginate(
+        page, page_size, False)
+    next_url = url_for('.show_catalog', page=products.next_num) \
+        if products.has_next else None
+    prev_url = url_for('.show_catalog', page=products.prev_num) \
+        if products.has_prev else None
+    return render_template('inventory/list-products.html',
+        products=products.items, next_url=next_url, prev_url=prev_url)
 
 
 @blueprint.route('/stock', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
+# TODO: add pagination to joined query
 def show_stock():
     stock = Stock.query.first()
-    products = db.session.query(Product).\
-        join(StockProduct).\
-        order_by(Product.name).\
-        all()
-
+    page_size = current_app.config['PAGE_SIZE']
+    page = request.args.get('page', 1, type=int)
+    products = db.session.query(Product).join(StockProduct).\
+        order_by(Product.name).all()
     for p in products:
         p.total = stock.total(p)
     return render_template('inventory/index.html',
-                           products=products)
+        products=products)
 
 
 @blueprint.route('/transactions', methods=['GET'])
 @login_required
 @permission_required(Permission.VIEW)
 def list_transactions():
+    page_size = current_app.config['PAGE_SIZE']
+    page = request.args.get('page', 1, type=int)
     transactions = Transaction.query.order_by(
-        Transaction.updated_on.desc()).all()
+        Transaction.updated_on.desc()).\
+        paginate(page, page_size, False)
+    next_url = url_for('.list_transactions', page=transactions.next_num) \
+        if transactions.has_next else None
+    prev_url = url_for('.list_transactions', page=transactions.prev_num) \
+        if transactions.has_prev else None
     return render_template('inventory/list-transactions.html',
-                           transactions=transactions)
+        transactions=transactions.items, next_url=next_url, prev_url=prev_url)
 
 
 # TODO: Implement this method:
@@ -71,10 +86,8 @@ def list_transactions():
 @login_required
 @permission_required(Permission.DELETE)
 def delete_transaction(transaction_id):
-    transactions = Transaction.query.all()
     flash('Essa funcionalidade ainda não foi implementada.', 'warning')
-    return render_template('inventory/list-transactions.html',
-                           transactions=transactions)
+    return redirect(url_for('.list_transactions'))
 
 
 @blueprint.route('/orders/add', methods=['GET', 'POST'])

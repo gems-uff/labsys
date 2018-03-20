@@ -20,6 +20,8 @@ class Config:
     BOOTSTRAP_SERVE_LOCAL = True
     LOGIN_MESSAGE = 'É necessário realizar login para acessar essa página'
 
+    PAGE_SIZE = 5
+
     @staticmethod
     def init_app(app):
         pass
