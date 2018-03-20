@@ -90,13 +90,14 @@ def purchase_product():
         'specs': specifications,
     }
     form = forms.OrderItemForm(**form_context)
+
+    if session.get('order_items') is None:
+        session['order_items'] = []
     order_items = [jsonpickle.decode(item)
                    for item in session.get('order_items')]
     for order_item in order_items:
         order_item.item = Specification.query.get(order_item.item_id)
 
-    if session.get('order_items') is None:
-        session['order_items'] = []
 
     if request.method == 'POST':
         logging.info('POSTing to purchase_product')
@@ -151,6 +152,8 @@ def checkout():
     '''
     form = forms.OrderForm()
     stock = Stock.get_reactive_stock()
+    if session.get('order_items') is None:
+        session['order_items'] = []
     order_items = [jsonpickle.decode(item)
                    for item in session.get('order_items')]
     for order_item in order_items:
@@ -283,6 +286,7 @@ def add_product_to_catalog():
                 specification=specification,
             )
             db.session.add(product)
+            db.session.add(specification)
             db.session.commit()
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
@@ -293,8 +297,9 @@ def add_product_to_catalog():
             logging.info(exc)
             flash('Ocorreu um erro inesperado, contate um admministrador.', 'danger')
             return render_template('inventory/create-product.html', form=form)
-        return render_template('inventory/details-product.html',
-                               product=product)
+        return redirect(url_for('.detail_product',
+                                product_id=product.id,
+                                specifications=product.specifications))
     return render_template('inventory/create-product.html', form=form)
 
 
