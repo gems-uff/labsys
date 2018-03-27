@@ -1,11 +1,12 @@
 import os, unittest
-import labsys
+from flask import url_for
+
 from labsys.app import create_app, db
 from labsys.auth.models import Role
 import labsys.inventory.models as models
 
 
-class ShowCatalogTestCase(unittest.TestCase):
+class TestInventoryViews(unittest.TestCase):
 
     def setUp(self):
         self.app = create_app('testing')
@@ -22,3 +23,8 @@ class ShowCatalogTestCase(unittest.TestCase):
 
     def test_dummy(self):
         self.assertTrue(True)
+
+    def test_home_page(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Bem-vindo!', response.get_data(as_text=True))
