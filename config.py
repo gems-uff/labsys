@@ -41,6 +41,7 @@ class TestingConfig(Config):
     DATABASE_URI_ENV_KEY = 'TEST_DATABASE_URL'
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
     WTF_CSRF_ENABLED = False
+    LOGIN_DISABLED = True
 
 
 class ProductionConfig(Config):

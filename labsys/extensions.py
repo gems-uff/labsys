@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_admin import Admin
+from flask_admin.menu import MenuLink
 
 
 def setup_login_manager():
@@ -19,6 +21,7 @@ moment = Moment()
 db = SQLAlchemy()
 login_manager = setup_login_manager()
 toolbar = DebugToolbarExtension()
+admin = Admin(None, name='labsys', template_mode='bootstrap3')
 
 
 
