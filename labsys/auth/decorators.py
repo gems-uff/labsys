@@ -8,8 +8,7 @@ def permission_required(permission):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if not current_user.can(permission) and \
-                not current_app.config['TESTING'] == True:
+            if not current_user.can(permission):
                 abort(403)
             return f(*args, **kwargs)
         return decorated_function
@@ -17,4 +16,4 @@ def permission_required(permission):
 
 
 def admin_required(f):
-    return permission_required(Permission.ADMINISTER) (f)
+    return permission_required(Permission.ADMINISTER)(f)
