@@ -55,6 +55,13 @@ class TestAuthenticationViews(unittest.TestCase):
                 'password': 'a',
             }, follow_redirects=True)
             self.assertEqual(response.status_code, 200)
-            self.assertEqual(request.path, '/inventory/stock')
+            self.assertEqual('/inventory/stock', request.path)
 
         # log out
+        with self.client as client:
+            response = client.get(url_for('auth.logout'),
+                                  follow_redirects=True)
+            data = response.get_data(as_text=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Log Out realizado', data)
+            self.assertEqual('/auth/login', request.path)
