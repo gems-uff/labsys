@@ -56,8 +56,9 @@ def register():
             'auth/email/confirm',
             user=user,
             token=token)
-        flash('Uma mensagem de confirmação foi enviado para seu email.', 'success')
-        return redirect(url_for('admissions.list_admissions'))
+        flash('Uma mensagem de confirmação foi enviado para seu email.',
+              'success')
+        return redirect(url_for('inventory.index'))
     return render_template('auth/register.html', form=form)
 
 
@@ -99,7 +100,8 @@ def resend_confirmation():
         'auth/email/confirm',
         user=current_user,
         token=token)
-    flash('Uma nova mensagem de confirmação foi enviada ao seu email.', 'success')
+    flash('Uma nova mensagem de confirmação foi enviada ao seu email.',
+          'success')
     return redirect(url_for('admissions.list_admissions'))
 
 
