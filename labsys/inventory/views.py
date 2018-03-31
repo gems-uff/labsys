@@ -233,7 +233,6 @@ def checkout():
 def consume_product():
     logging.info('consume_product()')
     stock = Stock.get_reactive_stock()
-    # TODO: alphabetical order
     stock_products = sorted(
         [sp for sp in stock.stock_products if sp.amount > 0],
         key=lambda sp: sp.product.name,

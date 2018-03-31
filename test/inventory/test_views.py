@@ -288,3 +288,48 @@ class TestInventoryViews(unittest.TestCase):
 
             # Assert there are 2 products
             self.assertEqual(len(models.Product.query.all()), 2)
+
+    def test_consume_product(self):
+        spec1 = models.Specification('cat1', 'man1')
+        prod1 = models.Product('Prod1', spec1)
+        # Add product to stock
+        models.Stock.get_reactive_stock().add(prod1, 'lot1', '2018-03-30', 10)
+        stock_products = models.StockProduct.query.all()
+        # Asserts they were added
+        self.assertEqual(len(stock_products), 1)
+        self.assertEqual(stock_products[0].amount, 10)
+        with self.client as client:
+            # login
+            res = client.post(url_for('auth.login'), data={
+                'email': 'user@example.com',
+                'password': 'example',
+            }, follow_redirects=True)
+            self.assertEqual(res.status_code, 200)
+
+            # Try to consume amount greater than available
+            greater_amount_data={
+                'stock_product_id': stock_products[0].id,
+                'amount': 11
+            }
+            res = client.post(url_for('inventory.consume_product'),
+                        data=greater_amount_data,
+                        follow_redirects=True)
+            self.assertIn('Não há o suficiente', res.get_data(as_text=True))
+            # Assert stock is intact
+            self.assertEqual(stock_products[0].amount, 10)
+
+            # Try to consume a sufficient amount
+            sufficient_amount_data={
+                'stock_product_id': stock_products[0].id,
+                'amount': 9
+            }
+            res = client.post(url_for('inventory.consume_product'),
+                        data=sufficient_amount_data,
+                        follow_redirects=True)
+            self.assertIn('removidas do estoque', res.get_data(as_text=True))
+            # Assert stock was subtracted
+            self.assertEqual(stock_products[0].amount, 1)
+            # Assert transaction was created
+            transactions = models.Transaction.query.all()
+            self.assertEqual(len(transactions), 1)
+            self.assertEqual(transactions[0].amount, 9)
