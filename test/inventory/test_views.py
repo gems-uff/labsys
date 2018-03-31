@@ -1,9 +1,10 @@
-import os, unittest, datetime
+import unittest
 from flask import url_for, request
 
 from labsys.app import create_app, db
 from labsys.auth.models import Role, User
-import labsys.inventory.models as models
+
+from labsys.inventory import models
 
 
 class TestInventoryViews(unittest.TestCase):
@@ -18,9 +19,9 @@ class TestInventoryViews(unittest.TestCase):
         db.session.commit()
         Role.insert_roles()
         staff = Role.query.filter_by(name='Staff').first()
-        self.user = User(email='user@example.com', password='example', role=staff, confirmed=True)
+        self.user = User(email='user@example.com',
+                         password='example', role=staff, confirmed=True)
         self.user.role = Role.query.filter_by(name='Staff').first()
-
 
     def tearDown(self):
         db.session.remove()
@@ -48,7 +49,6 @@ class TestInventoryViews(unittest.TestCase):
             res = client.get(url_for('inventory.purchase_product'),
                              follow_redirects=False)
             self.assertEqual(res.status_code, 200)
-            data = res.get_data(as_text=True)
             self.assertEqual('/inventory/orders/add', request.path)
 
             # Add order_item to cart
@@ -59,8 +59,8 @@ class TestInventoryViews(unittest.TestCase):
                 'expiration_date': '2018-03-21',
             }
             res = client.post(url_for('inventory.purchase_product'),
-                                      data=order_item_dict,
-                                      follow_redirects=True)
+                              data=order_item_dict,
+                              follow_redirects=True)
             self.assertIn('adicionado ao carrinho', res.get_data(as_text=True))
 
             # Add another order_item to cart same lot
@@ -71,14 +71,14 @@ class TestInventoryViews(unittest.TestCase):
                 'expiration_date': '2018-03-21',
             }
             res = client.post(url_for('inventory.purchase_product'),
-                                      data=order_item_dict,
-                                      follow_redirects=True)
+                              data=order_item_dict,
+                              follow_redirects=True)
             self.assertIn('adicionado ao carrinho', res.get_data(as_text=True))
 
             # Go to checkout
             res = client.post(url_for('inventory.purchase_product'),
-                                       data={'finish_order': True},
-                                       follow_redirects=True)
+                              data={'finish_order': True},
+                              follow_redirects=True)
             self.assertEqual(res.status_code, 200)
             self.assertEqual('/inventory/orders/checkout', request.path)
 
@@ -135,7 +135,6 @@ class TestInventoryViews(unittest.TestCase):
             res = client.get(url_for('inventory.purchase_product'),
                              follow_redirects=False)
             self.assertEqual(res.status_code, 200)
-            data = res.get_data(as_text=True)
             self.assertEqual('/inventory/orders/add', request.path)
 
             # Add order_item to cart
@@ -146,8 +145,8 @@ class TestInventoryViews(unittest.TestCase):
                 'expiration_date': '2018-03-21',
             }
             res = client.post(url_for('inventory.purchase_product'),
-                                      data=order_item_dict,
-                                      follow_redirects=True)
+                              data=order_item_dict,
+                              follow_redirects=True)
             self.assertIn('adicionado ao carrinho', res.get_data(as_text=True))
 
             # Add another order_item to cart same lot
@@ -158,14 +157,14 @@ class TestInventoryViews(unittest.TestCase):
                 'expiration_date': '2018-03-21',
             }
             res = client.post(url_for('inventory.purchase_product'),
-                                      data=order_item_dict,
-                                      follow_redirects=True)
+                              data=order_item_dict,
+                              follow_redirects=True)
             self.assertIn('adicionado ao carrinho', res.get_data(as_text=True))
 
             # Go to checkout
             res = client.post(url_for('inventory.purchase_product'),
-                                       data={'finish_order': True},
-                                       follow_redirects=True)
+                              data={'finish_order': True},
+                              follow_redirects=True)
             self.assertEqual(res.status_code, 200)
             self.assertEqual('/inventory/orders/checkout', request.path)
 
@@ -221,7 +220,6 @@ class TestInventoryViews(unittest.TestCase):
             res = client.get(url_for('inventory.purchase_product'),
                              follow_redirects=False)
             self.assertEqual(res.status_code, 200)
-            data = res.get_data(as_text=True)
             self.assertEqual('/inventory/orders/add', request.path)
 
             # Add order_item to cart
@@ -232,8 +230,8 @@ class TestInventoryViews(unittest.TestCase):
                 'expiration_date': '2018-03-21',
             }
             res = client.post(url_for('inventory.purchase_product'),
-                                      data=order_item_dict,
-                                      follow_redirects=True)
+                              data=order_item_dict,
+                              follow_redirects=True)
             self.assertIn('adicionado ao carrinho', res.get_data(as_text=True))
 
             # Add another order_item to cart same lot
@@ -244,14 +242,14 @@ class TestInventoryViews(unittest.TestCase):
                 'expiration_date': '2018-03-21',
             }
             res = client.post(url_for('inventory.purchase_product'),
-                                      data=order_item_dict,
-                                      follow_redirects=True)
+                              data=order_item_dict,
+                              follow_redirects=True)
             self.assertIn('adicionado ao carrinho', res.get_data(as_text=True))
 
             # Go to checkout
             res = client.post(url_for('inventory.purchase_product'),
-                                       data={'finish_order': True},
-                                       follow_redirects=True)
+                              data={'finish_order': True},
+                              follow_redirects=True)
             self.assertEqual(res.status_code, 200)
             self.assertEqual('/inventory/orders/checkout', request.path)
 
@@ -307,25 +305,25 @@ class TestInventoryViews(unittest.TestCase):
             self.assertEqual(res.status_code, 200)
 
             # Try to consume amount greater than available
-            greater_amount_data={
+            greater_amount_data = {
                 'stock_product_id': stock_products[0].id,
                 'amount': 11
             }
             res = client.post(url_for('inventory.consume_product'),
-                        data=greater_amount_data,
-                        follow_redirects=True)
+                              data=greater_amount_data,
+                              follow_redirects=True)
             self.assertIn('Não há o suficiente', res.get_data(as_text=True))
             # Assert stock is intact
             self.assertEqual(stock_products[0].amount, 10)
 
             # Try to consume a sufficient amount
-            sufficient_amount_data={
+            sufficient_amount_data = {
                 'stock_product_id': stock_products[0].id,
                 'amount': 9
             }
             res = client.post(url_for('inventory.consume_product'),
-                        data=sufficient_amount_data,
-                        follow_redirects=True)
+                              data=sufficient_amount_data,
+                              follow_redirects=True)
             self.assertIn('removidas do estoque', res.get_data(as_text=True))
             # Assert stock was subtracted
             self.assertEqual(stock_products[0].amount, 1)
