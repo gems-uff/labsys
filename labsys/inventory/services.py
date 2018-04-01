@@ -1,4 +1,3 @@
-from flask import jsonify
 from ..extensions import db
 from labsys.inventory import models as m
 

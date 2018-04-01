@@ -6,7 +6,9 @@ from .main.views import blueprint as main_blueprint
 from .admissions.views import blueprint as admissions_blueprint
 from .auth.views import blueprint as auth_blueprint
 from .inventory.views import blueprint as inventory_blueprint
-from .extensions import bootstrap, mail, moment, db, login_manager, toolbar, admin
+from .extensions import (
+    bootstrap, mail, moment, db, login_manager, toolbar, admin,
+)
 
 
 def create_app(config_name):
@@ -37,7 +39,7 @@ def register_blueprints(app):
 
 def register_error_handlers(app):
     @app.errorhandler(403)
-    def page_not_found(e):
+    def unauthorized(e):
         return render_template('403.html'), 403
 
     @app.errorhandler(404)
