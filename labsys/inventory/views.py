@@ -13,26 +13,45 @@ from .models import (Order, OrderItem, Product, Specification, Stock,
                      StockProduct, Transaction)
 
 
+# TODO: where should it go?
+def get_page_size():
+    return current_app.config['PAGE_SIZE']
+
+
+def get_page():
+    return request.args.get('page', 1, type=int)
+
+
 @blueprint.route('/', methods=['GET'])
 @permission_required(Permission.VIEW)
 def index():
     return redirect(url_for('.show_stock'))
 
 
+def paginated(query, template, page, view_method, **kwargs):
+    prev_url = url_for(
+        view_method, page=query.prev_num) if query.has_prev else None
+    next_url = url_for(
+        view_method, page=query.next_num) if query.has_next else None
+    return render_template(template,
+                           **kwargs,
+                           next_url=next_url,
+                           prev_url=prev_url)
+
+
 @blueprint.route('/catalog', methods=['GET'])
 @permission_required(Permission.VIEW)
 def show_catalog():
-    page_size = current_app.config['PAGE_SIZE']
-    page = request.args.get('page', 1, type=int)
-    products = Product.query.order_by(Product.name).paginate(
-        page, page_size, False)
-    next_url = url_for('.show_catalog', page=products.next_num) \
-        if products.has_next else None
-    prev_url = url_for('.show_catalog', page=products.prev_num) \
-        if products.has_prev else None
-    return render_template('inventory/list-products.html',
-                           products=products.items, next_url=next_url,
-                           prev_url=prev_url)
+    template = 'inventory/list-products.html'
+    view = 'inventory.show_catalog'
+    page = get_page()
+    query = Product.query.order_by(Product.name).paginate(
+        page, get_page_size(), False)
+    return paginated(query,
+                     template,
+                     page,
+                     view,
+                     products=query.items)
 
 
 @blueprint.route('/stock', methods=['GET'])
