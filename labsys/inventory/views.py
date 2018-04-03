@@ -13,7 +13,6 @@ from .models import (Order, OrderItem, Product, Specification, Stock,
                      StockProduct, Transaction)
 
 
-# TODO: where should it go?
 def get_page_size():
     return current_app.config['PAGE_SIZE']
 
@@ -28,13 +27,19 @@ def index():
     return redirect(url_for('.show_stock'))
 
 
-def paginated(query, template, page, view_method, **kwargs):
+def paginated(query, template_name, view_method, context_title):
+    page = get_page()
+    page_size = get_page_size()
+    query = query.paginate(page, page_size, False)
     prev_url = url_for(
         view_method, page=query.prev_num) if query.has_prev else None
     next_url = url_for(
         view_method, page=query.next_num) if query.has_next else None
-    return render_template(template,
-                           **kwargs,
+    context = {
+        context_title: query.items,
+    }
+    return render_template(template_name,
+                           **context,
                            next_url=next_url,
                            prev_url=prev_url)
 
@@ -44,44 +49,38 @@ def paginated(query, template, page, view_method, **kwargs):
 def show_catalog():
     template = 'inventory/list-products.html'
     view = 'inventory.show_catalog'
-    page = get_page()
-    query = Product.query.order_by(Product.name).paginate(
-        page, get_page_size(), False)
-    return paginated(query,
-                     template,
-                     page,
-                     view,
-                     products=query.items)
+    query = Product.query.order_by(Product.name)
+    context_title = 'products'
+    return paginated(query=query,
+                     template_name=template,
+                     view_method=view,
+                     context_title=context_title)
 
 
 @blueprint.route('/stock', methods=['GET'])
 @permission_required(Permission.VIEW)
 def show_stock():
     stock = Stock.query.first()
-    products = db.session.query(Product).join(StockProduct).\
-        order_by(Product.name).all()
+    template = 'inventory/index.html'
+    products = db.session.query(
+        Product).join(StockProduct).order_by(Product.name).all()
     for p in products:
         p.total = stock.total(p)
-    return render_template('inventory/index.html',
+    return render_template(template,
                            products=products)
 
 
 @blueprint.route('/transactions', methods=['GET'])
 @permission_required(Permission.VIEW)
 def list_transactions():
-    page_size = current_app.config['PAGE_SIZE']
-    page = request.args.get('page', 1, type=int)
-    transactions = Transaction.query.order_by(
-        Transaction.updated_on.desc()).\
-        paginate(page, page_size, False)
-    next_url = url_for('.list_transactions', page=transactions.next_num) \
-        if transactions.has_next else None
-    prev_url = url_for('.list_transactions', page=transactions.prev_num) \
-        if transactions.has_prev else None
-    return render_template('inventory/list-transactions.html',
-                           transactions=transactions.items,
-                           next_url=next_url,
-                           prev_url=prev_url)
+    template = 'inventory/list-transactions.html'
+    view = 'inventory.list_transactions'
+    query = Transaction.query.order_by(Transaction.updated_on.desc())
+    context_title = 'transactions'
+    return paginated(query=query,
+                     template_name=template,
+                     view_method=view,
+                     context_title=context_title)
 
 
 # TODO: Implement this method:
@@ -95,7 +94,6 @@ def delete_transaction(transaction_id):
 @blueprint.route('/orders/add', methods=['GET', 'POST'])
 @permission_required(Permission.EDIT)
 def purchase_product():
-    print(logger)
     logger.info('purchase_product()')
     specifications = db.session.query(Specification).\
         join(Product).\
