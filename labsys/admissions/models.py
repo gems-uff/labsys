@@ -3,18 +3,27 @@ from sqlalchemy import asc
 
 from ..extensions import db
 
+'''
+- O Patient só pode ter um Address, ou seja, a pergunta "Quando ele foi admitido no ano X, ele morava onde?" não pode ser respondida.
+    - Podemos futuramente pensar em uma maneira da Admission saber disso, ex.: Admission.patient_residence
+- Quando uma Admission é deletada, os "eventos" também o são: Vaccine, Hospitalization, UTIHospitalization e ClinicalEvolution
+'''
+
+# TODO: Remove cities, states, regions, countries
+# TODO: Add RiskFactor to Admission
+# TODO: Add nullable to columns which are not present in initial importing CSV
+# TODO: Abstract events (Vaccine, etc.)
+
 
 class Patient(db.Model):
     __tablename__ = 'patients'
     id = db.Column(db.Integer, primary_key=True)
-
     # Attributes
     name = db.Column(db.String(255))
     birth_date = db.Column(db.Date)
     age = db.Column(db.Integer)
     age_unit = db.Column(db.String(1))
     gender = db.Column(db.String(1))
-
     # Relationships
     residence = db.relationship('Address', backref='patient', uselist=False)
     admissions = db.relationship(
@@ -27,34 +36,35 @@ class Patient(db.Model):
 class Address(db.Model):
     __tablename__ = 'addresses'
     id = db.Column(db.Integer, primary_key=True)
+    # FK
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     # Attributes
+    country = db.Column(db.String(255))
+    state = db.Column(db.String(255))
+    city = db.Column(db.String(255))
     neighborhood = db.Column(db.String(255))
     zone = db.Column(db.Integer)
     details = db.Column(db.String(255))
-    # Relationships
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
-    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
 
     def __repr__(self):
-        return '<Address[{}]: Pat{}>'.format(self.id, self.patient_id)
+        return '<Address[{}]: Pat{}>'.format(self.id, self.patient)
 
 
 class Admission(db.Model):
     __tablename__ = 'admissions'
     id = db.Column(db.Integer, primary_key=True)
+    # FK
+    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     # Attributes
     id_lvrs_intern = db.Column(db.String(32), unique=True)
+    state = db.Column(db.String(255))
+    city = db.Column(db.String(255))
     first_symptoms_date = db.Column(db.Date)
     semepi_symptom = db.Column(db.Integer)
     health_unit = db.Column(db.String(128))
     requesting_institution = db.Column(db.String(128))
     details = db.Column(db.String(255))
     # Relationships
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
-    city_id = db.Column(db.Integer, db.ForeignKey('cities.id'))
-    patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     vaccine = db.relationship(
         'Vaccine',
         backref='admission',
@@ -77,6 +87,7 @@ class Admission(db.Model):
         cascade='all, delete-orphan')
     symptoms = db.relationship(
         'ObservedSymptom', backref='admission', lazy='dynamic')
+    # TODO: add risk_factors
     samples = db.relationship(
         'Sample', backref='admission', lazy='dynamic')
 
@@ -87,11 +98,11 @@ class Admission(db.Model):
 class Vaccine(db.Model):
     __tablename__ = 'vaccines'
     id = db.Column(db.Integer, primary_key=True)
+    # FK
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     # Attributes
     applied = db.Column(db.Boolean, nullable=True)
     last_dose_date = db.Column(db.Date())
-    # Realtionships
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
 
     def __repr__(self):
         return '<Vaccine[{}]: {}>'.format(self.id, self.applied)
@@ -100,11 +111,11 @@ class Vaccine(db.Model):
 class Hospitalization(db.Model):
     __tablename__ = 'hospitalizations'
     id = db.Column(db.Integer, primary_key=True)
+    # FK
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     # Attributes
     occurred = db.Column(db.Boolean, nullable=True)
     date = db.Column(db.Date())
-    # Relationships
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
 
     def __repr__(self):
         return '<Hospitalization[{}]: {}>'.format(self.id, self.occurred)
@@ -113,11 +124,11 @@ class Hospitalization(db.Model):
 class UTIHospitalization(db.Model):
     __tablename__ = 'uti_hospitalizations'
     id = db.Column(db.Integer, primary_key=True)
+    # FK
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     # Attributes
     occurred = db.Column(db.Boolean, nullable=True)
     date = db.Column(db.Date())
-    # Relationships
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
 
     def __repr__(self):
         return '<UTI Hospitalization[{}]: {}>'.format(self.id, self.occurred)
@@ -126,11 +137,11 @@ class UTIHospitalization(db.Model):
 class ClinicalEvolution(db.Model):
     __tablename__ = 'clinical_evolutions'
     id = db.Column(db.Integer, primary_key=True)
+    # FK
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     # Attributes
     death = db.Column(db.Boolean, nullable=True)
     date = db.Column(db.Date())
-    # Relationships
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
 
     def __repr__(self):
         return '<ClinicalEvolution[{}]: {}>'.format(self.id, self.death)
@@ -149,12 +160,12 @@ class Symptom(db.Model):
     @classmethod
     def get_primary_symptoms(cls):
         return cls.query.filter(
-            cls.primary == True).order_by(asc(Symptom.id)).all()
+            cls.primary is True).order_by(asc(Symptom.id)).all()
 
     @classmethod
     def get_secondary_symptoms(cls):
         return cls.query.filter(
-            cls.primary == False).order_by(asc(Symptom.id)).all()
+            cls.primary is False).order_by(asc(Symptom.id)).all()
 
     def __repr__(self):
         return '<Symptom[{}]: {}>'.format(self.id, self.name)
@@ -163,12 +174,12 @@ class Symptom(db.Model):
 class ObservedSymptom(db.Model):
     __tablename__ = 'observed_symptoms'
     id = db.Column(db.Integer, primary_key=True)
+    # FK
+    symptom_id = db.Column(db.Integer, db.ForeignKey('symptoms.id'))
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     # Attributes
     observed = db.Column(db.Boolean)
     details = db.Column(db.String(255))
-    # Relationships
-    symptom_id = db.Column(db.Integer, db.ForeignKey('symptoms.id'))
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
 
     def __repr__(self):
         return '<ObservedSymptom[{}]: {}>'.format(self.id, self.symptom.name)
@@ -180,6 +191,9 @@ class Method(db.Model):
     # Attributes
     name = db.Column(db.String(64))
     primary = db.Column(db.Boolean)
+    # Relationships
+    samples = db.relationship(
+        'Sample', backref='method', uselist=False)
 
     def __repr__(self):
         return '<Method[{}]: {}>'.format(self.id, self.name)
@@ -189,8 +203,8 @@ class Sample(db.Model):
 
     __tablename__ = 'samples'
     id = db.Column(db.Integer, primary_key=True)
-    _ordering = db.Column(db.Integer)
     # Attributes
+    _ordering = db.Column(db.Integer)
     admission_date = db.Column(db.Date())
     collection_date = db.Column(db.Date())
     semepi = db.Column(db.Integer)
@@ -199,7 +213,6 @@ class Sample(db.Model):
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     # Relationships
-    method = db.relationship('Method', backref=db.backref('samples', lazy='dynamic'))
     cdc_exam = db.relationship('CdcExam', backref='sample', uselist=False)
 
     @hybrid_property
@@ -238,71 +251,3 @@ class CdcExam(db.Model):
 
     def __repr__(self):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)
-
-
-class Country(db.Model):
-    __tablename__ = 'countries'
-    id = db.Column(db.Integer, primary_key=True)
-    name_pt_br = db.Column(db.String(255))
-    abbreviation = db.Column(db.String(2))
-    name_en_us = db.Column(db.String(255))
-    bacen_code = db.Column(db.Integer)
-    regions = db.relationship('Region', backref='country', lazy='dynamic')
-    addresses = db.relationship('Address', backref='country', lazy='dynamic')
-
-    def __repr__(self):
-        return '<Country[{}/{}]>'.format(self.name_en_us, self.abbreviation)
-
-    def __str__(self):
-        return '{}/{}'.format(self.name_pt_br, self.abbreviation)
-
-
-class Region(db.Model):
-    __tablename__ = 'regions'
-    id = db.Column(db.Integer, primary_key=True)
-    country_id = db.Column(db.Integer, db.ForeignKey('countries.id'))
-    name = db.Column(db.String(16))
-    region_code = db.Column(db.Integer)
-    states = db.relationship('State', backref='region', lazy='dynamic')
-
-    def __repr__(self):
-        return '<Region[{}: {}]>'.format(self.name, self.region_code)
-
-    def __str__(self):
-        return '{}'.format(self.name)
-
-
-class State(db.Model):
-    __tablename__ = 'states'
-    id = db.Column(db.Integer, primary_key=True)
-    region_id = db.Column(db.Integer, db.ForeignKey('regions.id'))
-    name = db.Column(db.String(64))
-    uf_code = db.Column(db.String(2))
-    ibge_code = db.Column(db.Integer)
-    cities = db.relationship('City', backref='state', lazy='dynamic')
-    addresses = db.relationship('Address', backref='state', lazy='dynamic')
-    admissions = db.relationship('Admission', backref='state', lazy='dynamic')
-
-    def __repr__(self):
-        return '<State[{}/{}]>'.format(self.name, self.uf_code)
-
-    def __str__(self):
-        return '{}/{}'.format(self.name, self.uf_code)
-
-
-class City(db.Model):
-    __tablename__ = 'cities'
-    id = db.Column(db.Integer, primary_key=True)
-    state_id = db.Column(db.Integer, db.ForeignKey('states.id'))
-    ibge_code = db.Column(db.Integer)
-    name = db.Column(db.String(128))
-    addresses = db.relationship('Address', backref='city', lazy='dynamic')
-    admissions = db.relationship('Admission', backref='city', lazy='dynamic')
-
-    def __repr__(self):
-        return '<City[{}/{}]>'.format(self.name, self.state.uf_code
-                                      if self.state is not None else 'None')
-
-    def __str__(self):
-        return '{}/{}'.format(self.name, self.state.uf_code
-                              if self.state is not None else 'None')

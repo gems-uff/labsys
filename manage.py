@@ -12,8 +12,8 @@ from labsys.auth.views import ProtectedModelView
 import labsys.inventory.models as im
 from labsys.admissions.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
-    CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
-    Region, State, City, Address,
+    CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
+    Address,
 )
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
