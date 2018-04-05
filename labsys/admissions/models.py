@@ -65,11 +65,6 @@ class Admission(db.Model):
     requesting_institution = db.Column(db.String(128))
     details = db.Column(db.String(255))
     # Relationships
-    vaccine = db.relationship(
-        'Vaccine',
-        backref='admission',
-        uselist=False,
-        cascade='all, delete-orphan')
     hospitalization = db.relationship(
         'Hospitalization',
         backref='admission',
@@ -87,7 +82,6 @@ class Admission(db.Model):
         cascade='all, delete-orphan')
     symptoms = db.relationship(
         'ObservedSymptom', backref='admission', lazy='dynamic')
-    # TODO: add risk_factors
     samples = db.relationship(
         'Sample', backref='admission', lazy='dynamic')
 
@@ -103,6 +97,13 @@ class Vaccine(db.Model):
     # Attributes
     applied = db.Column(db.Boolean, nullable=True)
     last_dose_date = db.Column(db.Date())
+    # Relationship
+    admission = db.relationship(
+        'Admission',
+        backref=db.backref('vaccine',
+                           uselist=False,
+                           cascade='all, delete-orphan')
+    )
 
     def __repr__(self):
         return '<Vaccine[{}]: {}>'.format(self.id, self.applied)
