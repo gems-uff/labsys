@@ -42,28 +42,29 @@ class TestAuthenticationViews(unittest.TestCase):
         self.assertEqual(admission.patient, patient)
         self.assertEqual(len(patient.admissions.all()), 1)
 
-    def test_admission_event_1to1_relationship(self):
+    def test_admission_vaccine_1to1_relationship(self):
         '''
-        Where Event is a Vaccine, Hospitalizaion, UTIHospitalization or ClinicalEvolution
+        where event is a vaccine, hospitalizaion, utihospitalization or
+        clinicalEvolution
         '''
-        # Add vaccine to admission
+        # add vaccine to admission
         admission = mock.admission()
         vaccine = mock.vaccine()
         admission.vaccine = vaccine
         self.assertEqual(vaccine.admission.vaccine, vaccine)
-        # Overrides previous vaccine (since it's one-to-one)
+        # overrides previous vaccine (since it's one-to-one)
         vaccine2 = mock.vaccine()
         vaccine2.admission = admission
         self.assertNotEqual(admission.vaccine, vaccine)
         self.assertEqual(admission.vaccine, vaccine2)
-        # Ensures commit works
+        # ensures commit works
         db.session.add(admission)
         db.session.commit()
         self.assertEqual(vaccine2.id, 1)
-        # Ensures cascade all, delete-orphan works
+        # ensures cascade all, delete-orphan works
         db.session.delete(admission)
         db.session.commit()
-        query_admission = Admission.query.all()
-        query_vaccine = Vaccine.query.all()
-        self.assertEqual(query_admission, 0)
-        self.assertEqual(query_vaccine, 0)
+        query_admission = admission.query.all()
+        query_vaccine = vaccine.query.all()
+        self.assertEqual(len(query_admission), 0)
+        self.assertEqual(len(query_vaccine), 0)

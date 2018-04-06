@@ -1,4 +1,5 @@
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import asc
 
 from ..extensions import db
@@ -65,21 +66,6 @@ class Admission(db.Model):
     requesting_institution = db.Column(db.String(128))
     details = db.Column(db.String(255))
     # Relationships
-    hospitalization = db.relationship(
-        'Hospitalization',
-        backref='admission',
-        uselist=False,
-        cascade='all, delete-orphan')
-    uti_hospitalization = db.relationship(
-        'UTIHospitalization',
-        backref='admission',
-        uselist=False,
-        cascade='all, delete-orphan')
-    clinical_evolution = db.relationship(
-        'ClinicalEvolution',
-        backref='admission',
-        uselist=False,
-        cascade='all, delete-orphan')
     symptoms = db.relationship(
         'ObservedSymptom', backref='admission', lazy='dynamic')
     samples = db.relationship(
@@ -89,21 +75,41 @@ class Admission(db.Model):
         return '<Admission[{}]: {}>'.format(self.id, self.id_lvrs_intern)
 
 
-class Vaccine(db.Model):
-    __tablename__ = 'vaccines'
+class AdmissionOneToOneMixin(object):
+    '''
+    A mixin that adds a One-to-One relationship to Admission
+
+    The relationship considers Admission as a parent and cascades
+    all to the subject using it.
+    '''
+    # Relationship
+    @declared_attr
+    def admission(cls):
+        return db.relationship(
+            'Admission',
+            backref=db.backref(cls.__name__.lower(),
+                               uselist=False,
+                               cascade='all, delete-orphan')
+        )
+
+
+class DatedEvent(db.Model):
+    __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
+    # date = db.Column(db.Date, nullable=True)
+    # occurred = db.Column(db.Boolean, nullable=True)
+
+
+class Vaccine(AdmissionOneToOneMixin, DatedEvent):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    __tablename__ = 'vaccines'
     # FK
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
     # Attributes
     applied = db.Column(db.Boolean, nullable=True)
     last_dose_date = db.Column(db.Date())
-    # Relationship
-    admission = db.relationship(
-        'Admission',
-        backref=db.backref('vaccine',
-                           uselist=False,
-                           cascade='all, delete-orphan')
-    )
 
     def __repr__(self):
         return '<Vaccine[{}]: {}>'.format(self.id, self.applied)
@@ -117,6 +123,13 @@ class Hospitalization(db.Model):
     # Attributes
     occurred = db.Column(db.Boolean, nullable=True)
     date = db.Column(db.Date())
+    # Relationship
+    admission = db.relationship(
+        'Admission',
+        backref=db.backref('hospitalization',
+                           uselist=False,
+                           cascade='all, delete-orphan')
+    )
 
     def __repr__(self):
         return '<Hospitalization[{}]: {}>'.format(self.id, self.occurred)
@@ -130,6 +143,13 @@ class UTIHospitalization(db.Model):
     # Attributes
     occurred = db.Column(db.Boolean, nullable=True)
     date = db.Column(db.Date())
+    # Relationship
+    admission = db.relationship(
+        'Admission',
+        backref=db.backref('uti_hospitalization',
+                           uselist=False,
+                           cascade='all, delete-orphan')
+    )
 
     def __repr__(self):
         return '<UTI Hospitalization[{}]: {}>'.format(self.id, self.occurred)
@@ -143,6 +163,13 @@ class ClinicalEvolution(db.Model):
     # Attributes
     death = db.Column(db.Boolean, nullable=True)
     date = db.Column(db.Date())
+    # Relationship
+    admission = db.relationship(
+        'Admission',
+        backref=db.backref('clinical_evolution',
+                           uselist=False,
+                           cascade='all, delete-orphan')
+    )
 
     def __repr__(self):
         return '<ClinicalEvolution[{}]: {}>'.format(self.id, self.death)
