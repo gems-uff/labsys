@@ -97,21 +97,25 @@ class DatedEvent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, nullable=True)
     occurred = db.Column(db.Boolean, nullable=True)
-    # FK
 
+    # Foreign Key
     @declared_attr
     def admission_id(cls):
         return db.Column(db.Integer, db.ForeignKey('admissions.id'))
+
+    @declared_attr
+    def __tablename__(cls):
+        return '{}s'.format(cls.__name__.lower())
+
+    def __repr__(self):
+        return '<{}[{}]: {}>'.format(self.__class__.__name__,
+                                     self.id,
+                                     self.occurred)
 
 
 class Vaccine(AdmissionOneToOneMixin, DatedEvent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-    __tablename__ = 'vaccines'
-
-    def __repr__(self):
-        return '<Vaccine[{}]: {}>'.format(self.id, self.applied)
 
 
 class Hospitalization(db.Model):
