@@ -89,15 +89,19 @@ class AdmissionOneToOneMixin(object):
             'Admission',
             backref=db.backref(cls.__name__.lower(),
                                uselist=False,
-                               cascade='all, delete-orphan')
-        )
+                               cascade='all, delete-orphan'))
 
 
 class DatedEvent(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
-    # date = db.Column(db.Date, nullable=True)
-    # occurred = db.Column(db.Boolean, nullable=True)
+    date = db.Column(db.Date, nullable=True)
+    occurred = db.Column(db.Boolean, nullable=True)
+    # FK
+
+    @declared_attr
+    def admission_id(cls):
+        return db.Column(db.Integer, db.ForeignKey('admissions.id'))
 
 
 class Vaccine(AdmissionOneToOneMixin, DatedEvent):
@@ -105,11 +109,6 @@ class Vaccine(AdmissionOneToOneMixin, DatedEvent):
         super().__init__(**kwargs)
 
     __tablename__ = 'vaccines'
-    # FK
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
-    # Attributes
-    applied = db.Column(db.Boolean, nullable=True)
-    last_dose_date = db.Column(db.Date())
 
     def __repr__(self):
         return '<Vaccine[{}]: {}>'.format(self.id, self.applied)

@@ -42,7 +42,7 @@ class TestAuthenticationViews(unittest.TestCase):
         self.assertEqual(admission.patient, patient)
         self.assertEqual(len(patient.admissions.all()), 1)
 
-    def test_admission_vaccine_1to1_relationship(self):
+    def test_admission_event_1to1_relationship(self):
         '''
         where event is a vaccine, hospitalizaion, utihospitalization or
         clinicalEvolution

@@ -37,4 +37,4 @@ def admission():
 
 
 def vaccine():
-    return Vaccine(applied=True, last_dose_date='2018-01-01')
+    return Vaccine(occurred=True, date='2018-01-01')
