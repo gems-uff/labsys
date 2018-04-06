@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import asc
 
 from ..extensions import db
+from labsys.utils.table_name_formatter import format_tablename
 
 '''
 - O Patient só pode ter um Address, ou seja, a pergunta "Quando ele foi admitido no ano X, ele morava onde?" não pode ser respondida.
@@ -103,10 +104,6 @@ class DatedEvent(db.Model):
     def admission_id(cls):
         return db.Column(db.Integer, db.ForeignKey('admissions.id'))
 
-    @declared_attr
-    def __tablename__(cls):
-        return '{}s'.format(cls.__name__.lower())
-
     def __repr__(self):
         return '<{}[{}]: {}>'.format(self.__class__.__name__,
                                      self.id,
@@ -114,68 +111,31 @@ class DatedEvent(db.Model):
 
 
 class Vaccine(AdmissionOneToOneMixin, DatedEvent):
+    __tablename__ = 'vaccines'
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
 
-class Hospitalization(db.Model):
+class Hospitalization(AdmissionOneToOneMixin, DatedEvent):
     __tablename__ = 'hospitalizations'
-    id = db.Column(db.Integer, primary_key=True)
-    # FK
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
-    # Attributes
-    occurred = db.Column(db.Boolean, nullable=True)
-    date = db.Column(db.Date())
-    # Relationship
-    admission = db.relationship(
-        'Admission',
-        backref=db.backref('hospitalization',
-                           uselist=False,
-                           cascade='all, delete-orphan')
-    )
 
-    def __repr__(self):
-        return '<Hospitalization[{}]: {}>'.format(self.id, self.occurred)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
-class UTIHospitalization(db.Model):
+class UTIHospitalization(AdmissionOneToOneMixin, DatedEvent):
     __tablename__ = 'uti_hospitalizations'
-    id = db.Column(db.Integer, primary_key=True)
-    # FK
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
-    # Attributes
-    occurred = db.Column(db.Boolean, nullable=True)
-    date = db.Column(db.Date())
-    # Relationship
-    admission = db.relationship(
-        'Admission',
-        backref=db.backref('uti_hospitalization',
-                           uselist=False,
-                           cascade='all, delete-orphan')
-    )
 
-    def __repr__(self):
-        return '<UTI Hospitalization[{}]: {}>'.format(self.id, self.occurred)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
-class ClinicalEvolution(db.Model):
+class ClinicalEvolution(AdmissionOneToOneMixin, DatedEvent):
     __tablename__ = 'clinical_evolutions'
-    id = db.Column(db.Integer, primary_key=True)
-    # FK
-    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
-    # Attributes
-    death = db.Column(db.Boolean, nullable=True)
-    date = db.Column(db.Date())
-    # Relationship
-    admission = db.relationship(
-        'Admission',
-        backref=db.backref('clinical_evolution',
-                           uselist=False,
-                           cascade='all, delete-orphan')
-    )
 
-    def __repr__(self):
-        return '<ClinicalEvolution[{}]: {}>'.format(self.id, self.death)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class Symptom(db.Model):

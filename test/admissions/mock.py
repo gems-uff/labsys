@@ -1,4 +1,6 @@
-from labsys.admissions.models import Patient, Address, Admission, Vaccine
+from labsys.admissions.models import (
+    Patient, Address, Admission, Vaccine, AdmissionOneToOneMixin, DatedEvent
+)
 
 
 def generate_mock(MockClass, **kwargs):
@@ -36,5 +38,5 @@ def admission():
                      )
 
 
-def vaccine():
-    return Vaccine(occurred=True, date='2018-01-01')
+def dated_event(_class, **kwargs):
+    return _class(**kwargs)

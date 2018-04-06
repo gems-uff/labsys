@@ -2,9 +2,8 @@ import unittest
 
 from labsys.app import create_app, db
 from labsys.admissions.models import (
-    Patient, Address, Admission, Vaccine, Hospitalization, UTIHospitalization,
-    ClinicalEvolution, Symptom, ObservedSymptom, Method, Sample, CdcExam)
-
+    Patient, Address, Admission, Symptom, ObservedSymptom, Method, Sample,
+    CdcExam, Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,)
 from . import mock
 
 
@@ -42,29 +41,34 @@ class TestAuthenticationViews(unittest.TestCase):
         self.assertEqual(admission.patient, patient)
         self.assertEqual(len(patient.admissions.all()), 1)
 
-    def test_admission_event_1to1_relationship(self):
+    def test_admission_dated_event_1to1_relationship(self):
         '''
-        where event is a vaccine, hospitalizaion, utihospitalization or
-        clinicalEvolution
+        Where dated event is a vaccine, hospitalizaion, utihospitalization or
+        clinicalEvolution.
+        That's why their constructor must be the same as MockDatedEvent.
         '''
-        # add vaccine to admission
+        # Setup
         admission = mock.admission()
-        vaccine = mock.vaccine()
+        vaccine = mock.dated_event(Vaccine)
+        # Add to admission
         admission.vaccine = vaccine
+        # Assert they are linked
         self.assertEqual(vaccine.admission.vaccine, vaccine)
-        # overrides previous vaccine (since it's one-to-one)
-        vaccine2 = mock.vaccine()
+        # Overrides previous vaccine (since it's one-to-one)
+        vaccine2 = mock.dated_event(Vaccine)
         vaccine2.admission = admission
+        # Assert it was replaced
         self.assertNotEqual(admission.vaccine, vaccine)
         self.assertEqual(admission.vaccine, vaccine2)
-        # ensures commit works
+        # Ensures commit works
         db.session.add(admission)
         db.session.commit()
         self.assertEqual(vaccine2.id, 1)
-        # ensures cascade all, delete-orphan works
+        self.assertIsNone(vaccine.id)
+        self.assertEqual(len(Admission.query.all()), 1)
+        self.assertEqual(len(Vaccine.query.all()), 1)
+        # Ensures cascade all, delete-orphan works
         db.session.delete(admission)
         db.session.commit()
-        query_admission = admission.query.all()
-        query_vaccine = vaccine.query.all()
-        self.assertEqual(len(query_admission), 0)
-        self.assertEqual(len(query_vaccine), 0)
+        self.assertEqual(len(Admission.query.all()), 0)
+        self.assertEqual(len(Vaccine.query.all()), 0)
