@@ -104,37 +104,6 @@ class TestModelsRelationships(unittest.TestCase):
         self.assertEqual(len(Admission.query.all()), 0)
         self.assertEqual(len(ObservedSymptom.query.all()), 0)
 
-    def test_admission_symptoms_1toM(self):
-        # Generate mock models
-        admission = mock.admission()
-        obs_symptom0 = ObservedSymptom(
-            observed=True,
-            details='obs symptom details',
-            admission=admission,
-            symptom=Symptom(name='symptom0', primary=True),
-        )
-        obs_symptom1 = ObservedSymptom(
-            observed=False,
-            details='obs symptom details',
-            admission=admission,
-            symptom=Symptom(name='symptom1', primary=True),
-        )
-        # Assert relationship is correctly setup
-        self.assertEqual(len(admission.symptoms), 2)
-        self.assertEqual(obs_symptom0.admission, obs_symptom1.admission)
-        self.assertEqual(admission.symptoms[0], obs_symptom0)
-        self.assertEqual(admission.symptoms[1], obs_symptom1)
-        # Assert they are correctly commited
-        db.session.add(admission)
-        db.session.commit()
-        # Assert symptoms have the same admission_id
-        self.assertEqual(obs_symptom0.admission_id, obs_symptom1.admission_id)
-        # Assert cascade all, delete-orphan works
-        db.session.delete(admission)
-        db.session.commit()
-        self.assertEqual(len(Admission.query.all()), 0)
-        self.assertEqual(len(ObservedSymptom.query.all()), 0)
-
     def test_syptom_observations_Mto1(self):
         symptom = Symptom(name='symptom', primary=True)
         admission0 = mock.admission()
