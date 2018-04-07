@@ -72,3 +72,19 @@ class TestAuthenticationViews(unittest.TestCase):
         db.session.commit()
         self.assertEqual(len(Admission.query.all()), 0)
         self.assertEqual(len(Vaccine.query.all()), 0)
+
+    def test_admission_observed_symptom_1toM_relationship(self):
+        admission = mock.admission()
+        obs_symptom = ObservedSymptom(
+            observed=True,
+            details='obs symptom details',
+            admission=admission,
+            symptom=Symptom(name='symptom1', primary=True),
+        )
+        obs_symptom = ObservedSymptom(
+            observed=False,
+            details='obs symptom details',
+            admission=admission,
+            symptom=Symptom(name='symptom2', primary=True),
+        )
+        self.assertEqual(len(admission.symptoms), 2)

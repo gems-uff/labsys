@@ -1,5 +1,6 @@
 from labsys.admissions.models import (
-    Patient, Address, Admission, Vaccine, AdmissionOneToOneMixin, DatedEvent
+    Patient, Address, Admission, Vaccine, AdmissionOneToOneMixin, DatedEvent,
+    ObservedSymptom, Symptom,
 )
 
 

@@ -2,7 +2,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy import asc
 
 from ..extensions import db
-from .mixins_and_models import AdmissionOneToOneMixin, DatedEvent
+
+from .mixins import AdmissionOneToOneMixin, DatedEvent
 
 '''
 Limitações conhecidas
@@ -65,9 +66,6 @@ class Admission(db.Model):
     health_unit = db.Column(db.String(128))
     requesting_institution = db.Column(db.String(128))
     details = db.Column(db.String(255))
-    # Relationships
-    symptoms = db.relationship(
-        'ObservedSymptom', backref='admission', lazy='dynamic')
     samples = db.relationship(
         'Sample', backref='admission', lazy='dynamic')
 
@@ -109,9 +107,6 @@ class Symptom(db.Model):
     # Attributes
     name = db.Column(db.String(64))
     primary = db.Column(db.Boolean)
-    # Relationships
-    observed_symptoms = db.relationship(
-        'ObservedSymptom', backref='symptom', lazy='dynamic')
 
     @classmethod
     def get_primary(cls):
@@ -136,6 +131,11 @@ class ObservedSymptom(db.Model):
     # Attributes
     observed = db.Column(db.Boolean)
     details = db.Column(db.String(255))
+    # Relationships
+    admission = db.relationship('Admission', backref=db.backref(
+        'symptoms', cascade='all, delete-orphan'))
+    symptom = db.relationship('Symptom', backref=db.backref(
+        'observed_symptoms', cascade='all, delete-orphan'))
 
     def __repr__(self):
         return '<ObservedSymptom[{}]: {}>'.format(self.id, self.symptom.name)
