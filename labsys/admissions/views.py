@@ -32,6 +32,7 @@ IGNORED = 9
 TRUE = 1
 FALSE = 0
 
+
 @blueprint.app_context_processor
 def inject_permissions():
     """This function is executed each request,
@@ -65,11 +66,11 @@ def detail_admission(id):
     symptoms = [{
         'symptom_id': s.id,
         'symptom_name': s.name
-    } for s in Symptom.get_primary_symptoms()]
+    } for s in Symptom.get_primary()]
     sec_symptoms = [{
         'symptom_id': s.id,
         'symptom_name': s.name
-    } for s in Symptom.get_secondary_symptoms()]
+    } for s in Symptom.get_secondary()]
 
     for obs_symptom in admission.symptoms:
         for symptom in symptoms:
@@ -112,11 +113,11 @@ def edit_admission(id):
     symptoms = [{
         'symptom_id': s.id,
         'symptom_name': s.name
-    } for s in Symptom.get_primary_symptoms()]
+    } for s in Symptom.get_primary()]
     sec_symptoms = [{
         'symptom_id': s.id,
         'symptom_name': s.name
-    } for s in Symptom.get_secondary_symptoms()]
+    } for s in Symptom.get_secondary()]
 
     for obs_symptom in admission.symptoms:
         for symptom in symptoms:
@@ -295,11 +296,11 @@ def create_admission():
         symptoms=[{
             'symptom_id': s.id,
             'symptom_name': s.name
-        } for s in Symptom.get_primary_symptoms()],
+        } for s in Symptom.get_primary()],
         sec_symptoms=[{
             'symptom_id': s.id,
             'symptom_name': s.name
-        } for s in Symptom.get_secondary_symptoms()], )
+        } for s in Symptom.get_secondary()], )
 
     # POST and valid
     if form.validate_on_submit():
