@@ -2,10 +2,9 @@ import logging
 import jsonpickle
 from datetime import datetime
 
-from sqlalchemy import asc, desc, UniqueConstraint, CheckConstraint
+from sqlalchemy import UniqueConstraint, CheckConstraint
 
-from ..extensions import db
-from .services import create_add_transaction_from_order
+from labsys.extensions import db
 from labsys.auth.models import User
 
 
@@ -36,6 +35,7 @@ class Base(db.Model):
         if attribute in obj is not null
             compare with attribute
     """
+
     def toJSON(self):
         return jsonpickle.encode(self)
 
@@ -197,7 +197,8 @@ class StockProduct(Base):
     expiration_date = db.Column(db.Date, nullable=True)
     amount = db.Column(db.Integer, default=0, nullable=False)
     # Relationships
-    product = db.relationship('Product', backref=db.backref('stock_products', lazy=True))
+    product = db.relationship(
+        'Product', backref=db.backref('stock_products', lazy=True))
 
 
 class OrderItem(Base):

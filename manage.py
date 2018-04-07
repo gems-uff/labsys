@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 import os
 
-from flask_admin import Admin
-from flask_admin.menu import MenuLink
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
+from flask_admin.menu import MenuLink
 
 from labsys.app import create_app
-from labsys.extensions import db
+from labsys.extensions import db, admin
 from labsys.auth.models import User, Role, PreAllowedUser
 from labsys.auth.views import ProtectedModelView
 import labsys.inventory.models as im
@@ -20,7 +19,6 @@ from labsys.admissions.models import (
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
 migrate = Migrate(app, db)
-admin = Admin(app, name='labsys', template_mode='bootstrap3')
 
 # region Add ModelView
 admin.add_views(

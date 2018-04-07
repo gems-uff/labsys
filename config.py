@@ -20,6 +20,8 @@ class Config:
     BOOTSTRAP_SERVE_LOCAL = True
     LOGIN_MESSAGE = 'É necessário realizar login para acessar essa página'
 
+    PAGE_SIZE = 20
+
     @staticmethod
     def init_app(app):
         pass
@@ -39,6 +41,8 @@ class TestingConfig(Config):
     DATABASE_URI_ENV_KEY = 'TEST_DATABASE_URL'
     SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
     WTF_CSRF_ENABLED = False
+    # LOGIN_DISABLED = True
+    SERVER_NAME = 'localhost:5000'
 
 
 class ProductionConfig(Config):
