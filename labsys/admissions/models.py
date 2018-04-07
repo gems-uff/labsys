@@ -135,7 +135,7 @@ class ObservedSymptom(db.Model):
     admission = db.relationship('Admission', backref=db.backref(
         'symptoms', cascade='all, delete-orphan'))
     symptom = db.relationship('Symptom', backref=db.backref(
-        'observed_symptoms', cascade='all, delete-orphan'))
+        'observations', cascade='all, delete-orphan'))
 
     def __repr__(self):
         return '<ObservedSymptom[{}]: {}>'.format(self.id, self.symptom.name)

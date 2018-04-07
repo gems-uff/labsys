@@ -7,7 +7,7 @@ from labsys.admissions.models import (
 from . import mock
 
 
-class TestAuthenticationViews(unittest.TestCase):
+class TestModelsRelationships(unittest.TestCase):
 
     def setUp(self):
         self.app = create_app('testing')
@@ -21,7 +21,7 @@ class TestAuthenticationViews(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    def test_patient_address_1to1_relationship(self):
+    def test_patient_address_1to1(self):
         patient = mock.patient()
         residence = mock.address()
         patient.residence = residence
@@ -29,7 +29,7 @@ class TestAuthenticationViews(unittest.TestCase):
         db.session.add(patient)
         db.session.commit()
 
-    def test_patient_admission_1toM_relationship(self):
+    def test_patient_admission_1toM(self):
         patient = mock.patient()
         admission = mock.admission()
         patient.admissions.append(admission)
@@ -41,7 +41,7 @@ class TestAuthenticationViews(unittest.TestCase):
         self.assertEqual(admission.patient, patient)
         self.assertEqual(len(patient.admissions.all()), 1)
 
-    def test_admission_dated_event_1to1_relationship(self):
+    def test_admission_dated_event_1to1(self):
         '''
         Where dated event is a vaccine, hospitalizaion, utihospitalization or
         clinicalEvolution.
@@ -73,7 +73,7 @@ class TestAuthenticationViews(unittest.TestCase):
         self.assertEqual(len(Admission.query.all()), 0)
         self.assertEqual(len(Vaccine.query.all()), 0)
 
-    def test_admission_symptoms_1toM_relationship(self):
+    def test_admission_symptoms_1toM(self):
         # Generate mock models
         admission = mock.admission()
         obs_symptom0 = ObservedSymptom(
@@ -103,3 +103,71 @@ class TestAuthenticationViews(unittest.TestCase):
         db.session.commit()
         self.assertEqual(len(Admission.query.all()), 0)
         self.assertEqual(len(ObservedSymptom.query.all()), 0)
+
+    def test_admission_symptoms_1toM(self):
+        # Generate mock models
+        admission = mock.admission()
+        obs_symptom0 = ObservedSymptom(
+            observed=True,
+            details='obs symptom details',
+            admission=admission,
+            symptom=Symptom(name='symptom0', primary=True),
+        )
+        obs_symptom1 = ObservedSymptom(
+            observed=False,
+            details='obs symptom details',
+            admission=admission,
+            symptom=Symptom(name='symptom1', primary=True),
+        )
+        # Assert relationship is correctly setup
+        self.assertEqual(len(admission.symptoms), 2)
+        self.assertEqual(obs_symptom0.admission, obs_symptom1.admission)
+        self.assertEqual(admission.symptoms[0], obs_symptom0)
+        self.assertEqual(admission.symptoms[1], obs_symptom1)
+        # Assert they are correctly commited
+        db.session.add(admission)
+        db.session.commit()
+        # Assert symptoms have the same admission_id
+        self.assertEqual(obs_symptom0.admission_id, obs_symptom1.admission_id)
+        # Assert cascade all, delete-orphan works
+        db.session.delete(admission)
+        db.session.commit()
+        self.assertEqual(len(Admission.query.all()), 0)
+        self.assertEqual(len(ObservedSymptom.query.all()), 0)
+
+    def test_syptom_observations_Mto1(self):
+        symptom = Symptom(name='symptom', primary=True)
+        admission0 = mock.admission()
+        admission1 = mock.admission()
+        # id_lvrs_intern must be unique
+        admission1.id_lvrs_intern += 'lvrs0002'
+        # Generate mock models
+        obs_symptom0 = ObservedSymptom(
+            observed=True,
+            details='obs symptom details',
+            admission=admission0,
+            symptom=symptom
+        )
+        obs_symptom1 = ObservedSymptom(
+            observed=False,
+            details='obs symptom details',
+            admission=admission1,
+            symptom=symptom,
+        )
+        # Assert relationship is correctly setup
+        self.assertEqual(len(symptom.observations), 2)
+        self.assertEqual(symptom.observations[0], obs_symptom0)
+        # Collaterally, admission has relation with observed symptom
+        self.assertEqual(admission0.symptoms[0], obs_symptom0)
+        # Assert they are correctly commited
+        db.session.add(symptom)
+        db.session.commit()
+        # Assert symptoms have the same admission_id
+        self.assertEqual(obs_symptom0.symptom_id, symptom.id)
+        # Assert cascade all, delete-orphan works
+        db.session.delete(symptom)
+        db.session.commit()
+        self.assertEqual(len(Symptom.query.all()), 0)
+        self.assertEqual(len(ObservedSymptom.query.all()), 0)
+        # Collaterally, admission does not have the observed symptom
+        self.assertEqual(len(admission0.symptoms), 0)
