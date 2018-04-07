@@ -3,7 +3,6 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import asc
 
 from ..extensions import db
-from labsys.utils.table_name_formatter import format_tablename
 
 '''
 - O Patient só pode ter um Address, ou seja, a pergunta "Quando ele foi admitido no ano X, ele morava onde?" não pode ser respondida.
@@ -149,12 +148,12 @@ class Symptom(db.Model):
         'ObservedSymptom', backref='symptom', lazy='dynamic')
 
     @classmethod
-    def get_primary_symptoms(cls):
+    def get_primary(cls):
         return cls.query.filter(
             cls.primary is True).order_by(asc(Symptom.id)).all()
 
     @classmethod
-    def get_secondary_symptoms(cls):
+    def get_secondary(cls):
         return cls.query.filter(
             cls.primary is False).order_by(asc(Symptom.id)).all()
 
