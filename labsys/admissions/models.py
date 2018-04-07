@@ -12,9 +12,8 @@ Limitações conhecidas
 - Quando uma Admission é deletada, os "eventos" também o são: Vaccine, Hospitalization, UTIHospitalization e ClinicalEvolution
 '''
 
-# TODO: Add RiskFactor to Admission
 # TODO: Add nullable to columns which are not present in initial importing CSV
-# TODO: Abstract events (Vaccine, etc.)
+# TODO: Abstract ObservedSymptoms/Symptoms and ObservedRiskFactors, RiskFactors
 
 
 class Patient(db.Model):
@@ -121,6 +120,33 @@ class ObservedSymptom(db.Model):
     admission = db.relationship('Admission', backref=db.backref(
         'symptoms', cascade='all, delete-orphan'))
     symptom = db.relationship('Symptom', backref=db.backref(
+        'observations', cascade='all, delete-orphan'))
+
+    def __repr__(self):
+        return '<ObservedSymptom[{}]: {}>'.format(self.id, self.symptom.name)
+
+
+class RiskFactor(PrimarySecondaryEntity):
+    __tablename__ = 'risk_factors'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class ObservedRiskFactor(db.Model):
+    __tablename__ = 'observed_risk_factors'
+
+    id = db.Column(db.Integer, primary_key=True)
+    # FK
+    risk_factor_id = db.Column(db.Integer, db.ForeignKey('risk_factors.id'))
+    admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
+    # Attributes
+    observed = db.Column(db.Boolean)
+    details = db.Column(db.String(255))
+    # Relationships
+    admission = db.relationship('Admission', backref=db.backref(
+        'risk_factors', cascade='all, delete-orphan'))
+    risk_factor = db.relationship('RiskFactor', backref=db.backref(
         'observations', cascade='all, delete-orphan'))
 
     def __repr__(self):
