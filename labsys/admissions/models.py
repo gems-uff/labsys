@@ -1,16 +1,16 @@
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import asc
 
 from ..extensions import db
+from .mixins_and_models import AdmissionOneToOneMixin, DatedEvent
 
 '''
+Limitações conhecidas
 - O Patient só pode ter um Address, ou seja, a pergunta "Quando ele foi admitido no ano X, ele morava onde?" não pode ser respondida.
     - Podemos futuramente pensar em uma maneira da Admission saber disso, ex.: Admission.patient_residence
 - Quando uma Admission é deletada, os "eventos" também o são: Vaccine, Hospitalization, UTIHospitalization e ClinicalEvolution
 '''
 
-# TODO: Remove cities, states, regions, countries
 # TODO: Add RiskFactor to Admission
 # TODO: Add nullable to columns which are not present in initial importing CSV
 # TODO: Abstract events (Vaccine, etc.)
@@ -73,40 +73,6 @@ class Admission(db.Model):
 
     def __repr__(self):
         return '<Admission[{}]: {}>'.format(self.id, self.id_lvrs_intern)
-
-
-class AdmissionOneToOneMixin(object):
-    '''
-    A mixin that adds a One-to-One relationship to Admission
-
-    The relationship considers Admission as a parent and cascades
-    all to the subject using it.
-    '''
-    # Relationship
-    @declared_attr
-    def admission(cls):
-        return db.relationship(
-            'Admission',
-            backref=db.backref(cls.__name__.lower(),
-                               uselist=False,
-                               cascade='all, delete-orphan'))
-
-
-class DatedEvent(db.Model):
-    __abstract__ = True
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, nullable=True)
-    occurred = db.Column(db.Boolean, nullable=True)
-
-    # Foreign Key
-    @declared_attr
-    def admission_id(cls):
-        return db.Column(db.Integer, db.ForeignKey('admissions.id'))
-
-    def __repr__(self):
-        return '<{}[{}]: {}>'.format(self.__class__.__name__,
-                                     self.id,
-                                     self.occurred)
 
 
 class Vaccine(AdmissionOneToOneMixin, DatedEvent):
