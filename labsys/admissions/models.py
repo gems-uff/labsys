@@ -3,7 +3,7 @@ from sqlalchemy import asc
 
 from ..extensions import db
 
-from .mixins import AdmissionOneToOneMixin, DatedEvent
+from .mixins import AdmissionOneToOneMixin, DatedEvent, PrimarySecondaryEntity
 
 '''
 Limitações conhecidas
@@ -101,25 +101,11 @@ class ClinicalEvolution(AdmissionOneToOneMixin, DatedEvent):
         super().__init__(**kwargs)
 
 
-class Symptom(db.Model):
+class Symptom(PrimarySecondaryEntity):
     __tablename__ = 'symptoms'
-    id = db.Column(db.Integer, primary_key=True)
-    # Attributes
-    name = db.Column(db.String(64))
-    primary = db.Column(db.Boolean)
 
-    @classmethod
-    def get_primary(cls):
-        return cls.query.filter(
-            cls.primary is True).order_by(asc(Symptom.id)).all()
-
-    @classmethod
-    def get_secondary(cls):
-        return cls.query.filter(
-            cls.primary is False).order_by(asc(Symptom.id)).all()
-
-    def __repr__(self):
-        return '<Symptom[{}]: {}>'.format(self.id, self.name)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class ObservedSymptom(db.Model):
