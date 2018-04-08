@@ -1,42 +1,49 @@
 from flask_wtf import FlaskForm
-from wtforms import (
-    StringField,
-    SubmitField,
-    FormField,
-    RadioField,
-    FieldList,
-    BooleanField,
-    Label,
-    DateField,
-    SelectField,
-    IntegerField,
-    FloatField,
-    widgets, )
-from wtforms.validators import InputRequired, Optional
-
+from wtforms import (BooleanField, DateField, FieldList, FloatField, FormField,
+                     IntegerField, Label, RadioField, SelectField, StringField,
+                     SubmitField, widgets)
+from wtforms.validators import InputRequired, Optional, length
 from . import custom_fields as cfields
 
 
-class NameForm(FlaskForm):
-    name = StringField('Qual é o seu nome?', validators=[InputRequired()])
-    submit = SubmitField('Enviar')
+ZONE_CHOICES = ((1, 'Urbana'),
+                (2, 'Rural'),
+                (3, 'Periurbana'),
+                (9, 'Ignorado'))
+
+YES_NO_IGNORED_CHOICES = ((1, 'Sim'),
+                          (0, 'Nao'),
+                          (9, 'Ignorado'))
 
 
-class ResidenceForm(FlaskForm):
+AGE_UNIT_CHOICES = (('Y', 'Anos'),
+                    ('M', 'Meses'),
+                    ('D', 'Dias'),
+                    ('H', 'Horas'))
+
+GENDER_CHOICES = (('M', 'Masculino'),
+                  ('F', 'Feminino'),
+                  ('I', 'Ignorado'))
+
+
+class AddressForm(FlaskForm):
     class Meta:
         csrf = False
 
-    country_id = cfields.CountrySelectField(label='País de residência')
-    state_id = cfields.StateSelectField(label='UF (Estado)')
-    city_id = cfields.CitySelectField(label='Município')
-    neighborhood = StringField('Bairro')
+    country = StringField(label='País de residência',
+                          validators=[length(max=128)])
+    state = StringField(label='UF (Estado)',
+                        validators=[length(max=2)])
+    city = StringField(label='Município',
+                       validators=[length(max=128)])
+    neighborhood = StringField(label='Bairro',
+                               validators=[length(max=128)])
     zone = RadioField(
         label='Zona',
-        choices=((1, 'Urbana'), (2, 'Rural'), (3, 'Periurbana'), (9,
-                                                                  'Ignorado')),
+        choices=ZONE_CHOICES,
         default=9,
         coerce=int, )
-    details = StringField('Detalhes da residência')
+    details = StringField(label='Observações', validators=[length(max=255)])
 
 
 class PatientForm(FlaskForm):
@@ -46,30 +53,27 @@ class PatientForm(FlaskForm):
     age = IntegerField('Idade', validators=[Optional()])
     age_unit = RadioField(
         label='Tipo idade',
-        choices=(('Y', 'Anos'), ('M', 'Meses'), ('D', 'Dias'), ('H', 'Horas')),
+        choices=AGE_UNIT_CHOICES,
         default='Y',
         coerce=str, )
     gender = RadioField(
         label='Sexo',
-        choices=(('M', 'Masculino'), ('F', 'Feminino'), ('I', 'Ignorado')),
+        choices=GENDER_CHOICES,
         default='I',
         coerce=str, )
-    residence = FormField(ResidenceForm, label='Residência')
-
-
-YES_NO_IGNORED_CHOICES = [(1, 'Sim'), (0, 'Nao'), (9, 'Ignorado')]
+    residence = FormField(AddressForm, label='Residência')
 
 
 class VaccineForm(FlaskForm):
     class Meta:
         csrf = False
 
-    applied = RadioField(
+    occurred = RadioField(
         label='Aplicação',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
         coerce=int, )
-    last_dose_date = DateField(
+    date = DateField(
         label='Data da última dose',
         format='%d/%m/%Y',
         validators=[Optional()])
@@ -109,18 +113,20 @@ class ClinicalEvolutionForm(FlaskForm):
     class Meta:
         csrf = False
 
-    death = RadioField(
+    occurred = RadioField(
         label='Evoluiu para óbito?',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
         coerce=int, )
     date = DateField(
-        label='Data do óbito', format='%d/%m/%Y', validators=[Optional()])
+        label='Data do óbito',
+        format='%d/%m/%Y',
+        validators=[Optional()])
 
 
 class ObservedSymptomForm(FlaskForm):
     def __init__(self, **kwargs):
-        super(ObservedSymptomForm, self).__init__(csrf_enabled=False, **kwargs)
+        super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = Label(self.observed.id,
                                     kwargs.pop('symptom_name', 'Undefined'))
 
@@ -129,41 +135,78 @@ class ObservedSymptomForm(FlaskForm):
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
         coerce=int, )
-    details = StringField()
+    details = StringField(validators=[length(max=128)])
 
 
 class SecondarySymptomForm(FlaskForm):
     def __init__(self, **kwargs):
-        super(SecondarySymptomForm, self).__init__(
+        super().__init__(
             csrf_enabled=False, **kwargs)
         self.observed.label = Label(self.observed.id,
                                     kwargs.pop('symptom_name', 'Undefined'))
 
     symptom_id = IntegerField(widget=widgets.HiddenInput())
     observed = BooleanField()
-    details = StringField()
+    details = StringField(validators=[length(max=128)])
 
 
-class CdcForm(FlaskForm):
+class ObservedRiskFactorForm(FlaskForm):
     def __init__(self, **kwargs):
-        super(CdcForm, self).__init__(csrf_enabled=False, **kwargs)
+        super().__init__(csrf_enabled=False, **kwargs)
+        self.observed.label = Label(self.observed.id,
+                                    kwargs.pop('risk_factor_name', 'Undefined'))
+
+    risk_factor_id = IntegerField(widget=widgets.HiddenInput())
+    observed = RadioField(
+        choices=YES_NO_IGNORED_CHOICES,
+        default=9,
+        coerce=int, )
+    details = StringField(validators=[length(max=128)])
+
+
+class SecondaryRiskFactorForm(FlaskForm):
+    def __init__(self, **kwargs):
+        super().__init__(
+            csrf_enabled=False, **kwargs)
+        self.observed.label = Label(self.observed.id,
+                                    kwargs.pop('risk_factor_name', 'Undefined'))
+
+    risk_factor_id = IntegerField(widget=widgets.HiddenInput())
+    observed = BooleanField()
+    details = StringField(validators=[length(max=128)])
+
+
+FLU_TYPE_CHOICES = (('A', 'A'),
+                    ('B', 'B'),
+                    ('Inconclusive', 'Inconclusivo'),
+                    ('Não Realizado', 'Não Realizado'),
+                    ('Ignorado', 'Ignorado')),
+FLU_SUBTYPE_CHOICES = (('H1', 'H1'),
+                       ('H3', 'H3'),
+                       ('Victoria', 'Victoria'),
+                       ('Yamagata', 'Yamagata'),
+                       ('Não Subtipado', 'Não SubtipADO'),
+                       ('Não Subtipável', 'Não SubtipÁVEL'),
+                       ('Ignorado', 'Ignorado'))
+
+
+class CdcExamForm(FlaskForm):
+    def __init__(self, **kwargs):
+        super(CdcExamForm, self).__init__(csrf_enabled=False, **kwargs)
 
     flu_type = SelectField(
         'Tipagem',
-        # TODO: model flu/subtype
-        choices=(('A', 'A'), ('B', 'B'), ('Inconclusive', 'Inconclusivo'),
-                 ('Não Realizado', 'Não Realizado'), ('Ignorado', 'Ignorado')),
+        choices=FLU_TYPE_CHOICES,
         default='Ignorado',
         coerce=str, )
     flu_subtype = SelectField(
         'Subtipo OU Linhagem',
-        choices=(('H1', 'H1'), ('H3', 'H3'), ('Victoria', 'Victoria'), (
-            'Yamagata', 'Yamagata'), ('Não Subtipado', 'Não SubtipADO'), (
-                'Não Subtipável', 'Não SubtipÁVEL'), ('Ignorado', 'Ignorado')),
+        choices=FLU_SUBTYPE_CHOICES,
         default='Ignorado',
         coerce=str, )
     dominant_ct = FloatField('CT (principal)', validators=[Optional()])
-    details = StringField('Informações adicionais sobre exame')
+    details = StringField(
+        'Informações adicionais sobre exame', validators=[length(max=128)])
 
 
 class SampleForm(FlaskForm):
@@ -180,7 +223,7 @@ class SampleForm(FlaskForm):
         validators=[InputRequired()])
     details = StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
-    cdc_exam = FormField(label='Resultado Exame CDC', form_class=CdcForm)
+    cdc_exam = FormField(label='Resultado Exame CDC', form_class=CdcExamForm)
 
 
 class AdmissionForm(FlaskForm):
@@ -192,8 +235,10 @@ class AdmissionForm(FlaskForm):
         validators=[Optional()])
     semepi_symptom = IntegerField(
         'Semana Epidemiológica (Sintomas)', validators=[Optional()])
-    state_id = cfields.StateSelectField('UF de Registro do Caso')
-    city_id = cfields.CitySelectField('Município de registro do caso')
+    state = StringField(label='UF (Estado)',
+                        validators=[length(max=2)])
+    city = StringField(label='Município de registro do caso',
+                       validators=[length(max=128)])
     health_unit = StringField('Unidade de Saúde')
     requesting_institution = StringField('Instituição Solicitante')
     details = StringField('Informações Adicionais')
@@ -208,7 +253,6 @@ class AdmissionForm(FlaskForm):
     symptoms = FieldList(FormField(ObservedSymptomForm))
     sec_symptoms = FieldList(
         FormField(SecondarySymptomForm), label='Sintomas Secundários')
-    # TODO: #1 must be dynamic
     samples = FieldList(
         FormField(label='Amostra', form_class=SampleForm),
         label='Amostras',
