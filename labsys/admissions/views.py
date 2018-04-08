@@ -1,38 +1,22 @@
-from flask import (
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    abort,
-    Blueprint
-)
+from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from flask_login import login_required
 
-from ..extensions import db
 from labsys.auth.decorators import permission_required
 from labsys.auth.models import Permission
+
+from . import blueprint
+from ..extensions import db
 from .forms import AdmissionForm
-from .models import (
-    Admission,
-    Patient,
-    Address,
-    Vaccine,
-    Hospitalization,
-    UTIHospitalization,
-    ClinicalEvolution,
-    Symptom,
-    ObservedSymptom,
-    Sample,
-    CdcExam, )
-
-
-blueprint = Blueprint('admissions', __name__)
+from .models import (Address, Admission, CdcExam, ClinicalEvolution,
+                     Hospitalization, ObservedSymptom, Patient, Sample,
+                     Symptom, UTIHospitalization, Vaccine)
 
 IGNORED = 9
 TRUE = 1
 FALSE = 0
 
 
+# TODO: do I need this?
 @blueprint.app_context_processor
 def inject_permissions():
     """This function is executed each request,
@@ -41,7 +25,6 @@ def inject_permissions():
 
 
 @blueprint.route('/', methods=['GET'])
-@login_required
 @permission_required(Permission.VIEW)
 def list_admissions():
     admissions = Admission.query.all()
@@ -56,38 +39,43 @@ def symptom_in_admission_symptoms(symptom_id, admission):
     return found
 
 
-@blueprint.route('/<int:id>/detail', methods=['GET', 'POST'])
+def get_symptoms(admission_id):
+    query = 'SELECT s.id, s.name, s.primary, obs.observed, obs.details \
+        FROM symptoms s \
+        LEFT JOIN observed_symptoms obs \
+            ON s.id = obs.symptom_id \
+        WHERE obs.admission_id = %d OR obs.admission_id IS NULL' % admission_id
+    result = db.engine.execute(query)
+
+    mapped_symptoms = [
+        {
+            'symptom_id': symptom[0],
+            'symptom_name': symptom[1],
+            'primary': symptom[2],
+            'observed': symptom[3],
+            'details': symptom[4],
+        } for symptom in result.fetchall()]
+    return mapped_symptoms
+
 @blueprint.route('/<int:id>', methods=['GET', 'POST'])
-@login_required
 @permission_required(Permission.VIEW)
-def detail_admission(id):
-    admission = Admission.query.get_or_404(id)
-
-    symptoms = [{
-        'symptom_id': s.id,
-        'symptom_name': s.name
-    } for s in Symptom.get_primary()]
-    sec_symptoms = [{
-        'symptom_id': s.id,
-        'symptom_name': s.name
-    } for s in Symptom.get_secondary()]
-
-    for obs_symptom in admission.symptoms:
-        for symptom in symptoms:
-            if symptom['symptom_id'] == obs_symptom.symptom.id:
-                symptom['observed'] = obs_symptom.observed
-                symptom['details'] = obs_symptom.details
-        for sec_symptom in sec_symptoms:
-            if sec_symptom['symptom_id'] == obs_symptom.symptom.id:
-                sec_symptom['observed'] = obs_symptom.observed
-                sec_symptom['details'] = obs_symptom.details
+def detail_admission(admission_id):
+    admission = Admission.query.get_or_404(admission_id)
+    symptoms = get_symptoms(admission_id)
+    primary_symptoms = []
+    sec_symptoms = []
+    for symptom in symptoms:
+        if symptom.primary:
+            primary_symptoms.append(symptom)
+        else:
+            sec_symptoms.append(symptom)
 
     form = AdmissionForm(
         id_lvrs_intern=admission.id_lvrs_intern,
         first_symptoms_date=admission.first_symptoms_date,
         semepi_symptom=admission.semepi_symptom,
-        state_id=admission.state_id,
-        city_id=admission.city_id,
+        state=admission.state,
+        city=admission.city,
         health_unit=admission.health_unit,
         requesting_institution=admission.requesting_institution,
         details=admission.details,
@@ -96,16 +84,14 @@ def detail_admission(id):
         hospitalization=admission.hospitalization,
         uti_hospitalization=admission.uti_hospitalization,
         clinical_evolution=admission.clinical_evolution,
-        symptoms=symptoms,
+        symptoms=primary_symptoms,
         sec_symptoms=sec_symptoms,
         samples=admission.samples, )
-    # TODO: if has permission to edit, link to edit view
 
     return render_template('admissions/create-admission.html', form=form, edit=False)
 
 
 @blueprint.route('/<int:id>/edit', methods=['GET', 'POST'])
-@login_required
 @permission_required(Permission.EDIT)
 def edit_admission(id):
     admission = Admission.query.get_or_404(id)
@@ -133,8 +119,8 @@ def edit_admission(id):
         id_lvrs_intern=admission.id_lvrs_intern,
         first_symptoms_date=admission.first_symptoms_date,
         semepi_symptom=admission.semepi_symptom,
-        state_id=admission.state_id,
-        city_id=admission.city_id,
+        state=admission.state,
+        city=admission.city,
         health_unit=admission.health_unit,
         requesting_institution=admission.requesting_institution,
         details=admission.details,
@@ -160,12 +146,12 @@ def edit_admission(id):
             admission.patient.gender = form.patient.data['gender']
 
             # TODO: probably override fields to allow returning None (ignoring coercion?)
-            admission.patient.residence.country_id = form.patient.residence.data['country_id']\
-                if form.patient.residence.data['country_id'] is not -1 else None
-            admission.patient.residence.state_id = form.patient.residence.data['state_id']\
-                if form.patient.residence.data['state_id'] is not -1 else None
-            admission.patient.residence.city_id = form.patient.residence.data['city_id']\
-                if form.patient.residence.data['city_id'] is not -1 else None
+            admission.patient.residence.country = form.patient.residence.data['country']\
+                if form.patient.residence.data['country'] is not -1 else None
+            admission.patient.residence.state = form.patient.residence.data['state']\
+                if form.patient.residence.data['state'] is not -1 else None
+            admission.patient.residence.city = form.patient.residence.data['city']\
+                if form.patient.residence.data['city'] is not -1 else None
             admission.patient.residence.neighborhood = form.patient.residence.data[
                 'neighborhood']
             admission.patient.residence.zone = form.patient.residence.data[
@@ -176,10 +162,10 @@ def edit_admission(id):
             admission.id_lvrs_intern = form.id_lvrs_intern.data
             admission.first_symptoms_date = form.first_symptoms_date.data
             admission.semepi_symptom = form.semepi_symptom.data
-            admission.state_id = form.state_id.data \
-                if form.state_id.data is not -1 else None
-            admission.city_id = form.city_id.data \
-                if form.city_id.data is not -1 else None
+            admission.state = form.state.data \
+                if form.state.data is not -1 else None
+            admission.city = form.city.data \
+                if form.city.data is not -1 else None
             admission.health_unit = form.health_unit.data
             admission.requesting_institution = form.requesting_institution.data
             admission.details = form.details.data
@@ -316,12 +302,12 @@ def create_admission():
 
             Address(
                 patient=patient,
-                country_id=form.patient.residence.data['country_id'] if
-                form.patient.residence.data['country_id'] is not -1 else None,
-                state_id=form.patient.residence.data['state_id']
-                if form.patient.residence.data['state_id'] is not -1 else None,
-                city_id=form.patient.residence.data['city_id']
-                if form.patient.residence.data['city_id'] is not -1 else None,
+                country=form.patient.residence.data['country'] if
+                form.patient.residence.data['country'] is not -1 else None,
+                state=form.patient.residence.data['state']
+                if form.patient.residence.data['state'] is not -1 else None,
+                city=form.patient.residence.data['city']
+                if form.patient.residence.data['city'] is not -1 else None,
                 neighborhood=form.patient.residence.data['neighborhood'],
                 zone=form.patient.residence.data['zone'],
                 details=form.patient.residence.data['details'])
@@ -330,10 +316,10 @@ def create_admission():
                 id_lvrs_intern=form.id_lvrs_intern.data,
                 first_symptoms_date=form.first_symptoms_date.data,
                 semepi_symptom=form.semepi_symptom.data,
-                state_id=form.state_id.data
-                if form.state_id.data is not -1 else None,
-                city_id=form.city_id.data
-                if form.city_id.data is not -1 else None,
+                state=form.state.data
+                if form.state.data is not -1 else None,
+                city=form.city.data
+                if form.city.data is not -1 else None,
                 health_unit=form.health_unit.data,
                 requesting_institution=form.requesting_institution.data,
                 details=form.details.data,
