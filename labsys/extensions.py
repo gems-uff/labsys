@@ -8,10 +8,10 @@ from flask_admin import Admin
 
 
 def setup_login_manager():
-    login_manager = LoginManager()
-    login_manager.session_protection = 'strong'
-    login_manager.login_view = 'auth.login'
-    return login_manager
+    setup_login_manager = LoginManager()
+    setup_login_manager.session_protection = 'strong'
+    setup_login_manager.login_view = 'auth.login'
+    return setup_login_manager
 
 
 bootstrap = Bootstrap()
