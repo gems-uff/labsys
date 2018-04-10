@@ -6,6 +6,10 @@ from wtforms.validators import InputRequired, Optional, length
 from . import custom_fields as cfields
 
 
+
+
+
+
 ZONE_CHOICES = ((1, 'Urbana'),
                 (2, 'Rural'),
                 (3, 'Periurbana'),
@@ -84,26 +88,29 @@ class AdmissionForm(FlaskForm):
     submit = SubmitField('Criar')
 
 
+class NullBooleanField(RadioField):
+    pass
+
+
 class DatedEventForm(FlaskForm):
     def __init__(self, occurred_label='Ocorreu', date_label='Data', **kwargs):
-        super().__init__(**kwargs)
-        self.meta.csrf = False
+        csrf_enabled = kwargs.pop('csrf_enabled', False)
+        super().__init__(csrf_enabled=csrf_enabled, **kwargs)
         self.occurred.label = occurred_label
         self.date.label = date_label
+
     occurred = RadioField(
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
-        coerce=int, )
     date = DateField(
         format='%d/%m/%Y',
-        validators=[Optional()])
+        validators=[Optional()]))
 
 
 class VaccineForm(DatedEventForm):
     def __init__(self, **kwargs):
         super().__init__(occurred_label='Houve aplicação?',
                          date_label='Data da última dose', **kwargs)
-
 
 class HospitalizationForm(FlaskForm):
     def __init__(self, **kwargs):

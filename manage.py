@@ -15,6 +15,8 @@ from labsys.admissions.models import (
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
     Address,
 )
+import labsys.admissions.forms as forms
+import labsys.admissions.models as models
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
@@ -34,7 +36,7 @@ admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 
 def make_shell_context():
     return dict(
-        app=app, db=db, User=User, Role=Role,
+        app=app, db=db, User=User, Role=Role, f=forms, m=models
     )
 
 

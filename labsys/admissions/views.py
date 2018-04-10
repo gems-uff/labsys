@@ -8,6 +8,7 @@ from labsys.utils.decorators import paginated
 from . import blueprint
 from ..extensions import db
 from .forms import AdmissionForm
+from . import forms
 from .models import (Address, Admission, CdcExam, ClinicalEvolution,
                      Hospitalization, ObservedSymptom, Patient, Sample,
                      Symptom, UTIHospitalization, Vaccine)
@@ -310,7 +311,6 @@ def edit_admission(id):
 
 
 @blueprint.route('/<int:id>/delete', methods=['GET'])
-@login_required
 @permission_required(Permission.DELETE)
 def delete_admission(id):
     admission = Admission.query.get(id)
@@ -321,7 +321,6 @@ def delete_admission(id):
 
 
 @blueprint.route('/create', methods=['GET', 'POST'])
-@login_required
 @permission_required(Permission.CREATE)
 def create_admission():
     form = AdmissionForm(
@@ -386,3 +385,9 @@ def create_admission():
     return render_template(
         'admissions/create-admission.html',
         form=form, )
+
+
+@blueprint.route('/<int:admission_id>/dated-events', methods=['GET, POST'])
+@permission_required(Permission.CREATE)
+def add_dated_events(admission_id):
+    vaccine_form = forms.VaccineForm(occurred=1, date='2018-0101')
