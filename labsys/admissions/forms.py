@@ -243,18 +243,4 @@ class AdmissionForm(FlaskForm):
     requesting_institution = StringField('Instituição Solicitante')
     details = StringField('Informações Adicionais')
     patient = FormField(PatientForm, label='Dados do Paciente')
-    vaccine = FormField(VaccineForm, label='Vacina contra Gripe')
-    hospitalization = FormField(
-        HospitalizationForm, label='Internação Hospitalar')
-    uti_hospitalization = FormField(
-        UTIHospitalizationForm, label='Internação UTI')
-    clinical_evolution = FormField(
-        ClinicalEvolutionForm, label='Evolução Clínica')
-    symptoms = FieldList(FormField(ObservedSymptomForm))
-    sec_symptoms = FieldList(
-        FormField(SecondarySymptomForm), label='Sintomas Secundários')
-    samples = FieldList(
-        FormField(label='Amostra', form_class=SampleForm),
-        label='Amostras',
-        min_entries=1)
     submit = SubmitField('Criar')
