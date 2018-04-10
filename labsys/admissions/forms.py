@@ -64,64 +64,63 @@ class PatientForm(FlaskForm):
     residence = FormField(AddressForm, label='Residência')
 
 
-class VaccineForm(FlaskForm):
-    class Meta:
-        csrf = False
+class AdmissionForm(FlaskForm):
+    id_lvrs_intern = StringField(
+        'Número Interno', validators=[InputRequired()])
+    first_symptoms_date = DateField(
+        'Data dos Primeiros Sintomas',
+        format='%d/%m/%Y',
+        validators=[Optional()])
+    semepi_symptom = IntegerField(
+        'Semana Epidemiológica (Sintomas)', validators=[Optional()])
+    state = StringField(label='UF (Estado)',
+                        validators=[length(max=2)])
+    city = StringField(label='Município de registro do caso',
+                       validators=[length(max=128)])
+    health_unit = StringField('Unidade de Saúde')
+    requesting_institution = StringField('Instituição Solicitante')
+    details = StringField('Informações Adicionais')
+    patient = FormField(PatientForm, label='Dados do Paciente')
+    submit = SubmitField('Criar')
 
+
+class DatedEventForm(FlaskForm):
+    def __init__(self, occurred_label='Ocorreu', date_label='Data', **kwargs):
+        super().__init__(**kwargs)
+        self.meta.csrf = False
+        self.occurred.label = occurred_label
+        self.date.label = date_label
     occurred = RadioField(
-        label='Aplicação',
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
         coerce=int, )
     date = DateField(
-        label='Data da última dose',
         format='%d/%m/%Y',
         validators=[Optional()])
+
+
+class VaccineForm(DatedEventForm):
+    def __init__(self, **kwargs):
+        super().__init__(occurred_label='Houve aplicação?',
+                         date_label='Data da última dose', **kwargs)
 
 
 class HospitalizationForm(FlaskForm):
-    class Meta:
-        csrf = False
-
-    occurred = RadioField(
-        label='Ocorreu internação?',
-        choices=YES_NO_IGNORED_CHOICES,
-        default=9,
-        coerce=int, )
-    date = DateField(
-        label='Data de internação (entrada)',
-        format='%d/%m/%Y',
-        validators=[Optional()])
+    def __init__(self, **kwargs):
+        super().__init__(occurred_label='Ocorreu internação?',
+                         date_label='Data de internação(entrada)', **kwargs)
 
 
 class UTIHospitalizationForm(FlaskForm):
-    class Meta:
-        csrf = False
-
-    occurred = RadioField(
-        label='Foi internado em UTI?',
-        choices=YES_NO_IGNORED_CHOICES,
-        default=9,
-        coerce=int, )
-    date = DateField(
-        label='Data de internação (entrada)',
-        format='%d/%m/%Y',
-        validators=[Optional()])
+    def __init__(self, **kwargs):
+        super().__init__(occurred_label='Foi internado em UTI?',
+                         date_label='Data de internação (entrada)', **kwargs)
 
 
 class ClinicalEvolutionForm(FlaskForm):
-    class Meta:
-        csrf = False
-
-    occurred = RadioField(
-        label='Evoluiu para óbito?',
-        choices=YES_NO_IGNORED_CHOICES,
-        default=9,
-        coerce=int, )
-    date = DateField(
-        label='Data do óbito',
-        format='%d/%m/%Y',
-        validators=[Optional()])
+    def __init__(self, **kwargs):
+        super().__init__(occurred_label='Evoluiu para óbito?',
+                         date_label='Data do óbito', **kwargs)
 
 
 class ObservedSymptomForm(FlaskForm):
@@ -224,23 +223,3 @@ class SampleForm(FlaskForm):
     details = StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
     cdc_exam = FormField(label='Resultado Exame CDC', form_class=CdcExamForm)
-
-
-class AdmissionForm(FlaskForm):
-    id_lvrs_intern = StringField(
-        'Número Interno', validators=[InputRequired()])
-    first_symptoms_date = DateField(
-        'Data dos Primeiros Sintomas',
-        format='%d/%m/%Y',
-        validators=[Optional()])
-    semepi_symptom = IntegerField(
-        'Semana Epidemiológica (Sintomas)', validators=[Optional()])
-    state = StringField(label='UF (Estado)',
-                        validators=[length(max=2)])
-    city = StringField(label='Município de registro do caso',
-                       validators=[length(max=128)])
-    health_unit = StringField('Unidade de Saúde')
-    requesting_institution = StringField('Instituição Solicitante')
-    details = StringField('Informações Adicionais')
-    patient = FormField(PatientForm, label='Dados do Paciente')
-    submit = SubmitField('Criar')
