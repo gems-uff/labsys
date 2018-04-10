@@ -175,23 +175,25 @@ class SecondaryRiskFactorForm(FlaskForm):
     details = StringField(validators=[length(max=128)])
 
 
-FLU_TYPE_CHOICES = (('A', 'A'),
-                    ('B', 'B'),
-                    ('Inconclusive', 'Inconclusivo'),
-                    ('Não Realizado', 'Não Realizado'),
-                    ('Ignorado', 'Ignorado')),
-FLU_SUBTYPE_CHOICES = (('H1', 'H1'),
-                       ('H3', 'H3'),
-                       ('Victoria', 'Victoria'),
-                       ('Yamagata', 'Yamagata'),
-                       ('Não Subtipado', 'Não SubtipADO'),
-                       ('Não Subtipável', 'Não SubtipÁVEL'),
-                       ('Ignorado', 'Ignorado'))
+
 
 
 class CdcExamForm(FlaskForm):
     def __init__(self, **kwargs):
         super(CdcExamForm, self).__init__(csrf_enabled=False, **kwargs)
+
+    FLU_TYPE_CHOICES = (('A', 'A'),
+                        ('B', 'B'),
+                        ('Inconclusive', 'Inconclusivo'),
+                        ('Não Realizado', 'Não Realizado'),
+                        ('Ignorado', 'Ignorado')),
+    FLU_SUBTYPE_CHOICES = (('H1', 'H1'),
+                           ('H3', 'H3'),
+                           ('Victoria', 'Victoria'),
+                           ('Yamagata', 'Yamagata'),
+                           ('Não Subtipado', 'Não SubtipADO'),
+                           ('Não Subtipável', 'Não SubtipÁVEL'),
+                           ('Ignorado', 'Ignorado'))
 
     flu_type = SelectField(
         'Tipagem',
