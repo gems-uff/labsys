@@ -108,6 +108,7 @@ class VaccineForm(DatedEventForm):
         super().__init__(occurred_label='Houve aplicação?',
                          date_label='Data da última dose', **kwargs)
 
+
 class HospitalizationForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(occurred_label='Ocorreu internação?',
@@ -168,17 +169,13 @@ class ObservedRiskFactorForm(FlaskForm):
 
 class SecondaryRiskFactorForm(FlaskForm):
     def __init__(self, **kwargs):
-        super().__init__(
-            csrf_enabled=False, **kwargs)
+        super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = Label(self.observed.id,
                                     kwargs.pop('risk_factor_name', 'Undefined'))
 
     risk_factor_id = IntegerField(widget=widgets.HiddenInput())
     observed = BooleanField()
     details = StringField(validators=[length(max=128)])
-
-
-
 
 
 class CdcExamForm(FlaskForm):

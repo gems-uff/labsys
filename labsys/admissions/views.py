@@ -19,38 +19,6 @@ TRUE = 1
 FALSE = 0
 
 
-def associate_dated_events_to_admission(
-        admission,
-        vaccine,
-        hospitalization,
-        uti_hospitalization,
-        clinical_evolution):
-    # Vaccine
-    occurred = vaccine.data['occurred']
-    occurred = bool(occurred) if occurred is not IGNORED else None
-    admission.vaccine = Vaccine(
-        occurred=occurred,
-        date=vaccine.data['date'],)
-    # Hospitalization
-    occurred = hospitalization.data['occurred']
-    occurred = bool(occurred) if occurred is not IGNORED else None
-    admission.hospitalization = Hospitalization(
-        occurred=occurred,
-        date=hospitalization['date'],)
-    # UTIHospitalization
-    occurred = uti_hospitalization.data['occurred']
-    occurred = bool(occurred) if occurred is not IGNORED else None
-    admission.uti_hospitalization = UTIHospitalization(
-        occurred=occurred,
-        date=uti_hospitalization['date'],)
-    # ClinincalEvolution
-    occurred = clinical_evolution.data['occurred']
-    occurred = bool(occurred) if occurred is not IGNORED else None
-    admission.clinical_evolution = ClinicalEvolution(
-        occurred=occurred,
-        date=clinical_evolution['date'],)
-
-
 def associate_observed_symptoms_to_admission(
         admission, symptom_forms, sec_symptom_forms):
     for symptom_form in symptom_forms:
@@ -323,37 +291,27 @@ def delete_admission(id):
 @blueprint.route('/create', methods=['GET', 'POST'])
 @permission_required(Permission.CREATE)
 def create_admission():
-    form = AdmissionForm(
-        symptoms=[{
-            'symptom_id': s.id,
-            'symptom_name': s.name
-        } for s in Symptom.get_primary()],
-        sec_symptoms=[{
-            'symptom_id': s.id,
-            'symptom_name': s.name
-        } for s in Symptom.get_secondary()], )
-
-    # POST and valid
+    form = AdmissionForm()
+    template = 'admissions/create-admission.html'
     if form.validate_on_submit():
         admission = Admission.query.filter_by(
             id_lvrs_intern=form.id_lvrs_intern.data).first()
         if admission is not None:
-            flash('Número Interno já cadastrado! Escolha outro!', 'danger')
+            flash('Número Interno já cadastrado!', 'danger')
         else:
+            # Unfortunately I cannot use **form.data to create an instance nor populate_obj
+            # because of nesting
             patient = Patient(
                 name=form.patient.data['name'],
                 birth_date=form.patient.data['birth_date'],
                 age=form.patient.data['age'],
                 age_unit=form.patient.data['age_unit'],
-                gender=form.patient.data['gender'], )
+                gender=form.patient.data['gender'],
+            )
             patient.residence = Address(
-                country=form.patient.residence.data['country'],
-                state=form.patient.residence.data['state'],
-                city=form.patient.residence.data['city'],
-                neighborhood=form.patient.residence.data['neighborhood'],
-                zone=form.patient.residence.data['zone'],
-                details=form.patient.residence.data['details'])
+                **form.patient.form.residence.form)
             admission = Admission(
+                patient=patient,
                 id_lvrs_intern=form.id_lvrs_intern.data,
                 first_symptoms_date=form.first_symptoms_date.data,
                 semepi_symptom=form.semepi_symptom.data,
@@ -361,30 +319,13 @@ def create_admission():
                 city=form.city.data,
                 health_unit=form.health_unit.data,
                 requesting_institution=form.requesting_institution.data,
-                details=form.details.data)
-            admission.patient = patient
-
-            associate_dated_events_to_admission(
-                admission,
-                form.vaccine,
-                form.hospitalization,
-                form.uti_hospitalization,
-                form.clinical_evolution)
-
-            associate_observed_symptoms_to_admission(
-                admission,
-                form.symptoms,
-                form.sec_symptoms)
-
-            associate_samples_to_admission(admission, form.samples)
+                details=form.details.data,
+            )
 
             db.session.add(admission)
             flash('Admissão criada com sucesso!', 'success')
-        return redirect(url_for('.create_admission'))
-
-    return render_template(
-        'admissions/create-admission.html',
-        form=form, )
+        return redirect(url_for('.detail_admission'))
+    return render_template(template, form=form)
 
 
 @blueprint.route('/<int:admission_id>/dated-events', methods=['GET, POST'])
