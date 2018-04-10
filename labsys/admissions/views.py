@@ -75,48 +75,6 @@ def list_admissions():
                      context_title=context_title)
 
 
-def symptom_in_admission_symptoms(symptom_id, admission):
-    found = None
-    for obs_symptom in admission.symptoms.all():
-        if obs_symptom.symptom_id == symptom_id:
-            return obs_symptom
-    return found
-
-
-@blueprint.route('/<int:id>', methods=['GET', 'POST'])
-@permission_required(Permission.VIEW)
-def detail_admission(admission_id):
-    admission = Admission.query.get_or_404(admission_id)
-    symptoms = get_admission_symptoms(admission_id)
-    primary_symptoms = []
-    sec_symptoms = []
-    for symptom in symptoms:
-        if symptom.primary:
-            primary_symptoms.append(symptom)
-        else:
-            sec_symptoms.append(symptom)
-
-    form = AdmissionForm(
-        id_lvrs_intern=admission.id_lvrs_intern,
-        first_symptoms_date=admission.first_symptoms_date,
-        semepi_symptom=admission.semepi_symptom,
-        state=admission.state,
-        city=admission.city,
-        health_unit=admission.health_unit,
-        requesting_institution=admission.requesting_institution,
-        details=admission.details,
-        patient=admission.patient,
-        vaccine=admission.vaccine,
-        hospitalization=admission.hospitalization,
-        uti_hospitalization=admission.uti_hospitalization,
-        clinical_evolution=admission.clinical_evolution,
-        symptoms=primary_symptoms,
-        sec_symptoms=sec_symptoms,
-        samples=admission.samples, )
-
-    return render_template('admissions/create-admission.html', form=form, edit=False)
-
-
 @blueprint.route('/<int:id>/edit', methods=['GET', 'POST'])
 @permission_required(Permission.EDIT)
 def edit_admission(id):
@@ -309,7 +267,7 @@ def create_admission():
                 gender=form.patient.data['gender'],
             )
             patient.residence = Address(
-                **form.patient.form.residence.form)
+                **form.patient.form.residence.form.data)
             admission = Admission(
                 patient=patient,
                 id_lvrs_intern=form.id_lvrs_intern.data,
@@ -323,9 +281,20 @@ def create_admission():
             )
 
             db.session.add(admission)
+            db.session.commit()
             flash('Admissão criada com sucesso!', 'success')
-        return redirect(url_for('.detail_admission'))
+        return redirect(url_for('.detail_admission',
+                                admission_id=admission.id))
     return render_template(template, form=form)
+
+
+@blueprint.route('/<int:admission_id>', methods=['GET'])
+@permission_required(Permission.VIEW)
+def detail_admission(admission_id):
+    admission = Admission.query.get_or_404(admission_id)
+    admission_form = AdmissionForm(obj=admission)
+    return render_template('admissions/detail-admission.html',
+                           admission=admission_form)
 
 
 @blueprint.route('/<int:admission_id>/dated-events', methods=['GET, POST'])

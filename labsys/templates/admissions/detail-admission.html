@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "utils/_forms_rendering.html" as frender %}
+
+{% block page_content %}
+  <!-- Admission -->
+  {{ frender.render_admission(admission) }}
+  <!-- Patient -->
+  {{ frender.render_patient(admission.patient) }}
+{% endblock %}
