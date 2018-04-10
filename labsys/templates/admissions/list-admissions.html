@@ -14,19 +14,21 @@
     <tr>
       <th width="15%">Número Interno</th>
       <th width="40%">Data de Coleta</th>
-      <th width="5%">Editar</th>
-      <th width="5%">Deletar</th>
+      <!-- <th width="5%">Editar</th> -->
+      <!-- <th width="5%">Deletar</th> -->
     </tr>
   </thead>
   <tbody>
     {% for admission in admissions %}
       <tr>
         <td>{{ admission.id_lvrs_intern }}</td>
-        {% if admission.samples %}
+        {% if admission.samples.all() %}
           <td>{{ admission.samples[0].collection_date.strftime('%d/%m/%Y') }}</td>
+        {% else %}
+          <td>Sem amostras cadastrada</td>
         {% endif %}
-        <td><a href="{{ url_for('admissions.edit_admission', id=admission.id) }}">Editar</a></td>
-        <td><a href="{{ url_for('admissions.delete_admission', id=admission.id) }}">Deletar</a></td>
+        <!-- <td><a href="{{ url_for('admissions.edit_admission', id=admission.id) }}">Editar</a></td> -->
+        <!-- <td><a href="{{ url_for('admissions.delete_admission', id=admission.id) }}">Deletar</a></td> -->
       </tr>
     {% endfor %}
   </tbody>
