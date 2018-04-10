@@ -1,14 +1,14 @@
+from ast import literal_eval
+
 from flask_wtf import FlaskForm
 from wtforms import (BooleanField, DateField, FieldList, FloatField, FormField,
                      IntegerField, Label, RadioField, SelectField, StringField,
                      SubmitField, widgets)
 from wtforms.validators import InputRequired, Optional, length
+
+from labsys.utils.custom_fields import NullBooleanField
+
 from . import custom_fields as cfields
-
-
-
-
-
 
 ZONE_CHOICES = ((1, 'Urbana'),
                 (2, 'Rural'),
@@ -88,10 +88,6 @@ class AdmissionForm(FlaskForm):
     submit = SubmitField('Criar')
 
 
-class NullBooleanField(RadioField):
-    pass
-
-
 class DatedEventForm(FlaskForm):
     def __init__(self, occurred_label='Ocorreu', date_label='Data', **kwargs):
         csrf_enabled = kwargs.pop('csrf_enabled', False)
@@ -99,12 +95,12 @@ class DatedEventForm(FlaskForm):
         self.occurred.label = occurred_label
         self.date.label = date_label
 
-    occurred = RadioField(
-        choices=YES_NO_IGNORED_CHOICES,
-        default=9,
+    occurred = NullBooleanField(
+        choices=((True, 'Sim'), (False, 'Não'), (None, 'Ignorado')),
+        default=None)
     date = DateField(
         format='%d/%m/%Y',
-        validators=[Optional()]))
+        validators=[Optional()])
 
 
 class VaccineForm(DatedEventForm):
