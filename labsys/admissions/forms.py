@@ -10,17 +10,13 @@ from labsys.utils.custom_fields import NullBooleanField
 
 from . import custom_fields as cfields
 
-ZONE_CHOICES = ((1, 'Urbana'),
-                (2, 'Rural'),
-                (3, 'Periurbana'),
-                (9, 'Ignorado'))
-
-YES_NO_IGNORED_CHOICES = ((1, 'Sim'),
-                          (0, 'Nao'),
-                          (9, 'Ignorado'))
-
 
 class AddressForm(FlaskForm):
+    ZONE_CHOICES = ((1, 'Urbana'),
+                    (2, 'Rural'),
+                    (3, 'Periurbana'),
+                    (9, 'Ignorado'))
+
     class Meta:
         csrf = False
 
@@ -125,18 +121,31 @@ class ClinicalEvolutionForm(FlaskForm):
 class ObservedSymptomForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
-        self.observed.label = wtf.Label(self.observed.id,
-                                        kwargs.pop('symptom_name', 'Undefined'))
 
     symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
     observed = NullBooleanField()
-    details = wtf.StringField(validators=[length(max=128)])
+    details = wtf.StringField(validators=[length(max=128)],
+                              render_kw={'placeholder': 'observações'})
+    symptom_name = wtf.StringField(render_kw={'readonly': True})
+
+
+# TODO: how to pass form_class
+class ObservedSymptomsFormList(FlaskForm):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        entities = kwargs.pop('entities', None)
+        if entities is not None:
+            for entity in entities:
+                self.observed_symptoms.append_entry(entity)
+
+    observed_symptoms = wtf.FieldList(
+        wtf.FormField(form_class=ObservedSymptomForm),
+        label='Sintomas observados')
 
 
 class SecondarySymptomForm(FlaskForm):
     def __init__(self, **kwargs):
-        super().__init__(
-            csrf_enabled=False, **kwargs)
+        super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = wtf.Label(self.observed.id,
                                         kwargs.pop('symptom_name', 'Undefined'))
 
@@ -152,10 +161,7 @@ class ObservedRiskFactorForm(FlaskForm):
                                         kwargs.pop('risk_factor_name', 'Undefined'))
 
     risk_factor_id = wtf.IntegerField(widget=widgets.HiddenInput())
-    observed = wtf.RadioField(
-        choices=YES_NO_IGNORED_CHOICES,
-        default=9,
-        coerce=int, )
+    observed = NullBooleanField()
     details = wtf.StringField(validators=[length(max=128)])
 
 

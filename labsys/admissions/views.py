@@ -91,3 +91,14 @@ def detail_admission(admission_id):
 @permission_required(Permission.CREATE)
 def add_dated_events(admission_id):
     vaccine_form = forms.VaccineForm(occurred=1, date='2018-0101')
+
+
+@blueprint.route('/test-forms')
+def test_forms():
+    entities = [
+        {'symptom_id': 1, 'observed': True, 'details': 'details', 'symptom_name': 'Febre'},
+        {'symptom_id': 2, 'observed': False, 'details': '', 'symptom_name': 'Gripe'},
+        {'symptom_id': 3, 'observed': None, 'symptom_name': 'Tosse'},
+    ]
+    formlist = forms.ObservedSymptomsFormList(entities=entities)
+    return render_template('admissions/formlist.html', formlist=formlist.observed_symptoms)

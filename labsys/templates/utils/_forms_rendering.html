@@ -1,4 +1,5 @@
 {% import "bootstrap/wtf.html" as wtf %}
+{% import "utils/_my_wtf.html" as mywtf %}
 
 
 {% macro render_simple_errors(form) -%}
@@ -130,5 +131,24 @@
     {{ wtf.form_field(form.state) }}
     {{ wtf.form_field(form.city) }}
     {{ wtf.form_field(form.details) }}
+  </fieldset>
+{%- endmacro %}
+
+{% macro render_symptoms_fieldlist(fieldlist) -%}
+  <fieldset>
+    <legend>{{ form.label.text }}</legend>
+    {% for subform in form.entries %}
+      {{ subform.hidden_tag() }}
+      <div class="form-inline">
+        <div class="form-group">
+          {{ subform.observed.label }}:&nbsp;&nbsp;
+          {{ mywtf.form_field(subform.observed) }}&nbsp;&nbsp;
+        </div>
+        <div class="form-group">
+          {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
+        </div>
+      </div>
+      <hr />
+    {% endfor %}
   </fieldset>
 {%- endmacro %}

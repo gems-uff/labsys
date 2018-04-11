@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "utils/_forms_rendering.html" as frender %}
+
+{% block page_content %}
+  <!-- ObservedSymptoms list -->
+  {{ frender.render_symptoms(formlist) }}
+{% endblock %}
