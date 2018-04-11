@@ -120,14 +120,16 @@ class ClinicalEvolutionForm(FlaskForm):
 
 class ObservedSymptomForm(FlaskForm):
     def __init__(self, **kwargs):
+        print(kwargs)
         super().__init__(csrf_enabled=False, **kwargs)
+        self.observed.label = wtf.Label(
+            self.observed.id,
+            kwargs.pop('symptom_name', 'UNDEFINED'))
 
     symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
     observed = NullBooleanField()
     details = wtf.StringField(validators=[length(max=128)],
                               render_kw={'placeholder': 'observações'})
-    symptom_name = wtf.StringField(render_kw={'readonly': True})
-
 
 # TODO: how to pass form_class
 class ObservedSymptomsFormList(FlaskForm):
