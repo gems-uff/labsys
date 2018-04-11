@@ -4,18 +4,15 @@ from flask import (
     request,
     url_for,
     flash,
-    Blueprint
 )
 from flask_admin.contrib.sqla import ModelView
 from flask_login import login_user, logout_user, login_required, current_user
 
 from ..extensions import db
 from labsys.utils.email import send_email
+from . import blueprint
 from .forms import LoginForm, RegistrationForm
 from .models import User, PreAllowedUser, Role
-
-
-blueprint = Blueprint('auth', __name__)
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
