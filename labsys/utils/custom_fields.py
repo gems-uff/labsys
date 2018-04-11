@@ -2,9 +2,9 @@ from wtforms.fields import RadioField
 
 class NullBooleanField(RadioField):
     DEFAULT_CHOICES = ((True, 'Sim'), (False, 'Não'), (None, 'Ignorado'))
-    def __init__(**kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.choices = kwargs.pop('choices', DEFAULT_CHOICES)
+        self.choices = kwargs.pop('choices', self.DEFAULT_CHOICES)
 
     def iter_choices(self):
         for value, label in self.choices:
