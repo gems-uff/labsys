@@ -1,9 +1,9 @@
 from ast import literal_eval
 
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, DateField, FieldList, FloatField, FormField,
-                     IntegerField, Label, RadioField, SelectField, StringField,
-                     SubmitField, widgets)
+import wtforms as wtf
+import wtforms.widgets as widgets
+import wtforms.widgets.html5 as html5widgets
 from wtforms.validators import InputRequired, Optional, length
 
 from labsys.utils.custom_fields import NullBooleanField
@@ -20,72 +20,70 @@ YES_NO_IGNORED_CHOICES = ((1, 'Sim'),
                           (9, 'Ignorado'))
 
 
-AGE_UNIT_CHOICES = (('Y', 'Anos'),
-                    ('M', 'Meses'),
-                    ('D', 'Dias'),
-                    ('H', 'Horas'))
-
-GENDER_CHOICES = (('M', 'Masculino'),
-                  ('F', 'Feminino'),
-                  ('I', 'Ignorado'))
-
-
 class AddressForm(FlaskForm):
     class Meta:
         csrf = False
 
-    country = StringField(label='País de residência',
-                          validators=[length(max=128)])
-    state = StringField(label='UF (Estado)',
-                        validators=[length(max=2)])
-    city = StringField(label='Município',
-                       validators=[length(max=128)])
-    neighborhood = StringField(label='Bairro',
-                               validators=[length(max=128)])
-    zone = RadioField(
-        label='Zona',
-        choices=ZONE_CHOICES,
-        default=9,
-        coerce=int, )
-    details = StringField(label='Observações', validators=[length(max=255)])
+    country = wtf.StringField('País de residência',
+                              validators=[length(max=128)])
+    state = wtf.StringField('UF (Estado)',
+                            validators=[length(max=2)])
+    city = wtf.StringField('Município',
+                           validators=[length(max=128)])
+    neighborhood = wtf.StringField('Bairro',
+                                   validators=[length(max=128)])
+    zone = wtf.RadioField('Zona',
+                          choices=ZONE_CHOICES,
+                          default=9,
+                          coerce=int, )
+    details = wtf.StringField('Observações', validators=[length(max=255)])
 
 
 class PatientForm(FlaskForm):
-    name = StringField('Nome do paciente')
-    birth_date = DateField(
-        'Data de nascimento', format='%d/%m/%Y', validators=[Optional()])
-    age = IntegerField('Idade', validators=[Optional()])
-    age_unit = RadioField(
-        label='Tipo idade',
-        choices=AGE_UNIT_CHOICES,
-        default='Y',
-        coerce=str, )
-    gender = RadioField(
-        label='Sexo',
-        choices=GENDER_CHOICES,
-        default='I',
-        coerce=str, )
-    residence = FormField(AddressForm, label='Residência')
+    AGE_UNIT_CHOICES = (
+        ('Y', 'Anos'),
+        ('M', 'Meses'),
+        ('D', 'Dias'),
+        ('H', 'Horas'))
+
+    GENDER_CHOICES = (
+        ('M', 'Masculino'),
+        ('F', 'Feminino'),
+        ('I', 'Ignorado'))
+
+    name = wtf.StringField('Nome do paciente')
+    birth_date = wtf.DateField('Data de nascimento',
+                               widget=html5widgets.DateInput(),
+                               validators=[Optional()])
+    age = wtf.IntegerField('Idade', validators=[Optional()])
+    age_unit = wtf.RadioField('Tipo idade',
+                              choices=AGE_UNIT_CHOICES,
+                              default='Y',
+                              coerce=str, )
+    gender = wtf.RadioField('Sexo',
+                            choices=GENDER_CHOICES,
+                            default='I',
+                            coerce=str, )
+    residence = wtf.FormField(AddressForm, 'Residência')
 
 
 class AdmissionForm(FlaskForm):
-    id_lvrs_intern = StringField(
+    id_lvrs_intern = wtf.StringField(
         'Número Interno', validators=[InputRequired()])
-    first_symptoms_date = DateField(
-        'Data dos Primeiros Sintomas',
-        format='%d/%m/%Y',
-        validators=[Optional()])
-    semepi_symptom = IntegerField(
-        'Semana Epidemiológica (Sintomas)', validators=[Optional()])
-    state = StringField(label='UF (Estado)',
-                        validators=[length(max=2)])
-    city = StringField(label='Município de registro do caso',
-                       validators=[length(max=128)])
-    health_unit = StringField('Unidade de Saúde')
-    requesting_institution = StringField('Instituição Solicitante')
-    details = StringField('Informações Adicionais')
-    patient = FormField(PatientForm, label='Dados do Paciente')
-    submit = SubmitField('Criar')
+    first_symptoms_date = wtf.DateField('Data dos primeiros sintomas',
+                                        widget=html5widgets.DateInput(),
+                                        validators=[InputRequired()])
+    semepi_symptom = wtf.IntegerField('Semana Epidemiológica (Sintomas)',
+                                      validators=[Optional()])
+    state = wtf.StringField('UF (Estado)',
+                            validators=[length(max=2)])
+    city = wtf.StringField('Município de registro do caso',
+                           validators=[length(max=128)])
+    health_unit = wtf.StringField('Unidade de Saúde')
+    requesting_institution = wtf.StringField('Instituição Solicitante')
+    details = wtf.StringField('Informações Adicionais')
+    patient = wtf.FormField(PatientForm, 'Dados do Paciente')
+    submit = wtf.SubmitField('Criar')
 
 
 class DatedEventForm(FlaskForm):
@@ -95,12 +93,9 @@ class DatedEventForm(FlaskForm):
         self.occurred.label = occurred_label
         self.date.label = date_label
 
-    occurred = NullBooleanField(
-        choices=((True, 'Sim'), (False, 'Não'), (None, 'Ignorado')),
-        default=None)
-    date = DateField(
-        format='%d/%m/%Y',
-        validators=[Optional()])
+    occurred = NullBooleanField(default=None)
+    date = wtf.DateField(widget=html5widgets.DateInput(),
+                         validators=[InputRequired()])
 
 
 class VaccineForm(DatedEventForm):
@@ -130,52 +125,49 @@ class ClinicalEvolutionForm(FlaskForm):
 class ObservedSymptomForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
-        self.observed.label = Label(self.observed.id,
-                                    kwargs.pop('symptom_name', 'Undefined'))
+        self.observed.label = wtf.Label(self.observed.id,
+                                        kwargs.pop('symptom_name', 'Undefined'))
 
-    symptom_id = IntegerField(widget=widgets.HiddenInput())
-    observed = RadioField(
-        choices=YES_NO_IGNORED_CHOICES,
-        default=9,
-        coerce=int, )
-    details = StringField(validators=[length(max=128)])
+    symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
+    observed = NullBooleanField()
+    details = wtf.StringField(validators=[length(max=128)])
 
 
 class SecondarySymptomForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(
             csrf_enabled=False, **kwargs)
-        self.observed.label = Label(self.observed.id,
-                                    kwargs.pop('symptom_name', 'Undefined'))
+        self.observed.label = wtf.Label(self.observed.id,
+                                        kwargs.pop('symptom_name', 'Undefined'))
 
-    symptom_id = IntegerField(widget=widgets.HiddenInput())
-    observed = BooleanField()
-    details = StringField(validators=[length(max=128)])
+    symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
+    observed = wtf.BooleanField()
+    details = wtf.StringField(validators=[length(max=128)])
 
 
 class ObservedRiskFactorForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
-        self.observed.label = Label(self.observed.id,
-                                    kwargs.pop('risk_factor_name', 'Undefined'))
+        self.observed.label = wtf.Label(self.observed.id,
+                                        kwargs.pop('risk_factor_name', 'Undefined'))
 
-    risk_factor_id = IntegerField(widget=widgets.HiddenInput())
-    observed = RadioField(
+    risk_factor_id = wtf.IntegerField(widget=widgets.HiddenInput())
+    observed = wtf.RadioField(
         choices=YES_NO_IGNORED_CHOICES,
         default=9,
         coerce=int, )
-    details = StringField(validators=[length(max=128)])
+    details = wtf.StringField(validators=[length(max=128)])
 
 
 class SecondaryRiskFactorForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
-        self.observed.label = Label(self.observed.id,
-                                    kwargs.pop('risk_factor_name', 'Undefined'))
+        self.observed.label = wtf.Label(self.observed.id,
+                                        kwargs.pop('risk_factor_name', 'Undefined'))
 
-    risk_factor_id = IntegerField(widget=widgets.HiddenInput())
-    observed = BooleanField()
-    details = StringField(validators=[length(max=128)])
+    risk_factor_id = wtf.IntegerField(widget=widgets.HiddenInput())
+    observed = wtf.BooleanField()
+    details = wtf.StringField(validators=[length(max=128)])
 
 
 class CdcExamForm(FlaskForm):
@@ -195,18 +187,16 @@ class CdcExamForm(FlaskForm):
                            ('Não Subtipável', 'Não SubtipÁVEL'),
                            ('Ignorado', 'Ignorado'))
 
-    flu_type = SelectField(
-        'Tipagem',
-        choices=FLU_TYPE_CHOICES,
-        default='Ignorado',
-        coerce=str, )
-    flu_subtype = SelectField(
-        'Subtipo OU Linhagem',
-        choices=FLU_SUBTYPE_CHOICES,
-        default='Ignorado',
-        coerce=str, )
-    dominant_ct = FloatField('CT (principal)', validators=[Optional()])
-    details = StringField(
+    flu_type = wtf.SelectField('Tipagem',
+                               choices=FLU_TYPE_CHOICES,
+                               default='Ignorado',
+                               coerce=str, )
+    flu_subtype = wtf.SelectField('Subtipo OU Linhagem',
+                                  choices=FLU_SUBTYPE_CHOICES,
+                                  default='Ignorado',
+                                  coerce=str, )
+    dominant_ct = wtf.FloatField('CT (principal)', validators=[Optional()])
+    details = wtf.StringField(
         'Informações adicionais sobre exame', validators=[length(max=128)])
 
 
@@ -214,14 +204,14 @@ class SampleForm(FlaskForm):
     def __init__(self, **kwargs):
         super(SampleForm, self).__init__(csrf_enabled=False, **kwargs)
 
-    collection_date = DateField(
-        'Data de coleta', format='%d/%m/%Y', validators=[InputRequired()])
-    semepi = IntegerField(
+    collection_date = wtf.DateField('Data de coleta',
+                                    widget=html5widgets.DateInput(),
+                                    validators=[InputRequired()])
+    semepi = wtf.IntegerField(
         'Semana Epidemiológica (Coleta)', validators=[Optional()])
-    admission_date = DateField(
-        'Data de Entrada no LVRS',
-        format='%d/%m/%Y',
-        validators=[InputRequired()])
-    details = StringField('Informações adicionais')
+    admission_date = wtf.DateField('Data de Entrada no LVRS',
+                                   widget=html5widgets.DateInput(),
+                                   validators=[InputRequired()])
+    details = wtf.StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
-    cdc_exam = FormField(label='Resultado Exame CDC', form_class=CdcExamForm)
+    cdc_exam = wtf.FormField('Resultado Exame CDC', form_class=CdcExamForm)

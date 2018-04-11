@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for
 from flask_login import login_required
 
 from labsys.auth.decorators import permission_required
