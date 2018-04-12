@@ -58,45 +58,6 @@
   </fieldset>
 {%- endmacro %}
 
-{% macro render_symptoms(form) -%}
-  <fieldset>
-    <legend>{{ form.label.text }}</legend>
-    {% for subform in form.entries %}
-      {{ subform.hidden_tag() }}
-      <div class="form-inline">
-        <div class="form-group">
-          {{ subform.observed.label }}:&nbsp;&nbsp;
-          {{ wtf.form_field(subform.observed) }}&nbsp;&nbsp;
-        </div>
-        <div class="form-group">
-          {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
-        </div>
-      </div>
-      <hr />
-    {% endfor %}
-  </fieldset>
-{%- endmacro %}
-
-{% macro render_secondary_symptoms(form) -%}
-  <fieldset>
-    <legend>{{ form.label.text }}</legend>
-    {% for subform in form.entries %}
-      {{ subform.hidden_tag() }}
-      <div class="form-inline">
-        <div class="form-group">
-          <label class="checkbox-inline">
-            {{ subform.observed }}
-            {{ subform.observed.label.text }}&nbsp;&nbsp;
-          </label>
-        </div>
-        <div class="form-group">
-          {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
-        </div>
-      </div>
-      <hr />
-    {% endfor %}
-  </fieldset>
-{%- endmacro %}
 
 {% macro render_samples(form) -%}
   <fieldset>
@@ -134,20 +95,42 @@
   </fieldset>
 {%- endmacro %}
 
-{% macro render_symptoms_fieldlist(fieldlist) -%}
-  <fieldset>
-    <legend>{{ form.label.text }}</legend>
-    {% for subform in form.entries %}
-      {{ subform.hidden_tag() }}
-      <div class="form-inline">
-        <div class="form-group">
-          {{ mywtf.form_field(subform.observed) }}&nbsp;&nbsp;
-        </div>
-        <div class="form-group">
-          {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
-        </div>
-      </div>
-      <hr />
-    {% endfor %}
-  </fieldset>
+{% macro render_prime_symptoms(fieldlist) -%}
+    <fieldset>
+        <legend>{{ fieldlist.label.text }}</legend>
+        {% for formfield in fieldlist.entries %}
+            {{ formfield.hidden_tag() }}
+            <div class="form-inline">
+                <div class="form-group">
+                    {{ formfield.observed.label }}:&nbsp;&nbsp;
+                    {{ mywtf.form_field(formfield.observed) }}&nbsp;&nbsp;
+                </div>
+                <div class="form-group">
+                    {{ formfield.details(class="form-control", placeholder="Informações adicionais", size=30) }}
+                </div>
+            </div>
+            <hr />
+        {% endfor %}
+    </fieldset>
+{%- endmacro %}
+
+{% macro render_secondary_symptoms(form) -%}
+    <fieldset>
+        <legend>{{ form.label.text }}</legend>
+        {% for subform in form.entries %}
+            {{ subform.hidden_tag() }}
+            <div class="form-inline">
+                <div class="form-group">
+                    <label class="checkbox-inline">
+                        {{ subform.observed }}
+                        {{ subform.observed.label.text }}&nbsp;&nbsp;
+                    </label>
+                </div>
+                <div class="form-group">
+                    {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
+                </div>
+            </div>
+            <hr />
+        {% endfor %}
+    </fieldset>
 {%- endmacro %}

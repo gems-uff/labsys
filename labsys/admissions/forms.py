@@ -131,7 +131,7 @@ class PrimaryEntityForm(FlaskForm):
                               render_kw={'placeholder': 'observações'})
 
 
-class SecondarySymptomForm(FlaskForm):
+class SecondaryEntityForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = wtf.Label(self.observed.id,
@@ -159,7 +159,7 @@ class SymptomsFormList(FlaskForm):
         wtf.FormField(form_class=PrimaryEntityForm),
                       label='Sintomas observados')
     secondary = wtf.FieldList(
-        wtf.FormField(form_class=SecondarySymptomForm),
+        wtf.FormField(form_class=SecondaryEntityForm),
         label='Sintomas secundarios')
 
 
