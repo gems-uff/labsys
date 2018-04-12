@@ -150,11 +150,17 @@ class SymptomsFormList(FlaskForm):
         if prime_entities is not None:
             for entity in prime_entities:
                 self.primary.append_entry(entity)
+        sec_entities = kwargs.pop('sec_entities', None)
+        if sec_entities is not None:
+            for entity in sec_entities:
+                self.secondary.append_entry(entity)
 
     primary = wtf.FieldList(
         wtf.FormField(form_class=PrimaryEntityForm),
                       label='Sintomas observados')
-
+    secondary = wtf.FieldList(
+        wtf.FormField(form_class=SecondarySymptomForm),
+        label='Sintomas secundarios')
 
 
 class ObservedRiskFactorForm(FlaskForm):
