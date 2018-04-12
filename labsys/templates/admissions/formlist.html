@@ -3,6 +3,7 @@
 {% import "utils/_forms_rendering.html" as frender %}
 
 {% block page_content %}
-  <!-- ObservedSymptoms list -->
-  {{ frender.render_prime_symptoms(prime_fieldlist) }}
+    <!-- ObservedSymptoms list -->
+    {{ frender.render_prime_symptoms(prime_fieldlist) }}
+    {{ frender.render_sec_symptoms(sec_fieldlist) }}
 {% endblock %}

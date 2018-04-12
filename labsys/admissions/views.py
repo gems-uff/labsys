@@ -95,6 +95,7 @@ def add_dated_events(admission_id):
 
 @blueprint.route('/test-forms')
 def test_forms():
+    template = 'admissions/formlist.html'
     prime_symptoms = [
         {'symptom_id': 1, 'observed': True, 'details': 'details', 'symptom_name': 'Febre'},
         {'symptom_id': 2, 'observed': False, 'details': '', 'symptom_name': 'Gripe'},
@@ -106,4 +107,6 @@ def test_forms():
     ]
     form = forms.SymptomsFormList(prime_entities=prime_symptoms,
                                       sec_entities=sec_symptoms)
-    return render_template('admissions/formlist.html', prime_fieldlist=form.primary)
+    return render_template(template,
+                           prime_fieldlist=form.primary,
+                           sec_fieldlist=form.secondary)
