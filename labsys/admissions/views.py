@@ -100,5 +100,5 @@ def test_forms():
         {'symptom_id': 2, 'observed': False, 'details': '', 'symptom_name': 'Gripe'},
         {'symptom_id': 3, 'observed': None},
     ]
-    formlist = forms.ObservedSymptomsFormList(entities=entities)
-    return render_template('admissions/formlist.html', formlist=formlist.observed_symptoms)
+    formlist = forms.SymptomsFormList(prime_entities=entities)
+    return render_template('admissions/formlist.html', formlist=formlist.primary)

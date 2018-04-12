@@ -118,9 +118,8 @@ class ClinicalEvolutionForm(FlaskForm):
                          date_label='Data do óbito', **kwargs)
 
 
-class ObservedSymptomForm(FlaskForm):
+class PrimaryEntityForm(FlaskForm):
     def __init__(self, **kwargs):
-        print(kwargs)
         super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = wtf.Label(
             self.observed.id,
@@ -130,19 +129,6 @@ class ObservedSymptomForm(FlaskForm):
     observed = NullBooleanField()
     details = wtf.StringField(validators=[length(max=128)],
                               render_kw={'placeholder': 'observações'})
-
-# TODO: how to pass form_class
-class ObservedSymptomsFormList(FlaskForm):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        entities = kwargs.pop('entities', None)
-        if entities is not None:
-            for entity in entities:
-                self.observed_symptoms.append_entry(entity)
-
-    observed_symptoms = wtf.FieldList(
-        wtf.FormField(form_class=ObservedSymptomForm),
-        label='Sintomas observados')
 
 
 class SecondarySymptomForm(FlaskForm):
@@ -154,6 +140,21 @@ class SecondarySymptomForm(FlaskForm):
     symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
     observed = wtf.BooleanField()
     details = wtf.StringField(validators=[length(max=128)])
+
+
+# TODO: how to pass form_class
+class SymptomsFormList(FlaskForm):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        prime_entities = kwargs.pop('prime_entities', None)
+        if prime_entities is not None:
+            for entity in prime_entities:
+                self.primary.append_entry(entity)
+
+    primary = wtf.FieldList(
+        wtf.FormField(form_class=PrimaryEntityForm),
+                      label='Sintomas observados')
+
 
 
 class ObservedRiskFactorForm(FlaskForm):
