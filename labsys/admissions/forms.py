@@ -143,24 +143,30 @@ class SecondaryEntityForm(FlaskForm):
 
 
 # TODO: how to pass form_class
-class SymptomsFormList(FlaskForm):
+class PrimeSecFormList(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # Populate primary entities
         prime_entities = kwargs.pop('prime_entities', None)
         if prime_entities is not None:
             for entity in prime_entities:
                 self.primary.append_entry(entity)
+        prime_label = kwargs.pop('prime_label', 'Primários')
+        self.primary.label = prime_label
+
+        # Populate secondary entities
         sec_entities = kwargs.pop('sec_entities', None)
         if sec_entities is not None:
             for entity in sec_entities:
                 self.secondary.append_entry(entity)
+        sec_label = kwargs.pop('sec_label', 'Secundários')
+        self.secondary.label = sec_label
 
     primary = wtf.FieldList(
-        wtf.FormField(form_class=PrimaryEntityForm),
-                      label='Sintomas observados')
+        wtf.FormField(form_class=PrimaryEntityForm))
     secondary = wtf.FieldList(
-        wtf.FormField(form_class=SecondaryEntityForm),
-        label='Sintomas secundarios')
+        wtf.FormField(form_class=SecondaryEntityForm))
+    submit = wtf.SubmitField('Criar')
 
 
 class ObservedRiskFactorForm(FlaskForm):

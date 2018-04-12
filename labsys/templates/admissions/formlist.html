@@ -3,7 +3,10 @@
 {% import "utils/_forms_rendering.html" as frender %}
 
 {% block page_content %}
-    <!-- ObservedSymptoms list -->
-    {{ frender.render_prime_symptoms(prime_fieldlist) }}
-    {{ frender.render_sec_symptoms(sec_fieldlist) }}
+    {{ frender.render_simple_errors(form) }}
+    <form class="form" method="post">
+        {{ frender.prime_entities_fieldlist(form.primary) }}
+        {{ frender.sec_entities_fieldlist(form.secondary) }}
+        {{ wtf.form_field(form.submit) }}
+    </form>
 {% endblock %}

@@ -95,9 +95,9 @@
   </fieldset>
 {%- endmacro %}
 
-{% macro render_prime_symptoms(fieldlist) -%}
+{% macro prime_entities_fieldlist(fieldlist) -%}
     <fieldset>
-        <legend>{{ fieldlist.label.text }}</legend>
+        <legend>{{ fieldlist.label }}</legend>
         {% for formfield in fieldlist.entries %}
             {{ formfield.hidden_tag() }}
             <div class="form-inline">
@@ -114,9 +114,9 @@
     </fieldset>
 {%- endmacro %}
 
-{% macro render_sec_symptoms(fieldlist) -%}
+{% macro sec_entities_fieldlist(fieldlist) -%}
     <fieldset>
-        <legend>{{ fieldlist.label.text }}</legend>
+        <legend>{{ fieldlist.label }}</legend>
         {% for formfield in fieldlist.entries %}
             {{ formfield.hidden_tag() }}
             <div class="form-inline">

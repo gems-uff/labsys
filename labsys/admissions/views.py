@@ -105,8 +105,19 @@ def test_forms():
         {'symptom_id': 10, 'observed': True, 'details': 'aaaaaa', 'symptom_name': 'dor de gargante'},
         {'symptom_id': 11, 'observed': False, 'details': '', 'symptom_name': 'dor de cabeca'},
     ]
-    form = forms.SymptomsFormList(prime_entities=prime_symptoms,
-                                      sec_entities=sec_symptoms)
+    form = forms.PrimeSecFormList(prime_entities=prime_symptoms,
+                                  prime_label='Sintomas observados',
+                                  sec_entities=sec_symptoms,
+                                  sec_label='Sintomas secundários')
+
     return render_template(template,
-                           prime_fieldlist=form.primary,
-                           sec_fieldlist=form.secondary)
+                           form=form)
+
+
+@blueprint.route('/test-forms', methods=['POST'])
+def post_test_forms():
+    form = forms.PrimeSecFormList()
+    import json
+    print(form.data)
+    response = json.dumps(form.data)
+    return response
