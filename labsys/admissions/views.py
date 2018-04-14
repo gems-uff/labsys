@@ -97,13 +97,13 @@ def add_dated_events(admission_id):
 def test_forms():
     template = 'admissions/formlist.html'
     prime_symptoms = [
-        {'symptom_id': 1, 'observed': True, 'details': 'details', 'symptom_name': 'Febre'},
-        {'symptom_id': 2, 'observed': False, 'details': '', 'symptom_name': 'Gripe'},
+        {'symptom_id': 1, 'observed': True, 'details': 'details', 'entity_name': 'Febre'},
+        {'symptom_id': 2, 'observed': False, 'details': '', 'entity_name': 'Gripe'},
         {'symptom_id': 3, 'observed': None},
     ]
     sec_symptoms = [
-        {'symptom_id': 10, 'observed': True, 'details': 'aaaaaa', 'symptom_name': 'dor de gargante'},
-        {'symptom_id': 11, 'observed': False, 'details': '', 'symptom_name': 'dor de cabeca'},
+        {'symptom_id': 10, 'observed': True, 'details': 'aaaaaa', 'entity_name': 'dor de gargante'},
+        {'symptom_id': 11, 'observed': False, 'details': '', 'entity_name': 'dor de cabeca'},
     ]
     form = forms.PrimeSecFormList(prime_entities=prime_symptoms,
                                   prime_label='Sintomas observados',

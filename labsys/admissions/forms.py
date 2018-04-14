@@ -118,28 +118,25 @@ class ClinicalEvolutionForm(FlaskForm):
                          date_label='Data do óbito', **kwargs)
 
 
-class PrimaryEntityForm(FlaskForm):
+class ObservedEntityForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = wtf.Label(
             self.observed.id,
-            kwargs.pop('symptom_name', 'UNDEFINED'))
+            kwargs.pop('entity_name', 'UNDEFINED'))
 
-    symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
+    entity_id = wtf.IntegerField(widget=widgets.HiddenInput())
     observed = NullBooleanField()
     details = wtf.StringField(validators=[length(max=128)],
                               render_kw={'placeholder': 'observações'})
 
 
-class SecondaryEntityForm(FlaskForm):
-    def __init__(self, **kwargs):
-        super().__init__(csrf_enabled=False, **kwargs)
-        self.observed.label = wtf.Label(self.observed.id,
-                                        kwargs.pop('symptom_name', 'Undefined'))
+class PrimaryEntityForm(ObservedEntityForm):
+    pass
 
-    symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
+
+class SecondaryEntityForm(ObservedEntityForm):
     observed = wtf.BooleanField()
-    details = wtf.StringField(validators=[length(max=128)])
 
 
 # TODO: how to pass form_class
@@ -163,7 +160,7 @@ class PrimeSecFormList(FlaskForm):
         self.secondary.label = sec_label
 
     primary = wtf.FieldList(
-        wtf.FormField(form_class=PrimaryEntityForm))
+        wtf.FormField(form_class=ObservedEntityForm))
     secondary = wtf.FieldList(
         wtf.FormField(form_class=SecondaryEntityForm))
     submit = wtf.SubmitField('Criar')
