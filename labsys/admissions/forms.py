@@ -140,7 +140,7 @@ class SecondaryEntityForm(ObservedEntityForm):
 
 
 # TODO: how to pass form_class
-class PrimeSecFormList(FlaskForm):
+class ObservedEntityFormList(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Populate primary entities
@@ -160,7 +160,7 @@ class PrimeSecFormList(FlaskForm):
         self.secondary.label = sec_label
 
     primary = wtf.FieldList(
-        wtf.FormField(form_class=ObservedEntityForm))
+        wtf.FormField(form_class=PrimaryEntityForm))
     secondary = wtf.FieldList(
         wtf.FormField(form_class=SecondaryEntityForm))
     submit = wtf.SubmitField('Criar')

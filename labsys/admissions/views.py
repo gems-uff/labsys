@@ -93,30 +93,51 @@ def add_dated_events(admission_id):
     vaccine_form = forms.VaccineForm(occurred=1, date='2018-0101')
 
 
-@blueprint.route('/test-forms')
-def test_forms():
+@blueprint.route('/test-symptoms-formlist')
+def test_symptoms_formlist():
     template = 'admissions/formlist.html'
     prime_symptoms = [
-        {'symptom_id': 1, 'observed': True, 'details': 'details', 'entity_name': 'Febre'},
-        {'symptom_id': 2, 'observed': False, 'details': '', 'entity_name': 'Gripe'},
-        {'symptom_id': 3, 'observed': None},
+        {'entity_id': 1, 'observed': True, 'details': 'details', 'entity_name': 'Febre'},
+        {'entity_id': 2, 'observed': False, 'details': '', 'entity_name': 'Gripe'},
+        {'entity_id': 3, 'observed': None},
     ]
     sec_symptoms = [
-        {'symptom_id': 10, 'observed': True, 'details': 'aaaaaa', 'entity_name': 'dor de gargante'},
-        {'symptom_id': 11, 'observed': False, 'details': '', 'entity_name': 'dor de cabeca'},
+        {'entity_id': 10, 'observed': True, 'details': 'aaaaaa', 'entity_name': 'dor de gargante'},
+        {'entity_id': 11, 'observed': False, 'details': '', 'entity_name': 'dor de cabeca'},
     ]
-    form = forms.PrimeSecFormList(prime_entities=prime_symptoms,
+    form = forms.ObservedEntityFormList(prime_entities=prime_symptoms,
                                   prime_label='Sintomas observados',
                                   sec_entities=sec_symptoms,
                                   sec_label='Sintomas secundários')
+    return render_template(template,
+                           form=form)
 
+
+@blueprint.route('/test-riskfactors-formlist', methods=['GET', 'POST'])
+def test_riskfactors_formlist():
+    template = 'admissions/formlist.html'
+    prime_risk_factors = [
+        {'entity_id': 1, 'observed': True, 'details': 'details', 'entity_name': 'Obesidade'},
+        {'entity_id': 2, 'observed': False, 'details': '', 'entity_name': 'Fator de risco qq'},
+        {'entity_id': 3, 'observed': None},
+    ]
+    sec_risk_factors = [
+        {'entity_id': 10, 'observed': True, 'details': 'aaaaaa', 'entity_name': 'fator de risco sec'},
+        {'entity_id': 11, 'observed': False, 'details': '', 'entity_name': 'fator outro'},
+    ]
+    form = forms.ObservedEntityFormList(prime_entities=prime_risk_factors,
+                                        prime_label='Fatores de Risco',
+                                        sec_entities=sec_risk_factors,
+                                        sec_label='Fatores de Risco secundários')
+    if form.validate_on_submit():
+        pass
     return render_template(template,
                            form=form)
 
 
 @blueprint.route('/test-forms', methods=['POST'])
 def post_test_forms():
-    form = forms.PrimeSecFormList()
+    form = forms.ObservedEntityFormList()
     import json
     print(form.data)
     response = json.dumps(form.data)
