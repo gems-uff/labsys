@@ -139,7 +139,7 @@ class SecondaryEntityForm(ObservedEntityForm):
     observed = wtf.BooleanField()
 
 
-# TODO: how to pass form_class
+# TODO: how to pass form_class => make a class factory method
 class ObservedEntityFormList(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

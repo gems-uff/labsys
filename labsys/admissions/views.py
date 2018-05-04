@@ -93,6 +93,7 @@ def add_dated_events(admission_id):
     vaccine_form = forms.VaccineForm(occurred=1, date='2018-0101')
 
 
+# TODO: find out why when fail it creates another instance of fields
 @blueprint.route('/<int:admission_id>/symptoms', methods=['GET', 'POST'])
 @permission_required(Permission.CREATE)
 def add_symptoms(admission_id):
@@ -100,19 +101,17 @@ def add_symptoms(admission_id):
     admission = Admission.query.get_or_404(admission_id)
     symptoms = get_admission_symptoms(admission.id)
     prime_symptoms = [
-        {'entity_id': 1, 'observed': True, 'details': 'details', 'entity_name': 'Febre'},
-        {'entity_id': 2, 'observed': False, 'details': '', 'entity_name': 'Gripe'},
-        {'entity_id': 3, 'observed': None},
-    ]
+        symptom for symptom in symptoms if symptom['primary'] is True]
     sec_symptoms = [
-        {'entity_id': 10, 'observed': True, 'details': 'aaaaaa', 'entity_name': 'dor de gargante'},
-        {'entity_id': 11, 'observed': False, 'details': '', 'entity_name': 'dor de cabeca'},
-    ]
+        symptom for symptom in symptoms if symptom['primary'] is False]
     form = forms.ObservedEntityFormList(prime_entities=prime_symptoms,
                                         prime_label='Sintomas observados',
                                         sec_entities=sec_symptoms,
                                         sec_label='Sintomas secundários')
-    # form = forms.ObservedEntityFormList()
     if form.validate_on_submit():
+        for prime_symptom in form.primary.entries:
+            print(prime_symptom.entity_id.data)
+            print(prime_symptom.observed.data)
+            print(prime_symptom.details.data)
         return redirect(url_for('.add_symptoms', admission_id=admission_id))
     return render_template(template, form=form)

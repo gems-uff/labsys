@@ -9,14 +9,13 @@ def get_admission_symptoms(admission_id):
         WHERE obs.admission_id = %d OR obs.admission_id IS NULL' % admission_id
     result = db.engine.execute(query)
 
-    mapped_symptoms = [
-        {
-            'symptom_id': symptom[0],
-            'symptom_name': symptom[1],
-            'primary': symptom[2],
-            'observed': symptom[3],
-            'details': symptom[4],
-        } for symptom in result.fetchall()]
+    mapped_symptoms = [{
+        'entity_id': symptom[0],
+        'entity_name': symptom[1],
+        'primary': symptom[2],
+        'observed': symptom[3],
+        'details': symptom[4],
+    } for symptom in result.fetchall()]
     return mapped_symptoms
 
 
@@ -30,8 +29,8 @@ def get_admission_risk_factors(admission_id):
 
     mapped_risk_factors = [
         {
-            'risk_factor_id': risk_factor[0],
-            'risk_factor_name': risk_factor[1],
+            'entity_id': risk_factor[0],
+            'entity_name': risk_factor[1],
             'primary': risk_factor[2],
             'observed': risk_factor[3],
             'details': risk_factor[4],
