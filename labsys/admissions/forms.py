@@ -139,25 +139,11 @@ class SecondaryEntityForm(ObservedEntityForm):
     observed = wtf.BooleanField()
 
 
-# TODO: how to pass form_class => make a class factory method
 class ObservedEntityFormList(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Populate primary entities
-        prime_entities = kwargs.pop('prime_entities', None)
-        if prime_entities is not None:
-            for entity in prime_entities:
-                self.primary.append_entry(entity)
-        prime_label = kwargs.pop('prime_label', 'Primários')
-        self.primary.label = prime_label
-
-        # Populate secondary entities
-        sec_entities = kwargs.pop('sec_entities', None)
-        if sec_entities is not None:
-            for entity in sec_entities:
-                self.secondary.append_entry(entity)
-        sec_label = kwargs.pop('sec_label', 'Secundários')
-        self.secondary.label = sec_label
+        self.primary.label = kwargs.pop('prime_label', 'Primários')
+        self.secondary.label = kwargs.pop('sec_label', 'Secundários')
 
     primary = wtf.FieldList(
         wtf.FormField(form_class=PrimaryEntityForm))

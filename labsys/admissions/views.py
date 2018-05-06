@@ -104,14 +104,12 @@ def add_symptoms(admission_id):
         symptom for symptom in symptoms if symptom['primary'] is True]
     sec_symptoms = [
         symptom for symptom in symptoms if symptom['primary'] is False]
-    form = forms.ObservedEntityFormList(prime_entities=prime_symptoms,
-                                        prime_label='Sintomas observados',
-                                        sec_entities=sec_symptoms,
-                                        sec_label='Sintomas secundários')
+    form = forms.ObservedEntityFormList(data={'primary': prime_symptoms, 'secondary': sec_symptoms})
     if form.validate_on_submit():
         for prime_symptom in form.primary.entries:
-            print(prime_symptom.entity_id.data)
-            print(prime_symptom.observed.data)
-            print(prime_symptom.details.data)
+            if prime_symptom.observed.data is not None:
+                print(prime_symptom.entity_id.data)
+                print(prime_symptom.observed.data)
+                print(prime_symptom.details.data)
         return redirect(url_for('.add_symptoms', admission_id=admission_id))
     return render_template(template, form=form)
