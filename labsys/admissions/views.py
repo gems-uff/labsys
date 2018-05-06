@@ -108,8 +108,6 @@ def add_symptoms(admission_id):
     if form.validate_on_submit():
         for prime_symptom in form.primary.entries:
             if prime_symptom.observed.data is not None:
-                print(prime_symptom.entity_id.data)
-                print(prime_symptom.observed.data)
-                print(prime_symptom.details.data)
+                pass
         return redirect(url_for('.add_symptoms', admission_id=admission_id))
     return render_template(template, form=form)

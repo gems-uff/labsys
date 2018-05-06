@@ -152,28 +152,6 @@ class ObservedEntityFormList(FlaskForm):
     submit = wtf.SubmitField('Criar')
 
 
-class ObservedRiskFactorForm(FlaskForm):
-    def __init__(self, **kwargs):
-        super().__init__(csrf_enabled=False, **kwargs)
-        self.observed.label = wtf.Label(self.observed.id,
-                                        kwargs.pop('risk_factor_name', 'Undefined'))
-
-    risk_factor_id = wtf.IntegerField(widget=widgets.HiddenInput())
-    observed = NullBooleanField()
-    details = wtf.StringField(validators=[length(max=128)])
-
-
-class SecondaryRiskFactorForm(FlaskForm):
-    def __init__(self, **kwargs):
-        super().__init__(csrf_enabled=False, **kwargs)
-        self.observed.label = wtf.Label(self.observed.id,
-                                        kwargs.pop('risk_factor_name', 'Undefined'))
-
-    risk_factor_id = wtf.IntegerField(widget=widgets.HiddenInput())
-    observed = wtf.BooleanField()
-    details = wtf.StringField(validators=[length(max=128)])
-
-
 class CdcExamForm(FlaskForm):
     def __init__(self, **kwargs):
         super(CdcExamForm, self).__init__(csrf_enabled=False, **kwargs)
