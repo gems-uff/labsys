@@ -1,4 +1,5 @@
 from labsys.extensions import db
+from labsys.admissions.models import ObservedSymptom
 
 
 def get_admission_symptoms(admission_id):
@@ -36,3 +37,26 @@ def get_admission_risk_factors(admission_id):
             'details': risk_factor[4],
         } for risk_factor in result.fetchall()]
     return mapped_risk_factors
+
+def upsert_symptom(admission, obs_symptom_dict):
+    '''
+    Edge cases:
+    - Insert a new symptom => should create another
+    - Insert an existing symptom with same data
+        => should NOT create another
+        => should UPDATE existing obs_symptom (observed, details)
+    '''
+    obs_symptom = ObservedSymptom.query.filter_by(
+        admission_id=admission.id,
+        symptom_id=obs_symptom_dict['entity_id'],
+    ).first()
+
+    if obs_symptom is None:
+        obs_symptom = ObservedSymptom()
+
+    obs_symptom.admission_id = admission.id
+    obs_symptom.symptom_id = obs_symptom_dict['entity_id']
+    obs_symptom.observed = obs_symptom_dict['observed']
+    obs_symptom.details= obs_symptom_dict['details']
+    db.session.add(obs_symptom)
+    db.session.commit()

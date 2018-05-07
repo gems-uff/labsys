@@ -4,15 +4,14 @@ from flask_login import login_required
 from labsys.auth.decorators import permission_required
 from labsys.auth.models import Permission
 from labsys.utils.decorators import paginated
+from labsys.admissions import service
 
-from . import blueprint
+from . import blueprint, forms
 from ..extensions import db
 from .forms import AdmissionForm
-from . import forms
 from .models import (Address, Admission, CdcExam, ClinicalEvolution,
                      Hospitalization, ObservedSymptom, Patient, Sample,
                      Symptom, UTIHospitalization, Vaccine)
-from .services import get_admission_risk_factors, get_admission_symptoms
 
 
 # TODO: do I need this?
@@ -99,15 +98,16 @@ def add_dated_events(admission_id):
 def add_symptoms(admission_id):
     template = 'admissions/formlist.html'
     admission = Admission.query.get_or_404(admission_id)
-    symptoms = get_admission_symptoms(admission.id)
+    symptoms = service.get_admission_symptoms(admission_id)
     prime_symptoms = [
         symptom for symptom in symptoms if symptom['primary'] is True]
     sec_symptoms = [
         symptom for symptom in symptoms if symptom['primary'] is False]
-    form = forms.ObservedEntityFormList(data={'primary': prime_symptoms, 'secondary': sec_symptoms})
+    form = forms.ObservedEntityFormList(
+        data={'primary': prime_symptoms, 'secondary': sec_symptoms})
     if form.validate_on_submit():
         for prime_symptom in form.primary.entries:
             if prime_symptom.observed.data is not None:
-                pass
-        return redirect(url_for('.add_symptoms', admission_id=admission_id))
+                service.upsert_symptom(admission, prime_symptom.data)
+        return redirect(url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)
