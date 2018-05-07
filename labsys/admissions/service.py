@@ -39,10 +39,31 @@ def get_admission_risk_factors(admission_id):
     return mapped_risk_factors
 
 def upsert_symptom(admission_id, obs_symptom_dict):
+    '''
+    This method may create, update or remove an observed symptom
+    from an admission.
+
+    - Create: if there's no assigned observed symptom and the incoming
+    hasn't been ignored.
+    - Update: if there's already one assigned and has been updated to
+    something else than ignored.
+    - Delete: in the case there's already one assigned and it has been
+    updated to ignored.
+    '''
     obs_symptom = ObservedSymptom.query.filter_by(
         admission_id=admission_id,
         symptom_id=obs_symptom_dict['entity_id'],
     ).first()
+
+    if obs_symptom_dict['observed'] is None:
+        # Not assigned => don't do anything
+        if obs_symptom is None:
+            return
+        # Assigned => delete it
+        else:
+            db.session.delete(obs_symptom)
+            db.session.commit()
+            return
 
     if obs_symptom is None:
         obs_symptom = ObservedSymptom()
