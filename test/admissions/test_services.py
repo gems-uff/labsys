@@ -26,6 +26,7 @@ class TestAdmissionServices(unittest.TestCase):
         db.drop_all()
 
     def test_upsert_symptom_to_admission(self):
+        # TODO: test excluding
         admission = mock.admission()
         db.session.add(admission)
         db.session.commit()

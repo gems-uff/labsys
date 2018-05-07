@@ -106,7 +106,8 @@ def add_symptoms(admission_id):
     form = forms.ObservedEntityFormList(
         data={'primary': prime_symptoms, 'secondary': sec_symptoms})
     if form.validate_on_submit():
-        for prime_symptom in form.primary.entries:
-            service.upsert_symptom(admission_id, prime_symptom.data)
+        entries = form.primary.entries + form.secondary.entries
+        for symptom in entries:
+            service.upsert_symptom(admission_id, symptom.data)
         return redirect(url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)

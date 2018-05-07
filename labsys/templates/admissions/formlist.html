@@ -8,7 +8,7 @@
         {{ form.hidden_tag() }}
         {{ wtf.form_errors(form, hiddens="only") }}
         {{ frender.prime_entities_fieldlist(form.primary) }}
-        {{ frender.sec_entities_fieldlist(form.secondary) }}
+        {{ frender.prime_entities_fieldlist(form.secondary) }}
         {{ wtf.form_field(form.submit) }}
     </form>
 {% endblock %}

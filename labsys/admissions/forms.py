@@ -131,12 +131,8 @@ class ObservedEntityForm(FlaskForm):
                               render_kw={'placeholder': 'observações'})
 
 
-class PrimaryEntityForm(ObservedEntityForm):
+class EntityForm(ObservedEntityForm):
     pass
-
-
-class SecondaryEntityForm(ObservedEntityForm):
-    observed = wtf.BooleanField()
 
 
 class ObservedEntityFormList(FlaskForm):
@@ -146,9 +142,9 @@ class ObservedEntityFormList(FlaskForm):
         self.secondary.label = kwargs.pop('sec_label', 'Secundários')
 
     primary = wtf.FieldList(
-        wtf.FormField(form_class=PrimaryEntityForm))
+        wtf.FormField(form_class=EntityForm))
     secondary = wtf.FieldList(
-        wtf.FormField(form_class=SecondaryEntityForm))
+        wtf.FormField(form_class=EntityForm))
     submit = wtf.SubmitField('Criar')
 
 
