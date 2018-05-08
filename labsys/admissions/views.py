@@ -80,10 +80,15 @@ def create_admission():
 @blueprint.route('/<int:admission_id>', methods=['GET'])
 @permission_required(Permission.VIEW)
 def detail_admission(admission_id):
+    template = 'admissions/detail-admission.html'
     admission = Admission.query.get_or_404(admission_id)
     admission_form = AdmissionForm(obj=admission)
-    return render_template('admissions/detail-admission.html',
-                           admission=admission_form)
+    symptoms_link = url_for('.add_symptoms', admission_id=admission_id)
+    return render_template(
+        template,
+        admission=admission_form,
+        symptoms_link=symptoms_link
+    )
 
 
 @blueprint.route('/<int:admission_id>/dated-events', methods=['GET, POST'])
@@ -92,11 +97,10 @@ def add_dated_events(admission_id):
     vaccine_form = forms.VaccineForm(occurred=1, date='2018-0101')
 
 
-# TODO: find out why when fail it creates another instance of fields
 @blueprint.route('/<int:admission_id>/symptoms', methods=['GET', 'POST'])
 @permission_required(Permission.CREATE)
 def add_symptoms(admission_id):
-    template = 'admissions/formlist.html'
+    template = 'admissions/entities_formlist.html'
     admission = Admission.query.get_or_404(admission_id)
     symptoms = service.get_admission_symptoms(admission_id)
     prime_symptoms = [
