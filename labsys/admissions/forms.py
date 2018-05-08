@@ -140,7 +140,8 @@ class ObservedSymptomFormList(FlaskForm):
         'Primários')
     secondary = wtf.TextField(
         'Secundários (separar por vírgula)',
-        validators=[Optional()])
+        validators=[Optional()],
+        render_kw={'placeholder': 'Ex.: tosse, desmaios, febre (40 graus)'})
     submit = wtf.SubmitField('Criar')
 
 

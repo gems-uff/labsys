@@ -103,10 +103,12 @@ def add_symptoms(admission_id):
     template = 'admissions/entities_formlist.html'
     admission = Admission.query.get_or_404(admission_id)
     symptoms = service.get_admission_symptoms(admission_id)
-    prime_symptoms = [
-        symptom for symptom in symptoms if symptom['primary'] is True]
-    form = forms.ObservedSymptomFormList(data={'primary': prime_symptoms})
+    form = forms.ObservedSymptomFormList(data={
+        'primary': symptoms,
+        'secondary': admission.secondary_symptoms,
+    })
     if form.validate_on_submit():
+        admission.secondary_symptoms = form.secondary.data
         for symptom in form.primary.entries:
             service.upsert_symptom(admission_id, symptom.data)
         return redirect(url_for('.detail_admission', admission_id=admission_id))
