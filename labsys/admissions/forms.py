@@ -118,7 +118,7 @@ class ClinicalEvolutionForm(FlaskForm):
                          date_label='Data do óbito', **kwargs)
 
 
-class ObservedEntityForm(FlaskForm):
+class ObservedSymptomForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = wtf.Label(
@@ -131,20 +131,16 @@ class ObservedEntityForm(FlaskForm):
                               render_kw={'placeholder': 'observações'})
 
 
-class EntityForm(ObservedEntityForm):
-    pass
-
-
-class ObservedEntityFormList(FlaskForm):
+class ObservedSymptomFormList(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.primary.label = kwargs.pop('prime_label', 'Primários')
-        self.secondary.label = kwargs.pop('sec_label', 'Secundários')
 
     primary = wtf.FieldList(
-        wtf.FormField(form_class=EntityForm))
-    secondary = wtf.FieldList(
-        wtf.FormField(form_class=EntityForm))
+        wtf.FormField(form_class=ObservedSymptomForm),
+        'Primários')
+    secondary = wtf.TextField(
+        'Secundários (separar por vírgula)',
+        validators=[Optional()])
     submit = wtf.SubmitField('Criar')
 
 
