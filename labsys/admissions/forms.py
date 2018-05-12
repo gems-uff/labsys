@@ -123,9 +123,9 @@ class ObservedSymptomForm(FlaskForm):
         super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = wtf.Label(
             self.observed.id,
-            kwargs.pop('entity_name', 'UNDEFINED'))
+            kwargs.pop('symptom_name', 'UNDEFINED'))
 
-    entity_id = wtf.IntegerField(widget=widgets.HiddenInput())
+    symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
     observed = NullBooleanField()
     details = wtf.StringField(validators=[length(max=128)],
                               render_kw={'placeholder': 'observações'})

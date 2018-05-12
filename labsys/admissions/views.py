@@ -102,9 +102,9 @@ def add_dated_events(admission_id):
 def add_symptoms(admission_id):
     template = 'admissions/entities_formlist.html'
     admission = Admission.query.get_or_404(admission_id)
-    symptoms = service.get_admission_symptoms(admission_id)
+    symptoms, symptoms_dict = service.get_admission_symptoms(admission_id)
     form = forms.ObservedSymptomFormList(data={
-        'primary': symptoms,
+        'primary': symptoms_dict,
         'secondary': admission.secondary_symptoms,
     })
     if form.validate_on_submit():
