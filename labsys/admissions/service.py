@@ -17,11 +17,12 @@ def get_admission_symptoms(admission_id):
     #     'observed': symptom[3],
     #     'details': symptom[4],
     # } for symptom in result.fetchall()]
-    observed_symptoms_ids = [s.id for s in Admission.query.get(admission_id).symptoms]
+    observed_symptoms_ids = [obs.symptom_id for obs in Admission.query.get(admission_id).symptoms]
     symptoms = [s for s in Symptom.query.all()]
 
     mapped_symptoms = []
 
+    # import pdb; pdb.set_trace()
     for symptom in symptoms:
         if symptom.id in observed_symptoms_ids:
             observed_symptom = ObservedSymptom.query.filter_by(symptom_id=symptom.id).first()
@@ -57,7 +58,7 @@ def get_admission_risk_factors(admission_id):
         } for risk_factor in result.fetchall()]
     return mapped_risk_factors
 
-def upsert_symptom(admission_id, obs_symptom_dict):
+def upsert_symptom(admission_id, obs_symptom_formdata):
     '''
     This method may create, update or remove an observed symptom
     from an admission.
@@ -69,27 +70,26 @@ def upsert_symptom(admission_id, obs_symptom_dict):
     - Delete: in the case there's already one assigned and it has been
     updated to ignored.
     '''
-    obs_symptom = ObservedSymptom.query.filter_by(
+    obs_symptom_obj = ObservedSymptom.query.filter_by(
         admission_id=admission_id,
-        symptom_id=symptom.id,
+        symptom_id=obs_symptom_formdata['symptom_id'],
     ).first()
 
-    if symptom.observed is None:
+    if obs_symptom_formdata['observed'] is None:
         # Not assigned => don't do anything
-        if obs_symptom is None:
+        if obs_symptom_obj is None:
             return
         # Assigned => delete it
-        else:
-            db.session.delete(obs_symptom)
-            db.session.commit()
-            return
+        db.session.delete(obs_symptom_obj)
+        db.session.commit()
+        return
 
-    if obs_symptom is None:
-        obs_symptom = ObservedSymptom()
+    if obs_symptom_obj is None:
+        obs_symptom_obj = ObservedSymptom()
 
-    obs_symptom.admission_id = admission_id
-    obs_symptom.symptom_id = symptom.id
-    obs_symptom.observed = symptom.observed
-    obs_symptom.details = symptom.details
-    db.session.add(obs_symptom)
+    obs_symptom_obj.admission_id = admission_id
+    obs_symptom_obj.symptom_id = obs_symptom_formdata['symptom_id']
+    obs_symptom_obj.observed = obs_symptom_formdata['observed']
+    obs_symptom_obj.details = obs_symptom_formdata['details']
+    db.session.add(obs_symptom_obj)
     db.session.commit()
