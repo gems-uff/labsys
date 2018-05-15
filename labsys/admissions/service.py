@@ -1,28 +1,13 @@
 from labsys.extensions import db
-from labsys.admissions.models import ObservedSymptom, Admission, Symptom
+from labsys.admissions.models import ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor
 
 
 def get_admission_symptoms(admission_id):
-    # query = 'SELECT s.id, s.name, s.primary, obs.observed, obs.details \
-    #     FROM symptoms s \
-    #     LEFT JOIN observed_symptoms obs \
-    #         ON s.id = obs.symptom_id \
-    #     WHERE obs.admission_id = %d OR obs.admission_id IS NULL' % admission_id
-    # result = db.engine.execute(query)
-
-    # mapped_symptoms = [{
-    #     'entity_id': symptom[0],
-    #     'entity_name': symptom[1],
-    #     'primary': symptom[2],
-    #     'observed': symptom[3],
-    #     'details': symptom[4],
-    # } for symptom in result.fetchall()]
     observed_symptoms_ids = [obs.symptom_id for obs in Admission.query.get(admission_id).symptoms]
     symptoms = [s for s in Symptom.query.all()]
 
     mapped_symptoms = []
 
-    # import pdb; pdb.set_trace()
     for symptom in symptoms:
         if symptom.id in observed_symptoms_ids:
             observed_symptom = ObservedSymptom.query.filter_by(symptom_id=symptom.id).first()
@@ -41,22 +26,27 @@ def get_admission_symptoms(admission_id):
 
 
 def get_admission_risk_factors(admission_id):
-    query = 'SELECT rf.id, rf.name, rf.primary, obs.observed, obs.details \
-        FROM risk_factors rf \
-        LEFT JOIN observed_risk_factors obs \
-            ON rf.id = obs.symptom_id \
-        WHERE obs.admission_id = %d OR obs.admission_id IS NULL' % admission_id
-    result = db.engine.execute(query)
+    observed_factors_ids = [obs.risk_factor_id for obs in Admission.query.get(admission_id).risk_factors]
+    factors = [f for f in RiskFactor.query.all()]
 
-    mapped_risk_factors = [
-        {
-            'entity_id': risk_factor[0],
-            'entity_name': risk_factor[1],
-            'primary': risk_factor[2],
-            'observed': risk_factor[3],
-            'details': risk_factor[4],
-        } for risk_factor in result.fetchall()]
-    return mapped_risk_factors
+    mapped_factors = []
+
+    for factor in factors:
+        if factor.id in observed_factors_ids:
+            observed_factor = ObservedRiskFactor.query.filter_by(risk_factor_id=factor.id).first()
+            factor.observed = observed_factor.observed
+            factor.details = observed_factor.details
+        else:
+            factor.observed = None
+            factor.details = ''
+        mapped_factors.append(factor)
+    return mapped_factors, [{
+        'risk_factor_name': factor.name,
+        'risk_factor_id': factor.id,
+        'observed': factor.observed,
+        'details': factor.details
+    } for factor in mapped_factors]
+
 
 def upsert_symptom(admission_id, obs_symptom_formdata):
     '''
@@ -92,4 +82,30 @@ def upsert_symptom(admission_id, obs_symptom_formdata):
     obs_symptom_obj.observed = obs_symptom_formdata['observed']
     obs_symptom_obj.details = obs_symptom_formdata['details']
     db.session.add(obs_symptom_obj)
+    db.session.commit()
+
+
+def upsert_risk_factor(admission_id, obs_factor_formdata):
+    obs_factor_obj = ObservedRiskFactor.query.filter_by(
+        admission_id=admission_id,
+        risk_factor_id=obs_factor_formdata['risk_factor_id'],
+    ).first()
+
+    if obs_factor_formdata['observed'] is None:
+        # Not assigned => don't do anything
+        if obs_factor_obj is None:
+            return
+        # Assigned => delete it
+        db.session.delete(obs_factor_obj)
+        db.session.commit()
+        return
+
+    if obs_factor_obj is None:
+        obs_factor_obj = ObservedRiskFactor()
+
+    obs_factor_obj.admission_id = admission_id
+    obs_factor_obj.risk_factor_id = obs_factor_formdata['risk_factor_id']
+    obs_factor_obj.observed = obs_factor_formdata['observed']
+    obs_factor_obj.details = obs_factor_formdata['details']
+    db.session.add(obs_factor_obj)
     db.session.commit()
