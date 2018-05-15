@@ -65,6 +65,9 @@ class Admission(db.Model):
     health_unit = db.Column(db.String(128))
     requesting_institution = db.Column(db.String(128))
     details = db.Column(db.String(255))
+    # maybe it should be in a separate table
+    secondary_symptoms = db.Column(db.String(512), nullable=True)
+    # relationships
     samples = db.relationship(
         'Sample', backref='admission', lazy='dynamic')
 
@@ -100,8 +103,11 @@ class ClinicalEvolution(AdmissionOneToOneMixin, DatedEvent):
         super().__init__(**kwargs)
 
 
-class Symptom(PrimarySecondaryEntity):
+class Symptom(db.Model):
     __tablename__ = 'symptoms'
+    id = db.Column(db.Integer, primary_key=True)
+    # Attributes
+    name = db.Column(db.String(64))
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

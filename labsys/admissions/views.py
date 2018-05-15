@@ -102,16 +102,14 @@ def add_dated_events(admission_id):
 def add_symptoms(admission_id):
     template = 'admissions/entities_formlist.html'
     admission = Admission.query.get_or_404(admission_id)
-    symptoms = service.get_admission_symptoms(admission_id)
-    prime_symptoms = [
-        symptom for symptom in symptoms if symptom['primary'] is True]
-    sec_symptoms = [
-        symptom for symptom in symptoms if symptom['primary'] is False]
-    form = forms.ObservedEntityFormList(
-        data={'primary': prime_symptoms, 'secondary': sec_symptoms})
+    symptoms, symptoms_dict = service.get_admission_symptoms(admission_id)
+    form = forms.ObservedSymptomFormList(data={
+        'primary': symptoms_dict,
+        'secondary': admission.secondary_symptoms,
+    })
     if form.validate_on_submit():
-        entries = form.primary.entries + form.secondary.entries
-        for symptom in entries:
+        admission.secondary_symptoms = form.secondary.data
+        for symptom in form.primary.entries:
             service.upsert_symptom(admission_id, symptom.data)
         return redirect(url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)

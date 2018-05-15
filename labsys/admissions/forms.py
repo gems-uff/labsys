@@ -118,33 +118,30 @@ class ClinicalEvolutionForm(FlaskForm):
                          date_label='Data do óbito', **kwargs)
 
 
-class ObservedEntityForm(FlaskForm):
+class ObservedSymptomForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
         self.observed.label = wtf.Label(
             self.observed.id,
-            kwargs.pop('entity_name', 'UNDEFINED'))
+            kwargs.pop('symptom_name', 'UNDEFINED'))
 
-    entity_id = wtf.IntegerField(widget=widgets.HiddenInput())
+    symptom_id = wtf.IntegerField(widget=widgets.HiddenInput())
     observed = NullBooleanField()
     details = wtf.StringField(validators=[length(max=128)],
                               render_kw={'placeholder': 'observações'})
 
 
-class EntityForm(ObservedEntityForm):
-    pass
-
-
-class ObservedEntityFormList(FlaskForm):
+class ObservedSymptomFormList(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.primary.label = kwargs.pop('prime_label', 'Primários')
-        self.secondary.label = kwargs.pop('sec_label', 'Secundários')
 
     primary = wtf.FieldList(
-        wtf.FormField(form_class=EntityForm))
-    secondary = wtf.FieldList(
-        wtf.FormField(form_class=EntityForm))
+        wtf.FormField(form_class=ObservedSymptomForm),
+        'Primários')
+    secondary = wtf.TextField(
+        'Secundários (separar por vírgula)',
+        validators=[Optional()],
+        render_kw={'placeholder': 'Ex.: tosse, desmaios, febre (40 graus)'})
     submit = wtf.SubmitField('Criar')
 
 
