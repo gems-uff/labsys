@@ -1,7 +1,6 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "utils/_my_wtf.html" as mywtf %}
 
-
 {% macro render_simple_errors(form) -%}
   {% if form.errors %}
     <ul class="errors">
@@ -46,16 +45,19 @@
 {%- endmacro %}
 
 {% macro render_dated_event(form) -%}
-  <fieldset>
-    <legend>{{ form.label.text }}</legend>
-    {% for subfield in form %}
-      {% if subfield.type == "RadioField" %}
-        {{ render_radio_inline_field(subfield) }}
-      {% else %}
-        {{ wtf.form_field(subfield, placeholder="dd/MM/yyyy") }}
-      {% endif %}
-    {% endfor %}
-  </fieldset>
+  {{ form.hidden_tag() }}
+  <div class="form">
+      <fieldset>
+        <label><h3>{{ form.label }}</h3></label>
+      </fieldset>
+      <div class="form-group">
+          {{ form.occurred.label }}:&nbsp;&nbsp;
+          {{ mywtf.form_field(form.occurred) }}&nbsp;&nbsp;
+          {{ form.date.label }}
+          {{ form.date(class="form-control") }}
+      </div>
+  </div>
+  <hr />
 {%- endmacro %}
 
 
