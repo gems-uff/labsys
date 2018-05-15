@@ -13,7 +13,7 @@ import labsys.inventory.models as im
 from labsys.admissions.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Address,
+    Address, RiskFactor, ObservedRiskFactor,
 )
 import labsys.admissions.forms as forms
 import labsys.admissions.models as models
@@ -33,6 +33,8 @@ admin.add_views(
     ProtectedModelView(Symptom, db.session),
     ProtectedModelView(ObservedSymptom, db.session),
     ProtectedModelView(Admission, db.session),
+    ProtectedModelView(RiskFactor, db.session),
+    ProtectedModelView(ObservedRiskFactor, db.session),
 )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion

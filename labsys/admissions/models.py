@@ -3,7 +3,7 @@ from sqlalchemy import asc
 
 from ..extensions import db
 
-from .mixins import AdmissionOneToOneMixin, DatedEvent, PrimarySecondaryEntity
+from .mixins import AdmissionOneToOneMixin, DatedEvent
 
 '''
 Limitações conhecidas
@@ -67,6 +67,7 @@ class Admission(db.Model):
     details = db.Column(db.String(255))
     # maybe it should be in a separate table
     secondary_symptoms = db.Column(db.String(512), nullable=True)
+    secondary_risk_factors = db.Column(db.String(512), nullable=True)
     # relationships
     samples = db.relationship(
         'Sample', backref='admission', lazy='dynamic')
@@ -132,8 +133,11 @@ class ObservedSymptom(db.Model):
         return '<ObservedSymptom[{}]: {}>'.format(self.id, self.symptom.name)
 
 
-class RiskFactor(PrimarySecondaryEntity):
+class RiskFactor(db.Model):
     __tablename__ = 'risk_factors'
+    id = db.Column(db.Integer, primary_key=True)
+    # Attributes
+    name = db.Column(db.String(64))
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
