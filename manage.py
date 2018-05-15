@@ -27,7 +27,11 @@ admin.add_views(
     ProtectedModelView(PreAllowedUser, db.session),
     ProtectedModelView(im.Product, db.session),
     ProtectedModelView(im.Transaction, db.session),
-    ProtectedModelView(im.StockProduct, db.session), )
+    ProtectedModelView(im.StockProduct, db.session),
+    ProtectedModelView(im.Specification, db.session),
+    ProtectedModelView(im.Order, db.session),
+    ProtectedModelView(im.OrderItem, db.session),
+)
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion
 
