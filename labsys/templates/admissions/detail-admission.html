@@ -7,11 +7,20 @@
   {{ frender.render_admission(admission) }}
   <!-- Patient -->
   {{ frender.render_patient(admission.patient) }}
+  <h2>Adicionar/editar sintomas e fatores de risco</h2>
   <!-- Symptoms -->
-  <div style="margin-top: 5%;">
+  <div>
     <fieldset class="btn btn-default">
       <label>
-        <a href="{{ symptoms_link }}">Ver/Editar sintomas e fatores de risco</a>
+        <a href="{{ symptoms_link }}">Sintomas</a>
+      </label>
+    </fieldset>
+  </div>
+  <!-- Risk Factors -->
+  <div>
+    <fieldset class="btn btn-default">
+      <label>
+        <a href="{{ risk_factors_link  }}">Fatores de Risco</a>
       </label>
     </fieldset>
   </div>

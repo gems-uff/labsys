@@ -3,7 +3,6 @@ from labsys.admissions.models import ObservedSymptom, Admission, Symptom, RiskFa
 
 
 def get_admission_symptoms(admission_id):
-
     observed_symptoms_ids = [obs.symptom_id for obs in Admission.query.get(admission_id).symptoms]
     symptoms = [s for s in Symptom.query.all()]
 
@@ -83,4 +82,30 @@ def upsert_symptom(admission_id, obs_symptom_formdata):
     obs_symptom_obj.observed = obs_symptom_formdata['observed']
     obs_symptom_obj.details = obs_symptom_formdata['details']
     db.session.add(obs_symptom_obj)
+    db.session.commit()
+
+
+def upsert_risk_factor(admission_id, obs_factor_formdata):
+    obs_factor_obj = ObservedRiskFactor.query.filter_by(
+        admission_id=admission_id,
+        risk_factor_id=obs_factor_formdata['risk_factor_id'],
+    ).first()
+
+    if obs_factor_formdata['observed'] is None:
+        # Not assigned => don't do anything
+        if obs_factor_obj is None:
+            return
+        # Assigned => delete it
+        db.session.delete(obs_factor_obj)
+        db.session.commit()
+        return
+
+    if obs_factor_obj is None:
+        obs_factor_obj = ObservedRiskFactor()
+
+    obs_factor_obj.admission_id = admission_id
+    obs_factor_obj.risk_factor_id = obs_factor_formdata['risk_factor_id']
+    obs_factor_obj.observed = obs_factor_formdata['observed']
+    obs_factor_obj.details = obs_factor_formdata['details']
+    db.session.add(obs_factor_obj)
     db.session.commit()

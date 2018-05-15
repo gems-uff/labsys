@@ -5,7 +5,6 @@ import wtforms as wtf
 import wtforms.widgets as widgets
 import wtforms.widgets.html5 as html5widgets
 from wtforms.validators import InputRequired, Optional, length
-
 from labsys.utils.custom_fields import NullBooleanField
 
 from . import custom_fields as cfields
@@ -143,6 +142,34 @@ class ObservedSymptomFormList(FlaskForm):
         validators=[Optional()],
         render_kw={'placeholder': 'Ex.: tosse, desmaios, febre (40 graus)'})
     submit = wtf.SubmitField('Criar')
+
+
+class ObservedRiskFactorForm(FlaskForm):
+    def __init__(self, **kwargs):
+        super().__init__(csrf_enabled=False, **kwargs)
+        self.observed.label = wtf.Label(
+            self.observed.id,
+            kwargs.pop('risk_factor_name', 'UNDEFINED'))
+
+    risk_factor_id = wtf.IntegerField(widget=widgets.HiddenInput())
+    observed = NullBooleanField()
+    details = wtf.StringField(validators=[length(max=128)],
+                              render_kw={'placeholder': 'observações'})
+
+
+class ObservedRiskFactorFormList(FlaskForm):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    primary = wtf.FieldList(
+        wtf.FormField(form_class=ObservedRiskFactorForm),
+        'Primários')
+    secondary = wtf.TextField(
+        'Secundários (separar por vírgula)',
+        validators=[Optional()],
+        render_kw={'placeholder': 'Ex.: obesidade'})
+    submit = wtf.SubmitField('Criar')
+
 
 
 class CdcExamForm(FlaskForm):
