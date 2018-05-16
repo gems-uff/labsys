@@ -1,4 +1,5 @@
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import asc
 
 from ..extensions import db
@@ -231,8 +232,13 @@ class CdcExam(db.Model):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)
 
 
-class Antiviral(db.Model):
+class Antiviral(AdmissionOneToOneMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    # Foreign Key
+    @declared_attr
+    def admission_id(cls):
+        return db.Column(db.Integer, db.ForeignKey('admissions.id'))
     # Attributes
     usage = db.Column(db.String(255), nullable=True)
+    other = db.Column(db.String(255), nullable=True)
     start_date = db.Column(db.Date, nullable=True)

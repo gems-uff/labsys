@@ -81,8 +81,8 @@ def create_admission():
 @blueprint.route('/<int:admission_id>', methods=['GET'])
 @permission_required(Permission.VIEW)
 def detail_admission(admission_id):
-    template = 'admissions/detail-admission.html'
     admission = Admission.query.get_or_404(admission_id)
+    template = 'admissions/detail-admission.html'
     admission_form = AdmissionForm(obj=admission)
     symptoms_link = url_for('.add_symptoms', admission_id=admission_id)
     risk_factors_link = url_for('.add_risk_factors', admission_id=admission_id)
@@ -99,8 +99,8 @@ def detail_admission(admission_id):
 @blueprint.route('/<int:admission_id>/dated-events', methods=['GET', 'POST'])
 @permission_required(Permission.CREATE)
 def add_dated_events(admission_id):
-    template = 'admissions/dated-events.html'
     admission = Admission.query.get_or_404(admission_id)
+    template = 'admissions/dated-events.html'
     dated_events = service.get_dated_events(admission)
     form = forms.DatedEventFormGroup(data=dated_events)
     if form.validate_on_submit():
@@ -113,8 +113,8 @@ def add_dated_events(admission_id):
 @blueprint.route('/<int:admission_id>/symptoms', methods=['GET', 'POST'])
 @permission_required(Permission.CREATE)
 def add_symptoms(admission_id):
-    template = 'admissions/entities_formlist.html'
     admission = Admission.query.get_or_404(admission_id)
+    template = 'admissions/entities_formlist.html'
     symptoms, symptoms_dict = service.get_admission_symptoms(admission_id)
     form = forms.ObservedSymptomFormList(data={
         'primary': symptoms_dict,
@@ -131,8 +131,8 @@ def add_symptoms(admission_id):
 @blueprint.route('/<int:admission_id>/riskfactors', methods=['GET', 'POST'])
 @permission_required(Permission.CREATE)
 def add_risk_factors(admission_id):
-    template = 'admissions/entities_formlist.html'
     admission = Admission.query.get_or_404(admission_id)
+    template = 'admissions/entities_formlist.html'
     risk_factors, risk_factors_dict = service.get_admission_risk_factors(admission_id)
     form = forms.ObservedRiskFactorFormList(data={
         'primary': risk_factors_dict,
@@ -144,3 +144,12 @@ def add_risk_factors(admission_id):
             service.upsert_risk_factor(admission_id, risk_factor.data)
         return redirect(url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)
+
+
+@blueprint.route('/<int:admission_id>/antiviral', methods=['GET', 'POST'])
+@permission_required(Permission.CREATE)
+def add_antiviral(admission_id):
+    admission = Admission.query.get_or_404(admission_id)
+    template = 'admissions/antiviral.html'
+    antiviral = service.get_antiviral(admission)
+    form = forms.AntiviralForm(data=antiviral)

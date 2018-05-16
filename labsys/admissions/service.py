@@ -2,6 +2,7 @@ from labsys.extensions import db
 from labsys.admissions.models import (
     ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor,
     Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
+    Antiviral,
 )
 
 
@@ -147,4 +148,16 @@ def upsert_dated_events(admission, dated_events_formdata):
     db.session.add(hospitalization)
     db.session.add(uti_hospitalization)
     db.session.add(clinical_evolution)
+    db.session.commit()
+
+
+def get_antiviral(admission):
+    return admission.antiviral
+
+
+def set_antiviral(admission, antiviral_formdata):
+    if admission.antiviral:
+        admission.antiviral.admission = None
+    antiviral = Antiviral(admission=admission, **antiviral_formdata)
+    db.session.add(antiviral)
     db.session.commit()
