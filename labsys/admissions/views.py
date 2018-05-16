@@ -77,6 +77,7 @@ def create_admission():
     return render_template(template, form=form)
 
 
+# TODO: merge symptoms and riskfactors
 @blueprint.route('/<int:admission_id>', methods=['GET'])
 @permission_required(Permission.VIEW)
 def detail_admission(admission_id):
@@ -85,18 +86,28 @@ def detail_admission(admission_id):
     admission_form = AdmissionForm(obj=admission)
     symptoms_link = url_for('.add_symptoms', admission_id=admission_id)
     risk_factors_link = url_for('.add_risk_factors', admission_id=admission_id)
+    dated_events_link = url_for('.add_dated_events', admission_id=admission_id)
     return render_template(
         template,
         admission=admission_form,
         symptoms_link=symptoms_link,
         risk_factors_link=risk_factors_link,
+        dated_events_link=dated_events_link,
     )
 
 
-@blueprint.route('/<int:admission_id>/dated-events', methods=['GET, POST'])
+@blueprint.route('/<int:admission_id>/dated-events', methods=['GET', 'POST'])
 @permission_required(Permission.CREATE)
 def add_dated_events(admission_id):
-    vaccine_form = forms.VaccineForm(occurred=1, date='2018-0101')
+    template = 'admissions/dated-events.html'
+    admission = Admission.query.get_or_404(admission_id)
+    dated_events = service.get_dated_events(admission)
+    form = forms.DatedEventFormGroup(data=dated_events)
+    if form.validate_on_submit():
+        service.upsert_dated_events(admission, form.data)
+        return redirect(url_for('.detail_admission',
+                                admission_id=admission_id))
+    return render_template(template, form=form)
 
 
 @blueprint.route('/<int:admission_id>/symptoms', methods=['GET', 'POST'])
@@ -133,4 +144,3 @@ def add_risk_factors(admission_id):
             service.upsert_risk_factor(admission_id, risk_factor.data)
         return redirect(url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)
-

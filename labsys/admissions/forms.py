@@ -85,12 +85,13 @@ class DatedEventForm(FlaskForm):
     def __init__(self, occurred_label='Ocorreu', date_label='Data', **kwargs):
         csrf_enabled = kwargs.pop('csrf_enabled', False)
         super().__init__(csrf_enabled=csrf_enabled, **kwargs)
-        self.occurred.label = occurred_label
-        self.date.label = date_label
+        self.occurred.label.text = occurred_label
+        self.date.label.text = date_label
 
     occurred = NullBooleanField(default=None)
+    # TODO: make date required if occurred is True (maybe on route)
     date = wtf.DateField(widget=html5widgets.DateInput(),
-                         validators=[InputRequired()])
+                         validators=[Optional()])
 
 
 class VaccineForm(DatedEventForm):
@@ -99,22 +100,30 @@ class VaccineForm(DatedEventForm):
                          date_label='Data da última dose', **kwargs)
 
 
-class HospitalizationForm(FlaskForm):
+class HospitalizationForm(DatedEventForm):
     def __init__(self, **kwargs):
         super().__init__(occurred_label='Ocorreu internação?',
                          date_label='Data de internação(entrada)', **kwargs)
 
 
-class UTIHospitalizationForm(FlaskForm):
+class UTIHospitalizationForm(DatedEventForm):
     def __init__(self, **kwargs):
         super().__init__(occurred_label='Foi internado em UTI?',
                          date_label='Data de internação (entrada)', **kwargs)
 
 
-class ClinicalEvolutionForm(FlaskForm):
+class ClinicalEvolutionForm(DatedEventForm):
     def __init__(self, **kwargs):
         super().__init__(occurred_label='Evoluiu para óbito?',
                          date_label='Data do óbito', **kwargs)
+
+
+class DatedEventFormGroup(FlaskForm):
+    vaccine = wtf.FormField(VaccineForm, 'Vacina contra gripe')
+    hospitalization = wtf.FormField(HospitalizationForm, 'Internação Hospitalar')
+    uti_hospitalization = wtf.FormField(UTIHospitalizationForm, 'Internação UTI')
+    clinical_evolution = wtf.FormField(ClinicalEvolutionForm, 'Evolução Clínica')
+    submit = wtf.SubmitField('Enviar')
 
 
 class ObservedSymptomForm(FlaskForm):
@@ -169,7 +178,6 @@ class ObservedRiskFactorFormList(FlaskForm):
         validators=[Optional()],
         render_kw={'placeholder': 'Ex.: obesidade'})
     submit = wtf.SubmitField('Criar')
-
 
 
 class CdcExamForm(FlaskForm):

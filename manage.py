@@ -35,6 +35,10 @@ admin.add_views(
     ProtectedModelView(Admission, db.session),
     ProtectedModelView(RiskFactor, db.session),
     ProtectedModelView(ObservedRiskFactor, db.session),
+    ProtectedModelView(Vaccine, db.session),
+    ProtectedModelView(Hospitalization, db.session),
+    ProtectedModelView(UTIHospitalization, db.session),
+    ProtectedModelView(ClinicalEvolution, db.session),
 )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion
