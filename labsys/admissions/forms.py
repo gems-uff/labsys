@@ -123,7 +123,7 @@ class DatedEventFormGroup(FlaskForm):
     hospitalization = wtf.FormField(HospitalizationForm, 'Internação Hospitalar')
     uti_hospitalization = wtf.FormField(UTIHospitalizationForm, 'Internação UTI')
     clinical_evolution = wtf.FormField(ClinicalEvolutionForm, 'Evolução Clínica')
-    submit = wtf.SubmitField('Enviar')
+    submit = wtf.SubmitField('Salvar')
 
 
 class ObservedSymptomForm(FlaskForm):
@@ -234,7 +234,7 @@ class AntiviralForm(FlaskForm):
         ('2 - Oseltamivir', '2 - Oseltamivir'),
         ('3 - Zanamivir', '3 - Zanamivir'),
         ('9 - Ignorado', '9 - Ignorado'),
-    ),
+    )
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
 
@@ -246,3 +246,4 @@ class AntiviralForm(FlaskForm):
     start_date = wtf.DateField('Início do tratamento',
                                widget=html5widgets.DateInput(),
                                validators=[Optional()])
+    submit = wtf.SubmitField('Salvar')

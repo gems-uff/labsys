@@ -152,12 +152,20 @@ def upsert_dated_events(admission, dated_events_formdata):
 
 
 def get_antiviral(admission):
-    return admission.antiviral
+    return {
+        'usage': admission.antiviral.usage,
+        'other': admission.antiviral.other,
+        'start_date': admission.antiviral.start_date,
+    }
 
 
-def set_antiviral(admission, antiviral_formdata):
+def upsert_antiviral(admission, antiviral_formdata):
     if admission.antiviral:
         admission.antiviral.admission = None
-    antiviral = Antiviral(admission=admission, **antiviral_formdata)
+    antiviral = Antiviral(admission=admission, **{
+        'usage': antiviral_formdata['usage'],
+        'start_date': antiviral_formdata['start_date'],
+        'other': antiviral_formdata['other'],
+    })
     db.session.add(antiviral)
     db.session.commit()
