@@ -1,5 +1,8 @@
 from labsys.extensions import db
-from labsys.admissions.models import ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor
+from labsys.admissions.models import (
+    ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor,
+    Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
+)
 
 
 def get_admission_symptoms(admission_id):
@@ -108,4 +111,40 @@ def upsert_risk_factor(admission_id, obs_factor_formdata):
     obs_factor_obj.observed = obs_factor_formdata['observed']
     obs_factor_obj.details = obs_factor_formdata['details']
     db.session.add(obs_factor_obj)
+    db.session.commit()
+
+
+def get_dated_events(admission):
+    mapped_dated_events = {}
+    mapped_dated_events['vaccine'] = admission.vaccine
+    mapped_dated_events['hospitalization'] = admission.hospitalization
+    mapped_dated_events['uti_hospitalization'] = admission.utihospitalization
+    mapped_dated_events['clinical_evolution'] = admission.clinicalevolution
+    return mapped_dated_events
+
+
+def upsert_dated_events(admission, dated_events_formdata):
+    # Null dated events (so they are excluded)
+    if admission.vaccine:
+        admission.vaccine.admission = None
+    if admission.hospitalization:
+        admission.hospitalization.admission = None
+    if admission.utihospitalization:
+        admission.utihospitalization.admission = None
+    if admission.clinicalevolution:
+        admission.clinicalevolution.admission = None
+
+    vaccine = Vaccine(admission=admission,
+        **dated_events_formdata['vaccine'])
+    hospitalization = Hospitalization(admission=admission,
+        **dated_events_formdata['hospitalization'])
+    uti_hospitalization = UTIHospitalization(admission=admission,
+        **dated_events_formdata['uti_hospitalization'])
+    clinical_evolution = ClinicalEvolution(admission=admission,
+        **dated_events_formdata['clinical_evolution'])
+
+    db.session.add(vaccine)
+    db.session.add(hospitalization)
+    db.session.add(uti_hospitalization)
+    db.session.add(clinical_evolution)
     db.session.commit()

@@ -6,7 +6,6 @@
   {{ frender.render_simple_errors(form) }}
   <form class="form" method="post">
     {{ form.hidden_tag() }}
-    {{ wtf.form_errors(form, hiddens="only") }}
     {{ frender.render_dated_event(form.vaccine) }}
     {{ frender.render_dated_event(form.hospitalization) }}
     {{ frender.render_dated_event(form.uti_hospitalization) }}

@@ -89,8 +89,9 @@ class DatedEventForm(FlaskForm):
         self.date.label.text = date_label
 
     occurred = NullBooleanField(default=None)
+    # TODO: make date required if occurred is True (maybe on route)
     date = wtf.DateField(widget=html5widgets.DateInput(),
-                         validators=[InputRequired()])
+                         validators=[Optional()])
 
 
 class VaccineForm(DatedEventForm):

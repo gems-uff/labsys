@@ -86,11 +86,13 @@ def detail_admission(admission_id):
     admission_form = AdmissionForm(obj=admission)
     symptoms_link = url_for('.add_symptoms', admission_id=admission_id)
     risk_factors_link = url_for('.add_risk_factors', admission_id=admission_id)
+    dated_events_link = url_for('.add_dated_events', admission_id=admission_id)
     return render_template(
         template,
         admission=admission_form,
         symptoms_link=symptoms_link,
         risk_factors_link=risk_factors_link,
+        dated_events_link=dated_events_link,
     )
 
 
@@ -98,7 +100,13 @@ def detail_admission(admission_id):
 @permission_required(Permission.CREATE)
 def add_dated_events(admission_id):
     template = 'admissions/dated-events.html'
-    form = forms.DatedEventFormGroup()
+    admission = Admission.query.get_or_404(admission_id)
+    dated_events = service.get_dated_events(admission)
+    form = forms.DatedEventFormGroup(data=dated_events)
+    if form.validate_on_submit():
+        service.upsert_dated_events(admission, form.data)
+        return redirect(url_for('.detail_admission',
+                                admission_id=admission_id))
     return render_template(template, form=form)
 
 

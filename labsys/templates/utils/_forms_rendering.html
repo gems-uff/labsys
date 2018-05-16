@@ -45,7 +45,6 @@
 {%- endmacro %}
 
 {% macro render_dated_event(form) -%}
-  {{ form.hidden_tag() }}
   <div class="form">
       <fieldset>
         <label><h3>{{ form.label }}</h3></label>
@@ -55,6 +54,7 @@
           {{ mywtf.form_field(form.occurred) }}&nbsp;&nbsp;
           {{ form.date.label }}
           {{ form.date(class="form-control") }}
+          {{ render_simple_errors(form) }}
       </div>
   </div>
   <hr />
