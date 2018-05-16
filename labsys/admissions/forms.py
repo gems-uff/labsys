@@ -225,3 +225,24 @@ class SampleForm(FlaskForm):
     details = wtf.StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
     cdc_exam = wtf.FormField('Resultado Exame CDC', form_class=CdcExamForm)
+
+
+# TODO: normalize it (creating a separate tabel for models)
+class AntiviralForm(FlaskForm):
+    ANTIVIRAL_CHOICES = (
+        ('1 - Não usou', '1 - Não usou'),
+        ('2 - Oseltamivir', '2 - Oseltamivir'),
+        ('3 - Zanamivir', '3 - Zanamivir'),
+        ('9 - Ignorado', '9 - Ignorado'),
+    ),
+    def __init__(self, **kwargs):
+        super().__init__(csrf_enabled=False, **kwargs)
+
+    usage = wtf.SelectField('Uso de antiviral?',
+                            choices=ANTIVIRAL_CHOICES,
+                            default='9 - Ignorado',
+                            coerce=str, )
+    other = wtf.StringField('4 - Outro, especifique')
+    start_date = wtf.DateField('Início do tratamento',
+                               widget=html5widgets.DateInput(),
+                               validators=[Optional()])

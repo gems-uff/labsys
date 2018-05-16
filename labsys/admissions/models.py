@@ -229,3 +229,10 @@ class CdcExam(db.Model):
 
     def __repr__(self):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)
+
+
+class Antiviral(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # Attributes
+    usage = db.Column(db.String(255), nullable=True)
+    start_date = db.Column(db.Date, nullable=True)
