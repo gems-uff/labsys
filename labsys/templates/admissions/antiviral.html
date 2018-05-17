@@ -7,10 +7,9 @@
   <form class="form" method="post">
     {{ form.hidden_tag() }}
     {{ wtf.form_errors(form, hiddens="only") }}
-    <!-- Admission -->
-    {{ frender.render_admission(form) }}
-    <!-- Patient -->
-    {{ frender.render_patient(form.patient) }}
+    {{ wtf.form_field(form.usage) }}
+    {{ wtf.form_field(form.other) }}
+    {{ wtf.form_field(form.start_date) }}
 
     {{ wtf.form_field(form.submit) }}
   </form>

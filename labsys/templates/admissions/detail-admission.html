@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "utils/_forms_rendering.html" as frender %}
+
+{% block page_content %}
+  <!-- Admission -->
+  {{ frender.render_admission(admission) }}
+  <!-- Patient -->
+  {{ frender.render_patient(admission.patient) }}
+  <h2>Adicionar/editar sintomas e fatores de risco</h2>
+  <!-- Symptoms -->
+  <div>
+    <fieldset class="btn btn-default">
+      <label>
+        <a href="{{ symptoms_link }}">Sintomas</a>
+      </label>
+    </fieldset>
+  </div>
+  <!-- Risk Factors -->
+  <div>
+    <fieldset class="btn btn-default">
+      <label>
+        <a href="{{ risk_factors_link }}">Fatores de Risco</a>
+      </label>
+    </fieldset>
+  </div>
+  <!-- Dated Events -->
+  <div>
+    <fieldset class="btn btn-default">
+      <label>
+        <a href="{{ dated_events_link }}">Vacinação, Hospitalização e Óbito</a>
+      </label>
+    </fieldset>
+  </div>
+  <!-- Antiviral -->
+  <div>
+    <fieldset class="btn btn-default">
+      <label>
+        <a href="{{ antiviral_link }}">Uso de Antiviral</a>
+      </label>
+    </fieldset>
+  </div>
+  <!-- XRay -->
+  <div>
+      <fieldset class="btn btn-default">
+          <label>
+              <a href="{{ xray_link }}">Raio X de Toráx</a>
+          </label>
+      </fieldset>
+  </div>
+
+{% endblock %}

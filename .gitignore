@@ -158,3 +158,6 @@ docs/ignored-queries/
 
 .DS_Store
 tags
+
+*.ipynb
+*.dump

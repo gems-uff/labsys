@@ -11,7 +11,6 @@ def send_async_email(app, msg):
 
 def send_email(recipients, subject, template, **kwargs):
     if len(recipients) == 0:
-        print('Nenhum recipiente cadastrado para receber notificação.')
         return None
     else:
         app = current_app._get_current_object()

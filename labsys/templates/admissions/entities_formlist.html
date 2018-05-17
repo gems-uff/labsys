@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "utils/_forms_rendering.html" as frender %}
+
+{% block page_content %}
+    {{ frender.render_simple_errors(form) }}
+    <form class="form" method="post">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+        {{ frender.prime_entities_fieldlist(form.primary) }}
+        {{ wtf.form_field(form.secondary) }}
+        {{ wtf.form_field(form.submit) }}
+    </form>
+{% endblock %}

@@ -34,7 +34,10 @@ class Role(db.Model):
     def insert_roles():
         roles = {
             'User': (Permission.VIEW, True),
-            'Staff': (Permission.VIEW | Permission.EDIT | Permission.CREATE,
+            'Staff': (Permission.VIEW |
+                      Permission.EDIT |
+                      Permission.CREATE |
+                      Permission.DELETE,
                       False),
             'Administrator': (0xff, False)
         }
@@ -91,7 +94,7 @@ class User(UserMixin, db.Model):
 
     def can(self, permissions):
         return self.role is not None and \
-               (self.role.permissions & permissions) == permissions
+            (self.role.permissions & permissions) == permissions
 
     def is_administrator(self):
         return self.can(Permission.ADMINISTER)
@@ -122,7 +125,6 @@ class User(UserMixin, db.Model):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
-
 
     def __repr__(self):
         return '<User %r>' % self.email
