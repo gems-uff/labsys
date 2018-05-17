@@ -2,7 +2,7 @@ from labsys.extensions import db
 from labsys.admissions.models import (
     ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor,
     Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Antiviral,
+    Antiviral, XRay,
 )
 
 
@@ -151,6 +151,7 @@ def upsert_dated_events(admission, dated_events_formdata):
     db.session.commit()
 
 
+# TODO: merge antiviral and xray
 def get_antiviral(admission):
     if admission.antiviral is None:
         admission.antiviral = Antiviral()
@@ -172,3 +173,24 @@ def upsert_antiviral(admission, antiviral_formdata):
     db.session.add(antiviral)
     db.session.commit()
 
+
+def get_xray(admission):
+    if admission.xray is None:
+        admission.xray = XRay()
+    return {
+        'usage': admission.xray.usage,
+        'other': admission.xray.other,
+        'start_date': admission.xray.start_date,
+    }
+
+
+def upsert_xray(admission, xray_formdata):
+    if admission.xray:
+        admission.xray.admission = None
+    xray = XRay(admission=admission, **{
+        'usage': xray_formdata['usage'],
+        'start_date': xray_formdata['start_date'],
+        'other': xray_formdata['other'],
+    })
+    db.session.add(xray)
+    db.session.commit()

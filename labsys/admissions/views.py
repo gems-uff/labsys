@@ -88,6 +88,7 @@ def detail_admission(admission_id):
     risk_factors_link = url_for('.add_risk_factors', admission_id=admission_id)
     dated_events_link = url_for('.add_dated_events', admission_id=admission_id)
     antiviral_link = url_for('.add_antiviral', admission_id=admission_id)
+    xray_link = url_for('.add_xray', admission_id=admission_id)
     return render_template(
         template,
         admission=admission_form,
@@ -95,6 +96,7 @@ def detail_admission(admission_id):
         risk_factors_link=risk_factors_link,
         dated_events_link=dated_events_link,
         antiviral_link=antiviral_link,
+        xray_link=xray_link,
     )
 
 
@@ -157,6 +159,20 @@ def add_antiviral(admission_id):
     form = forms.AntiviralForm(data=antiviral_formdata)
     if form.validate_on_submit():
         service.upsert_antiviral(admission, form.data)
+        return redirect(url_for('.detail_admission',
+                                admission_id=admission_id))
+    return render_template(template, form=form)
+
+
+@blueprint.route('/<int:admission_id>/xray', methods=['GET', 'POST'])
+@permission_required(Permission.CREATE)
+def add_xray(admission_id):
+    admission = Admission.query.get_or_404(admission_id)
+    template = 'admissions/xray.html'
+    xray_formdata = service.get_xray(admission)
+    form = forms.XRayForm(data=xray_formdata)
+    if form.validate_on_submit():
+        service.upsert_xray(admission, form.data)
         return redirect(url_for('.detail_admission',
                                 admission_id=admission_id))
     return render_template(template, form=form)

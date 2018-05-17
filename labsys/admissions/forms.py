@@ -1,4 +1,3 @@
-from ast import literal_eval
 
 from flask_wtf import FlaskForm
 import wtforms as wtf
@@ -120,9 +119,12 @@ class ClinicalEvolutionForm(DatedEventForm):
 
 class DatedEventFormGroup(FlaskForm):
     vaccine = wtf.FormField(VaccineForm, 'Vacina contra gripe')
-    hospitalization = wtf.FormField(HospitalizationForm, 'Internação Hospitalar')
-    uti_hospitalization = wtf.FormField(UTIHospitalizationForm, 'Internação UTI')
-    clinical_evolution = wtf.FormField(ClinicalEvolutionForm, 'Evolução Clínica')
+    hospitalization = wtf.FormField(HospitalizationForm,
+                                    'Internação Hospitalar')
+    uti_hospitalization = wtf.FormField(UTIHospitalizationForm,
+                                        'Internação UTI')
+    clinical_evolution = wtf.FormField(ClinicalEvolutionForm,
+                                       'Evolução Clínica')
     submit = wtf.SubmitField('Salvar')
 
 
@@ -235,6 +237,7 @@ class AntiviralForm(FlaskForm):
         ('3 - Zanamivir', '3 - Zanamivir'),
         ('9 - Ignorado', '9 - Ignorado'),
     )
+
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
 
@@ -244,6 +247,31 @@ class AntiviralForm(FlaskForm):
                             coerce=str, )
     other = wtf.StringField('4 - Outro, especifique')
     start_date = wtf.DateField('Início do tratamento',
+                               widget=html5widgets.DateInput(),
+                               validators=[Optional()])
+    submit = wtf.SubmitField('Salvar')
+
+
+# TODO: normalize it (creating a separate tabel for models)
+class XRayForm(FlaskForm):
+    XRAY_CHOICES = (
+        ('1 - Normal', '1 - Normal'),
+        ('2 - Infiltrado intersticial', '2 - Infiltrado intersticial'),
+        ('3 - Consolidação', '3 - Consolidação'),
+        ('4 - Misto', '4 - Misto'),
+        ('6 - Não realizado', '6 - Não realizado'),
+        ('9 - Ignorado', '9 - Ignorado'),
+    )
+
+    def __init__(self, **kwargs):
+        super().__init__(csrf_enabled=False, **kwargs)
+
+    usage = wtf.SelectField('Raio X de Tórax',
+                            choices=XRAY_CHOICES,
+                            default='9 - Ignorado',
+                            coerce=str, )
+    other = wtf.StringField('5 - Outro, especifique')
+    start_date = wtf.DateField('Data do Raio X',
                                widget=html5widgets.DateInput(),
                                validators=[Optional()])
     submit = wtf.SubmitField('Salvar')
