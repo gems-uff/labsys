@@ -13,8 +13,10 @@ import labsys.inventory.models as im
 from labsys.admissions.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
     CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Address,
+    Address, RiskFactor, ObservedRiskFactor, Antiviral, XRay,
 )
+import labsys.admissions.forms as forms
+import labsys.admissions.models as models
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
@@ -27,14 +29,26 @@ admin.add_views(
     ProtectedModelView(PreAllowedUser, db.session),
     ProtectedModelView(im.Product, db.session),
     ProtectedModelView(im.Transaction, db.session),
-    ProtectedModelView(im.StockProduct, db.session), )
+    ProtectedModelView(im.StockProduct, db.session),
+    ProtectedModelView(Symptom, db.session),
+    ProtectedModelView(ObservedSymptom, db.session),
+    ProtectedModelView(Admission, db.session),
+    ProtectedModelView(RiskFactor, db.session),
+    ProtectedModelView(ObservedRiskFactor, db.session),
+    ProtectedModelView(Vaccine, db.session),
+    ProtectedModelView(Hospitalization, db.session),
+    ProtectedModelView(UTIHospitalization, db.session),
+    ProtectedModelView(ClinicalEvolution, db.session),
+    ProtectedModelView(Antiviral, db.session),
+    ProtectedModelView(XRay, db.session),
+)
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion
 
 
 def make_shell_context():
     return dict(
-        app=app, db=db, User=User, Role=Role,
+        app=app, db=db, User=User, Role=Role, f=forms, m=models
     )
 
 

@@ -1,5 +1,5 @@
 {% import "bootstrap/wtf.html" as wtf %}
-
+{% import "utils/_my_wtf.html" as mywtf %}
 
 {% macro render_simple_errors(form) -%}
   {% if form.errors %}
@@ -45,57 +45,21 @@
 {%- endmacro %}
 
 {% macro render_dated_event(form) -%}
-  <fieldset>
-    <legend>{{ form.label.text }}</legend>
-    {% for subfield in form %}
-      {% if subfield.type == "RadioField" %}
-        {{ render_radio_inline_field(subfield) }}
-      {% else %}
-        {{ wtf.form_field(subfield, placeholder="dd/MM/yyyy") }}
-      {% endif %}
-    {% endfor %}
-  </fieldset>
+  <div class="form">
+      <fieldset>
+        <label><h3>{{ form.label }}</h3></label>
+      </fieldset>
+      <div class="form-group">
+          {{ form.occurred.label }}:&nbsp;&nbsp;
+          {{ mywtf.form_field(form.occurred) }}&nbsp;&nbsp;
+          {{ form.date.label }}
+          {{ form.date(class="form-control") }}
+          {{ render_simple_errors(form) }}
+      </div>
+  </div>
+  <hr />
 {%- endmacro %}
 
-{% macro render_symptoms(form) -%}
-  <fieldset>
-    <legend>{{ form.label.text }}</legend>
-    {% for subform in form.entries %}
-      {{ subform.hidden_tag() }}
-      <div class="form-inline">
-        <div class="form-group">
-          {{ subform.observed.label }}:&nbsp;&nbsp;
-          {{ wtf.form_field(subform.observed) }}&nbsp;&nbsp;
-        </div>
-        <div class="form-group">
-          {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
-        </div>
-      </div>
-      <hr />
-    {% endfor %}
-  </fieldset>
-{%- endmacro %}
-
-{% macro render_secondary_symptoms(form) -%}
-  <fieldset>
-    <legend>{{ form.label.text }}</legend>
-    {% for subform in form.entries %}
-      {{ subform.hidden_tag() }}
-      <div class="form-inline">
-        <div class="form-group">
-          <label class="checkbox-inline">
-            {{ subform.observed }}
-            {{ subform.observed.label.text }}&nbsp;&nbsp;
-          </label>
-        </div>
-        <div class="form-group">
-          {{ subform.details(class="form-control", placeholder="Informações adicionais", size=30) }}
-        </div>
-      </div>
-      <hr />
-    {% endfor %}
-  </fieldset>
-{%- endmacro %}
 
 {% macro render_samples(form) -%}
   <fieldset>
@@ -127,8 +91,48 @@
     {{ wtf.form_field(form.semepi_symptom) }}
     {{ wtf.form_field(form.requesting_institution) }}
     {{ wtf.form_field(form.health_unit) }}
-    {{ wtf.form_field(form.state_id) }}
-    {{ wtf.form_field(form.city_id) }}
+    {{ wtf.form_field(form.state) }}
+    {{ wtf.form_field(form.city) }}
     {{ wtf.form_field(form.details) }}
   </fieldset>
+{%- endmacro %}
+
+{% macro prime_entities_fieldlist(fieldlist) -%}
+    <fieldset>
+        <legend>{{ fieldlist.label }}</legend>
+        {% for formfield in fieldlist.entries %}
+            {{ formfield.hidden_tag() }}
+            <div class="form-inline">
+                <div class="form-group">
+                    {{ formfield.observed.label }}:&nbsp;&nbsp;
+                    {{ mywtf.form_field(formfield.observed) }}&nbsp;&nbsp;
+                </div>
+                <div class="form-group">
+                    {{ formfield.details(class="form-control", placeholder="Informações adicionais", size=30) }}
+                </div>
+            </div>
+            <hr />
+        {% endfor %}
+    </fieldset>
+{%- endmacro %}
+
+{% macro sec_entities_fieldlist(fieldlist) -%}
+    <fieldset>
+        <legend>{{ fieldlist.label }}</legend>
+        {% for formfield in fieldlist.entries %}
+            {{ formfield.hidden_tag() }}
+            <div class="form-inline">
+                <div class="form-group">
+                    <label class="checkbox-inline">
+                        {{ formfield.observed }}
+                        {{ formfield.observed.label.text }}&nbsp;&nbsp;
+                    </label>
+                </div>
+                <div class="form-group">
+                    {{ formfield.details(class="form-control", placeholder="Informações adicionais", size=30) }}
+                </div>
+            </div>
+            <hr />
+        {% endfor %}
+    </fieldset>
 {%- endmacro %}

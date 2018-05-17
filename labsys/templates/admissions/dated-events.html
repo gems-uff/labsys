@@ -6,12 +6,10 @@
   {{ frender.render_simple_errors(form) }}
   <form class="form" method="post">
     {{ form.hidden_tag() }}
-    {{ wtf.form_errors(form, hiddens="only") }}
-    <!-- Admission -->
-    {{ frender.render_admission(form) }}
-    <!-- Patient -->
-    {{ frender.render_patient(form.patient) }}
-
+    {{ frender.render_dated_event(form.vaccine) }}
+    {{ frender.render_dated_event(form.hospitalization) }}
+    {{ frender.render_dated_event(form.uti_hospitalization) }}
+    {{ frender.render_dated_event(form.clinical_evolution) }}
     {{ wtf.form_field(form.submit) }}
   </form>
 {% endblock %}

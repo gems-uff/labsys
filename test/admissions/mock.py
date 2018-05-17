@@ -10,33 +10,36 @@ def generate_mock(MockClass, **kwargs):
 
 
 def patient():
-    return Patient(name='Pat Name',
-                   birth_date='2018-01-01',
-                   age=10,
-                   age_unit='A',
-                   gender='H',
-                   )
+    return Patient(
+        name='Pat Name',
+        birth_date='2018-01-01',
+        age=10,
+        age_unit='A',
+        gender='H',
+    )
 
 
 def address():
-    return Address(country='Brasil',
-                   state='RJ', city='Niterói',
-                   neighborhood='Icaraí',
-                   zone=1,
-                   details='detalhes residência',
-                   )
+    return Address(
+        country='Brasil',
+        state='RJ', city='Niterói',
+        neighborhood='Icaraí',
+        zone=1,
+        details='detalhes residência',
+    )
 
 
 def admission():
-    return Admission(id_lvrs_intern='lvrs0001',
-                     state='RJ',
-                     city='Niterói',
-                     first_symptoms_date='2018-01-01',
-                     semepi_symptom=12,
-                     health_unit='Unidade de saude 1',
-                     requesting_institution='Solicitante 1',
-                     details='detalhes admission',
-                     )
+    return Admission(
+        id_lvrs_intern='lvrs0001',
+        state='RJ',
+        city='Niterói',
+        first_symptoms_date='2018-01-01',
+        semepi_symptom=12,
+        health_unit='Unidade de saude 1',
+        requesting_institution='Solicitante 1',
+        details='detalhes admission',
+    )
 
 
 def dated_event(_class, **kwargs):
