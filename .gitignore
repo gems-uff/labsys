@@ -160,3 +160,4 @@ docs/ignored-queries/
 tags
 
 *.ipynb
+*.dump
