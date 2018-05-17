@@ -161,3 +161,4 @@ tags
 
 *.ipynb
 *.dump
+docs/input/gal/
