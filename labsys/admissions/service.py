@@ -152,6 +152,8 @@ def upsert_dated_events(admission, dated_events_formdata):
 
 
 def get_antiviral(admission):
+    if admission.antiviral is None:
+        admission.antiviral = Antiviral()
     return {
         'usage': admission.antiviral.usage,
         'other': admission.antiviral.other,
@@ -169,3 +171,4 @@ def upsert_antiviral(admission, antiviral_formdata):
     })
     db.session.add(antiviral)
     db.session.commit()
+
