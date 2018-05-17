@@ -77,7 +77,7 @@ class AdmissionForm(FlaskForm):
     requesting_institution = wtf.StringField('Instituição Solicitante')
     details = wtf.StringField('Informações Adicionais')
     patient = wtf.FormField(PatientForm, 'Dados do Paciente')
-    submit = wtf.SubmitField('Criar')
+    submit = wtf.SubmitField('Salvar')
 
 
 class DatedEventForm(FlaskForm):
@@ -152,7 +152,7 @@ class ObservedSymptomFormList(FlaskForm):
         'Secundários (separar por vírgula)',
         validators=[Optional()],
         render_kw={'placeholder': 'Ex.: tosse, desmaios, febre (40 graus)'})
-    submit = wtf.SubmitField('Criar')
+    submit = wtf.SubmitField('Salvar')
 
 
 class ObservedRiskFactorForm(FlaskForm):
@@ -179,7 +179,7 @@ class ObservedRiskFactorFormList(FlaskForm):
         'Secundários (separar por vírgula)',
         validators=[Optional()],
         render_kw={'placeholder': 'Ex.: obesidade'})
-    submit = wtf.SubmitField('Criar')
+    submit = wtf.SubmitField('Salvar')
 
 
 class CdcExamForm(FlaskForm):
