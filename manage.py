@@ -20,7 +20,7 @@ import labsys.admissions.models as models
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, compare_type=True)
 
 # region Add ModelView
 admin.add_views(

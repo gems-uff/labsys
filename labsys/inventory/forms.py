@@ -16,8 +16,8 @@ class OrderItemForm(FlaskForm):
         specs = kwargs.get('specs', [])
         self.item_id.choices = [
             (s.id, '{} | Catálogo: {} | {} unidades/produto'.format(
-                s.product.name, s.catalog_number, s.units))
-            for s in specs]
+                s.product.name, s.catalog_number, s.units)) for s in specs
+        ]
 
     # TODO: make my own select field for foreign keys
     item_id = wtf.SelectField(
@@ -32,8 +32,9 @@ class OrderItemForm(FlaskForm):
                 min=1, max=None, message='Quantidade deve ser maior que zero!')
         ])
     lot_number = wtf.StringField(
-        'Lote', render_kw={"autocomplete": "off"}, validators=[InputRequired()]
-    )
+        'Lote',
+        render_kw={"autocomplete": "off"},
+        validators=[InputRequired()])
     expiration_date = wtf.DateField(
         'Data de Validade',
         widget=widgets.DateInput(),
@@ -47,20 +48,24 @@ class OrderForm(FlaskForm):
     invoice_type = wtf.SelectField(
         'Tipo de Nota',
         coerce=str,
-        choices=(
-            ('Nota Fiscal',
-             'Nota Fiscal'),
-            ('Nota de Fornecimento (FIOCRUZ)',
-             'Nota de Fornecimento (FIOCRUZ)'),
-            ('Nota de Fornecimento (Ministério da Saúde)',
-             'Nota de Fornecimento (Ministério da Saúde)'),
-            ('Outros', 'Outros')),
+        choices=(('Nota Fiscal',
+                  'Nota Fiscal'), ('Nota de Fornecimento (FIOCRUZ)',
+                                   'Nota de Fornecimento (FIOCRUZ)'),
+                 ('Nota de Fornecimento (Ministério da Saúde)',
+                  'Nota de Fornecimento (Ministério da Saúde)'), ('Outros',
+                                                                  'Outros')),
         default='Nota Fiscal',
         validators=[Optional()])
     invoice = wtf.StringField('Nota', validators=[Optional()])
+    invoice_value = wtf.FloatField(
+        'Valor total (separar por PONTO)',
+        render_kw={'placeholder': 'R$ 123.40'},
+        validators=[Optional()],
+        widget=widgets.NumberInput(step='0.01', min='0.00', max='9999999999.99'))
     financier = wtf.StringField('Financiador', validators=[Optional()])
     notes = wtf.StringField('Observações', validators=[Optional()])
-    submit = wtf.SubmitField('Finalizar a compra', render_kw={'class': 'btn-danger'})
+    submit = wtf.SubmitField(
+        'Finalizar a compra', render_kw={'class': 'btn-danger'})
     cancel = wtf.SubmitField('Limpar o carrinho')
 
 
@@ -70,20 +75,23 @@ class ConsumeProductForm(FlaskForm):
         stock_products = kwargs.get('stock_products', [])
         self.stock_product_id.choices = [
             (sp.id, 'Nome: {} | Catálogo: {} | Lote: {} | Quantidade: {}'
-                .format(
-                    sp.product.name,
-                    sp.product.get_base_spec().catalog_number,
-                    sp.lot_number,
-                    sp.amount,
-                ))
-            for sp in stock_products]
+             .format(
+                 sp.product.name,
+                 sp.product.get_base_spec().catalog_number,
+                 sp.lot_number,
+                 sp.amount,
+             )) for sp in stock_products
+        ]
 
     stock_product_id = wtf.SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
-    amount = wtf.IntegerField('Quantidade', validators=[
-        InputRequired(),
-        NumberRange(
-            min=1, max=None, message='Quantidade deve ser maior que zero!')],
+    amount = wtf.IntegerField(
+        'Quantidade',
+        validators=[
+            InputRequired(),
+            NumberRange(
+                min=1, max=None, message='Quantidade deve ser maior que zero!')
+        ],
         widget=widgets.NumberInput(),
         render_kw={'autocomplete': 'off'},
         default=1,
@@ -92,25 +100,27 @@ class ConsumeProductForm(FlaskForm):
 
 
 class AddProductForm(FlaskForm):
-    name = wtf.StringField(
-        'Nome do reativo', validators=[InputRequired()])
+    name = wtf.StringField('Nome do reativo', validators=[InputRequired()])
     catalog_number = wtf.StringField(
         'Número de catálogo', validators=[InputRequired()])
-    manufacturer = wtf.StringField(
-        'Fabricante', validators=[InputRequired()])
+    manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
     units = wtf.IntegerField(
-        'Unidades de estoque', default=1, validators=[
+        'Unidades de estoque',
+        default=1,
+        validators=[
             InputRequired(),
-            NumberRange(
-                min=1, max=None, message='Deve ser maior que zero!')],
+            NumberRange(min=1, max=None, message='Deve ser maior que zero!')
+        ],
         widget=widgets.NumberInput(),
         render_kw={'autocomplete': 'off'},
     )
     stock_minimum = wtf.IntegerField(
-        'Alertar quando estoque atingir', default=1, validators=[
+        'Alertar quando estoque atingir',
+        default=1,
+        validators=[
             InputRequired(),
-            NumberRange(
-                min=1, max=None, message='Deve ser maior que zero!')],
+            NumberRange(min=1, max=None, message='Deve ser maior que zero!')
+        ],
         widget=widgets.NumberInput(),
         render_kw={'autocomplete': 'off'},
     )
@@ -134,10 +144,12 @@ class AddSpecificationForm(FlaskForm):
     manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
     catalog_number = wtf.StringField('Catálogo', validators=[InputRequired()])
     units = wtf.IntegerField(
-        'Unidades de estoque', default=1, validators=[
+        'Unidades de estoque',
+        default=1,
+        validators=[
             InputRequired(),
-            NumberRange(
-                min=1, max=None, message='Deve ser maior que zero!')],
+            NumberRange(min=1, max=None, message='Deve ser maior que zero!')
+        ],
         widget=widgets.NumberInput(),
         render_kw={'autocomplete': 'off'},
     )

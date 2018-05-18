@@ -225,7 +225,7 @@ class Order(Base, TimeStampedModelMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     invoice = db.Column(db.String(128), nullable=True)
     invoice_type = db.Column(db.String(128), nullable=True)
-    invoice_value = db.Column(db.Integer, nullable=True)
+    invoice_value = db.Column(db.Numeric(12, 2), nullable=True)
     financier = db.Column(db.String(128), nullable=True)
     notes = db.Column(db.String(256), nullable=True)
     order_date = db.Column(
