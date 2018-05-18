@@ -103,8 +103,7 @@ class AddProductForm(FlaskForm):
     catalog_number = wtf.StringField(
         'Número de catálogo', validators=[InputRequired()])
     manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
-    units = wtf.IntegerField(
-        'Unidades de estoque',
+    units = wtf.IntegerField('<a href="#" data-toggle="tooltip" title="Quantidade de unidades que essa apresentação possui. Representa a quantidade física dessa apresentação que será adicionada ao estoque quando comprado.">Unidades de estoque</a>',
         default=1,
         validators=[
             InputRequired(),
@@ -112,6 +111,7 @@ class AddProductForm(FlaskForm):
         ],
         widget=widgets.NumberInput(),
         render_kw={'autocomplete': 'off'},
+
     )
     stock_minimum = wtf.IntegerField(
         'Alertar quando estoque atingir',
@@ -142,8 +142,7 @@ class AddSpecificationForm(FlaskForm):
     product_id = wtf.HiddenField()
     manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
     catalog_number = wtf.StringField('Catálogo', validators=[InputRequired()])
-    units = wtf.IntegerField(
-        'Unidades de estoque',
+    units = wtf.IntegerField('<a href="#" data-toggle="tooltip" title="Quantidade de unidades que essa apresentação possui. Representa a quantidade física dessa apresentação que será adicionada ao estoque quando comprado.">Unidades de estoque</a>',
         default=1,
         validators=[
             InputRequired(),
