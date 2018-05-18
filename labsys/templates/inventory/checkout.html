@@ -8,6 +8,10 @@
   </div>
   {% include "inventory/_cart.html" %}
   {{ wtf.quick_form(form) }}
+  <br />
+  <div class="btn btn-default">
+      <a href="{{ url_for('inventory.purchase_product') }}">Voltar</a>
+  </div>
 {% endblock %}
 
 {% block scripts %}
