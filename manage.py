@@ -12,9 +12,11 @@ from labsys.auth.views import ProtectedModelView
 import labsys.inventory.models as im
 from labsys.admissions.models import (
     Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
-    CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution, Country,
-    Region, State, City, Address,
+    CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
+    Address, RiskFactor, ObservedRiskFactor, Antiviral, XRay,
 )
+import labsys.admissions.forms as forms
+import labsys.admissions.models as models
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
@@ -31,6 +33,17 @@ admin.add_views(
     ProtectedModelView(im.Specification, db.session),
     ProtectedModelView(im.Order, db.session),
     ProtectedModelView(im.OrderItem, db.session),
+    ProtectedModelView(Symptom, db.session),
+    ProtectedModelView(ObservedSymptom, db.session),
+    ProtectedModelView(Admission, db.session),
+    ProtectedModelView(RiskFactor, db.session),
+    ProtectedModelView(ObservedRiskFactor, db.session),
+    ProtectedModelView(Vaccine, db.session),
+    ProtectedModelView(Hospitalization, db.session),
+    ProtectedModelView(UTIHospitalization, db.session),
+    ProtectedModelView(ClinicalEvolution, db.session),
+    ProtectedModelView(Antiviral, db.session),
+    ProtectedModelView(XRay, db.session),
 )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 # endregion
@@ -38,7 +51,7 @@ admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
 
 def make_shell_context():
     return dict(
-        app=app, db=db, User=User, Role=Role,
+        app=app, db=db, User=User, Role=Role, f=forms, m=models
     )
 
 
