@@ -7,7 +7,7 @@ from ..extensions import db
 
 
 def filter_table_name(source):
-    if source in ['products', 'stock_products', 'transactions']:
+    if source in ['products', 'stock_products', 'transactions', 'orders']:
         return source
     else:
         raise ValueError('{} is not a valid table name or \
@@ -55,6 +55,18 @@ export_transactions_query = "SELECT \
     ORDER BY t.updated_on DESC;"
 
 
+export_orders_query = 'SELECT \
+o.id, \
+o.order_date at time zone \'utc\' at time zone \'America/Sao_Paulo\' as data, \
+u.email as email_usuario, \
+o.invoice as numero_nota, \
+o.invoice_type as tipo_nota, \
+o.invoice_value as valor_total_nota, \
+o.financier as financiador, \
+o.notes as observacoes \
+FROM orders o JOIN users u ON o.user_id = u.id'
+
+
 def get_query(table_name):
     table_name = filter_table_name(table_name)
     if table_name == 'products':
@@ -63,6 +75,8 @@ def get_query(table_name):
         query = export_stock_products_query
     elif table_name == 'transactions':
         query = export_transactions_query
+    elif table_name == 'orders':
+        query = export_orders_query
     else:
         raise ValueError('{} table does not exist or its query was not added'.
                          format(table_name))

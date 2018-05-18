@@ -60,6 +60,19 @@ def list_transactions():
                      context_title=context_title)
 
 
+@blueprint.route('/orders', methods=['GET'])
+@permission_required(Permission.VIEW)
+def list_orders():
+    template = 'inventory/list-orders.html'
+    view = 'inventory.list_orders'
+    query = Order.query.order_by(Order.order_date.desc())
+    context_title = 'orders'
+    return paginated(query=query,
+                     template_name=template,
+                     view_method=view,
+                     context_title=context_title)
+
+
 # TODO: Implement this method:
 @blueprint.route('/transactions/<int:transaction_id>/delete', methods=['GET'])
 @permission_required(Permission.DELETE)

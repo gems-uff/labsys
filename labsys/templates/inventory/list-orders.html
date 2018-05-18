@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}LabSys - Estoque{% endblock %}
+
+{% block page_content %}
+{% include "inventory/_navigation.html" %}
+<div class="page-header">
+    <h1>
+      Ordens Executadas
+    </h1>
+</div>
+<table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th width="15%">Data</th>
+      <th width="20%">Usuário</th>
+      <th width="20%">Número da Nota</th>
+      <th width="10%">Tipo da Nota</th>
+      <th width="10%">Valor Total (R$)</th>
+      <th width="10%">Financiador</th>
+      <th width="15%">Observações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+      <tr>
+        <td>{{ moment(order.order_date).format('DD/MM/YYYY [-] HH:mm') }}</td>
+        <td>{{ order.user.email }}</td>
+        <td>{{ order.invoice }}</td>
+        <td>{{ order.invoice_type }}</td>
+        <td>{{ order.invoice_value }}</td>
+        <td>{{ order.financier }}</td>
+        <td>{{ order.notes }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% include "utils/_pagination.html" %}
+
+{% endblock %}
