@@ -64,8 +64,7 @@ class OrderForm(FlaskForm):
         widget=widgets.NumberInput(step='0.01', min='0.00', max='9999999999.99'))
     financier = wtf.StringField('Financiador', validators=[Optional()])
     notes = wtf.StringField('Observações', validators=[Optional()])
-    submit = wtf.SubmitField(
-        'Finalizar a compra', render_kw={'class': 'btn-danger'})
+    submit = wtf.SubmitField('Inserir no estoque')
     cancel = wtf.SubmitField('Limpar o carrinho')
 
 
