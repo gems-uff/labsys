@@ -55,5 +55,20 @@ $('#item_id').select2({
         return markup;
     }
 });
+
+$(document).ready(function() {
+    $('form').submit(function() {
+        var val = $("input[type=submit][clicked=true]").val();
+        // DO WORK
+        if (val === 'Limpar o carrinho') {
+            var c = confirm("Tem certeza que deseja excluir todos itens do carrinho?");
+            return c;
+        };
+    });
+    $("form input[type=submit]").click(function() {
+        $("input[type=submit]", $(this).parents("form")).removeAttr("clicked");
+        $(this).attr("clicked", "true");
+    });
+});
 </script>
 {% endblock %}
