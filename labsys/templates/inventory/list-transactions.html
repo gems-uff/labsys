@@ -26,10 +26,18 @@
       <tr>
         <td>{{ transaction.id }}</td>
         <td>{{ transaction.product.name }} | Lote: {{ transaction.lot_number }}</td>
-        {% if (transaction.category == 1) %}
-          <td class="success">Recebimento</td>
+        {% if transaction.patched_transaction_id %}
+          {% if (transaction.category == 1) %}
+            <td class="success">Desfaz Retirada: Id {{ transaction.patched_transaction_id }}</td>
+          {% else %}
+            <td class="danger">Desfaz Recebimento: Id {{ transaction.patched_transaction_id }}</td>
+          {% endif %}
         {% else %}
-          <td class="danger">Retirada</td>
+          {% if (transaction.category == 1) %}
+            <td class="success">Recebimento</td>
+          {% else %}
+            <td class="danger">Retirada</td>
+          {% endif %}
         {% endif %}
         <td>{{ transaction.amount }}</td>
         <td>{{ moment(transaction.created_on).format('DD/MM/YYYY [-] HH:mm') }}</td>

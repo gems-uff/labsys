@@ -258,6 +258,8 @@ class Transaction(Base, TimeStampedModelMixin):
         db.Integer, db.ForeignKey('products.id'), nullable=False)
     # Attributes
     lot_number = db.Column(db.String(64), nullable=True)
+    expiration_date = db.Column(
+        db.Date, default=None, nullable=True)
     stock_id = db.Column(
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
@@ -281,8 +283,66 @@ class Transaction(Base, TimeStampedModelMixin):
                  patched_transaction_id=None):
         self.user = user
         self.product = product
-        self.order_item = order_item
         self.lot_number = lot_number
         self.amount = amount
         self.stock = stock
         self.category = category
+        self.expiration_date = expiration_date
+        self.order_item = order_item
+        self.patched_transaction_id = patched_transaction_id
+
+    def undo(self, user):
+        if self.category is SUB:
+            logging.info('Trying to revert a SUB transaction')
+            patch_trx = Transaction(
+                user=user,
+                category=ADD,
+                patched_transaction_id=self.id,
+                product=self.product,
+                lot_number=self.lot_number,
+                amount=self.amount,
+                stock=self.stock,
+                expiration_date=self.expiration_date,
+                order_item=self.order_item)
+            db.session.add(patch_trx)
+            db.session.add(self.stock)
+            self.stock.add(
+                self.product,
+                self.lot_number,
+                self.expiration_date,
+                self.amount,
+            )
+            db.session.commit()
+            logging.info('Successfully reverted')
+            return True
+        elif self.category is ADD:
+            logging.info('Trying to revert an ADD transaction')
+            patch_trx = Transaction(
+                user=user,
+                category=SUB,
+                patched_transaction_id=self.id,
+                product=self.product,
+                lot_number=self.lot_number,
+                amount=self.amount,
+                stock=self.stock,
+                expiration_date=self.expiration_date,
+                order_item=self.order_item)
+            db.session.add(self.stock)
+            try:
+                self.stock.subtract(self.product, self.lot_number, self.amount)
+                db.session.add(patch_trx)
+                db.session.commit()
+                logging.info('Successfully reverted')
+                return True
+            except Exception as exc:
+                logging.error(exc)
+            return False
+        else:
+            logging.error('Could not identify transaction category')
+            return False
+
+
+
+
+
+
