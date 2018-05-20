@@ -220,13 +220,13 @@ class Sample(db.Model):
 
 class CdcExam(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    # FKs
+    sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
     # Attributes
     flu_type = db.Column(db.String(16))
     flu_subtype = db.Column(db.String(16))
-    dominant_ct = db.Column(db.Integer)
-    details = db.Column(db.String(255))
-    # FKs
-    sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
+    dominant_ct = db.Column(db.Numeric(12, 2), nullable=True)
+    details = db.Column(db.String(255), nullable=True)
 
     def __repr__(self):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)

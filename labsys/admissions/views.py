@@ -89,6 +89,7 @@ def detail_admission(admission_id):
     dated_events_link = url_for('.add_dated_events', admission_id=admission_id)
     antiviral_link = url_for('.add_antiviral', admission_id=admission_id)
     xray_link = url_for('.add_xray', admission_id=admission_id)
+    samples_link = url_for('.add_sample', admission_id=admission_id)
     return render_template(
         template,
         admission=admission_form,
@@ -97,6 +98,7 @@ def detail_admission(admission_id):
         dated_events_link=dated_events_link,
         antiviral_link=antiviral_link,
         xray_link=xray_link,
+        samples_link=samples_link,
     )
 
 
@@ -176,3 +178,21 @@ def add_xray(admission_id):
         return redirect(url_for('.detail_admission',
                                 admission_id=admission_id))
     return render_template(template, form=form)
+
+
+@blueprint.route('/<int:admission_id>/samples', methods=['GET', 'POST'])
+@permission_required(Permission.CREATE)
+def add_sample(admission_id):
+    admission = Admission.query.get_or_404(admission_id)
+    template = 'admissions/samples.html'
+    samples_formdata = service.get_samples(admission_id)
+    form = forms.SampleForm()
+    if form.validate_on_submit():
+        service.add_sample(admission, form.data)
+        return redirect(url_for('.add_sample',
+                                admission_id=admission_id))
+    return render_template(template, form=form,
+                           admission_link=url_for('.detail_admission',
+                                                  admission_id=admission_id))
+
+

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "utils/_forms_rendering.html" as frender %}
+
+{% block page_content %}
+<div class="btn btn-default">
+    <a href="{{ admission_link }}">Voltar</a>
+</div>
+{{ frender.render_simple_errors(form) }}
+<form class="form" method="post">
+    {{ form.hidden_tag() }}
+    <h3>Adicionar amostra</h3>
+    {{ wtf.form_errors(form, hiddens="only") }}
+    {{ wtf.form_field(form.collection_date) }}
+    {{ wtf.form_field(form.semepi) }}
+    {{ wtf.form_field(form.admission_date) }}
+    {{ wtf.form_field(form.details) }}
+    {{ wtf.form_field(form.method_id) }}
+    {{ wtf.form_field(form.cdc_exam) }}
+    {{ wtf.form_field(form.submit) }}
+</form>
+{% endblock %}

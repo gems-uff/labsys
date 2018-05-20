@@ -194,3 +194,11 @@ def upsert_xray(admission, xray_formdata):
     })
     db.session.add(xray)
     db.session.commit()
+
+
+def get_samples(admission_id):
+    return []
+
+
+def add_sample(admission, sample_formdata):
+    pass
