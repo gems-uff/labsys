@@ -10,13 +10,14 @@ def create_add_transaction_from_order(order, stock):
         total_units = order_item.amount * order_item.item.units
         expiration_date = order_item.expiration_date
         transaction = m.Transaction(
-            user,
-            product,
-            lot_number,
-            total_units,
-            stock,
-            m.ADD,
-            expiration_date,
+            user=user,
+            product=product,
+            lot_number=lot_number,
+            amount=total_units,
+            stock=stock,
+            category=m.ADD,
+            expiration_date=expiration_date,
+            order_item=order_item,
         )
         db.session.add(transaction)
     db.session.commit()
@@ -24,12 +25,12 @@ def create_add_transaction_from_order(order, stock):
 
 def create_sub_transaction(user, product, lot_number, amount, stock):
     transaction = m.Transaction(
-        user,
-        product,
-        lot_number,
-        amount,
-        stock,
-        m.SUB,
+        user=user,
+        product=product,
+        lot_number=lot_number,
+        amount=amount,
+        stock=stock,
+        category=m.SUB,
     )
     db.session.add(transaction)
     db.session.commit()

@@ -252,8 +252,11 @@ class Transaction(Base, TimeStampedModelMixin):
     __tablename__ = 'transactions'
     # Columns
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    order_item_id = db.Column(db.Integer, db.ForeignKey('order_items.id'),
+                              nullable=True)
     product_id = db.Column(
         db.Integer, db.ForeignKey('products.id'), nullable=False)
+    lot_number = db.Column(db.String(64), nullable=True)
     stock_id = db.Column(
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
@@ -265,15 +268,19 @@ class Transaction(Base, TimeStampedModelMixin):
     # Relationships
     user = db.relationship(
         User, backref=db.backref('transactions', lazy=True))
+    order_item = db.relationship(
+        OrderItem, backref=db.backref('transaction', lazy=True, uselist=False))
     product = db.relationship(
         Product, backref=db.backref('transactions', lazy=True))
     stock = db.relationship(
         Stock, backref=db.backref('transactions', lazy=True))
 
-    def __init__(self, user, product, lot_number, amount, stock, category,
-                 expiration_date=None):
+    def __init__(self, user, product, lot_number, amount, stock,
+                 category, expiration_date=None, order_item=None):
         self.user = user
         self.product = product
+        self.order_item = order_item
+        self.lot_number = lot_number
         self.amount = amount
         self.stock = stock
         self.category = category

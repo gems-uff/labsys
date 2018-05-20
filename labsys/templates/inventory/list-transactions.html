@@ -23,7 +23,7 @@
   <tbody>
     {% for transaction in transactions %}
       <tr>
-        <td>{{ transaction.product.name }}</td>
+        <td>{{ transaction.product.name }} | Lote: {{ transaction.lot_number }}</td>
         {% if (transaction.category == 1) %}
           <td class="success">Recebimento</td>
         {% else %}
