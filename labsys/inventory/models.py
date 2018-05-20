@@ -250,21 +250,22 @@ class Order(Base, TimeStampedModelMixin):
 
 class Transaction(Base, TimeStampedModelMixin):
     __tablename__ = 'transactions'
-    # Columns
+    # FK's
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     order_item_id = db.Column(db.Integer, db.ForeignKey('order_items.id'),
                               nullable=True)
     product_id = db.Column(
         db.Integer, db.ForeignKey('products.id'), nullable=False)
+    # Attributes
     lot_number = db.Column(db.String(64), nullable=True)
     stock_id = db.Column(
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
-    category = db.Column(db.Integer, nullable=False)
     # TODO: make sure alembic migrations recognizes this
     __table_args__ = (
         CheckConstraint(amount > 0, name='amount_is_positive'), {})
-
+    category = db.Column(db.Integer, nullable=False)
+    patched_transaction_id = db.Column(db.Integer, nullable=True)
     # Relationships
     user = db.relationship(
         User, backref=db.backref('transactions', lazy=True))
@@ -276,7 +277,8 @@ class Transaction(Base, TimeStampedModelMixin):
         Stock, backref=db.backref('transactions', lazy=True))
 
     def __init__(self, user, product, lot_number, amount, stock,
-                 category, expiration_date=None, order_item=None):
+                 category, expiration_date=None, order_item=None,
+                 patched_transaction_id=None):
         self.user = user
         self.product = product
         self.order_item = order_item
