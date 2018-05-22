@@ -3,9 +3,6 @@
 {% import "utils/_forms_rendering.html" as frender %}
 
 {% block page_content %}
-<div class="btn btn-default">
-    <a href="{{ add_sample_link }}">Voltar</a>
-</div>
 {{ frender.render_simple_errors(form) }}
 <form class="form" method="post">
     <h3>Editar amostra</h3>

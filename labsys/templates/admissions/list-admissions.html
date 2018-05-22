@@ -13,20 +13,22 @@
   <thead>
     <tr>
       <th width="15%">Número Interno</th>
-      <th width="20%">Data de Coleta</th>
-      <th width="30%">Adicionar amostras</th>
+      <th width="20%">Admissão</th>
+      <th width="20%">Amostras</th>
     </tr>
   </thead>
   <tbody>
     {% for admission in admissions %}
       <tr>
-        <td>{{ admission.id_lvrs_intern }}</td>
-        {% if admission.samples.all() %}
-          <td>{{ admission.samples[0].collection_date.strftime('%d/%m/%Y') }}</td>
-        {% else %}
-          <td>Sem amostras cadastrada</td>
-        {% endif %}
-        <td><a href="{{ url_for('admissions.add_sample', admission_id=admission.id) }}">Visualizar ou Adicionar amostras</td>
+        <td>
+          {{ admission.id_lvrs_intern }}
+        </td>
+        <td>
+          <a href="{{ url_for('admissions.detail_admission', admission_id=admission.id) }}">Visualizar detalhes</a>
+        </td>
+        <td>
+          <a href="{{ url_for('admissions.add_sample', admission_id=admission.id) }}">Visualizar amostras</a>
+        </td>
       </tr>
     {% endfor %}
   </tbody>
