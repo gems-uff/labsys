@@ -77,7 +77,7 @@ class AdmissionForm(FlaskForm):
     requesting_institution = wtf.StringField('Instituição Solicitante')
     details = wtf.StringField('Informações Adicionais')
     patient = wtf.FormField(PatientForm, 'Dados do Paciente')
-    submit = wtf.SubmitField('Criar')
+    submit = wtf.SubmitField('Salvar')
 
 
 class DatedEventForm(FlaskForm):
@@ -152,7 +152,7 @@ class ObservedSymptomFormList(FlaskForm):
         'Secundários (separar por vírgula)',
         validators=[Optional()],
         render_kw={'placeholder': 'Ex.: tosse, desmaios, febre (40 graus)'})
-    submit = wtf.SubmitField('Criar')
+    submit = wtf.SubmitField('Salvar')
 
 
 class ObservedRiskFactorForm(FlaskForm):
@@ -179,18 +179,18 @@ class ObservedRiskFactorFormList(FlaskForm):
         'Secundários (separar por vírgula)',
         validators=[Optional()],
         render_kw={'placeholder': 'Ex.: obesidade'})
-    submit = wtf.SubmitField('Criar')
+    submit = wtf.SubmitField('Salvar')
 
 
 class CdcExamForm(FlaskForm):
     def __init__(self, **kwargs):
-        super(CdcExamForm, self).__init__(csrf_enabled=False, **kwargs)
+        super().__init__(csrf_enabled=False, **kwargs)
 
     FLU_TYPE_CHOICES = (('A', 'A'),
                         ('B', 'B'),
-                        ('Inconclusive', 'Inconclusivo'),
+                        ('Inconclusivo', 'Inconclusivo'),
                         ('Não Realizado', 'Não Realizado'),
-                        ('Ignorado', 'Ignorado')),
+                        ('Ignorado', 'Ignorado'))
     FLU_SUBTYPE_CHOICES = (('H1', 'H1'),
                            ('H3', 'H3'),
                            ('Victoria', 'Victoria'),
@@ -208,14 +208,17 @@ class CdcExamForm(FlaskForm):
                                   default='Ignorado',
                                   coerce=str, )
     dominant_ct = wtf.FloatField('CT (principal)', validators=[Optional()])
+    dominant_ct = wtf.FloatField(
+        'CT (principal)',
+        render_kw={'placeholder': 'Ex.: 20.50'},
+        validators=[Optional()],
+        widget=html5widgets.NumberInput(step='0.01', min='0.00', max='99999.99'))
     details = wtf.StringField(
-        'Informações adicionais sobre exame', validators=[length(max=128)])
+        'Informações adicionais sobre exame', validators=[length(max=128)],
+        widget=widgets.TextArea())
 
 
 class SampleForm(FlaskForm):
-    def __init__(self, **kwargs):
-        super(SampleForm, self).__init__(csrf_enabled=False, **kwargs)
-
     collection_date = wtf.DateField('Data de coleta',
                                     widget=html5widgets.DateInput(),
                                     validators=[InputRequired()])
@@ -226,7 +229,8 @@ class SampleForm(FlaskForm):
                                    validators=[InputRequired()])
     details = wtf.StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
-    cdc_exam = wtf.FormField('Resultado Exame CDC', form_class=CdcExamForm)
+    cdc_exam = wtf.FormField(label='Resultado Exame CDC', form_class=CdcExamForm)
+    submit = wtf.SubmitField('Adicionar amostra')
 
 
 # TODO: normalize it (creating a separate tabel for models)

@@ -89,6 +89,7 @@ def detail_admission(admission_id):
     dated_events_link = url_for('.add_dated_events', admission_id=admission_id)
     antiviral_link = url_for('.add_antiviral', admission_id=admission_id)
     xray_link = url_for('.add_xray', admission_id=admission_id)
+    samples_link = url_for('.add_sample', admission_id=admission_id)
     return render_template(
         template,
         admission=admission_form,
@@ -97,6 +98,7 @@ def detail_admission(admission_id):
         dated_events_link=dated_events_link,
         antiviral_link=antiviral_link,
         xray_link=xray_link,
+        samples_link=samples_link,
     )
 
 
@@ -176,3 +178,38 @@ def add_xray(admission_id):
         return redirect(url_for('.detail_admission',
                                 admission_id=admission_id))
     return render_template(template, form=form)
+
+
+@blueprint.route('/<int:admission_id>/samples', methods=['GET', 'POST'])
+@permission_required(Permission.CREATE)
+def add_sample(admission_id):
+    admission = Admission.query.get_or_404(admission_id)
+    template = 'admissions/samples.html'
+    samples = service.get_samples(admission)
+    form = forms.SampleForm()
+    if form.validate_on_submit():
+        service.add_sample(admission, form)
+        return redirect(url_for('.add_sample',
+                                admission_id=admission_id))
+    return render_template(template, form=form, samples=samples,
+                           admission_link=url_for('.detail_admission',
+                                                  admission_id=admission_id))
+
+
+@blueprint.route('/samples/<int:sample_id>', methods=['GET', 'POST'])
+@permission_required(Permission.CREATE)
+def edit_sample(sample_id):
+    sample = Sample.query.get_or_404(sample_id)
+    # TODO: find out why dates why weird years are not loaded correctly
+    template = 'admissions/sample.html'
+    form = forms.SampleForm(obj=sample)
+    form.submit.label.text = 'Salvar edição'
+    if form.validate_on_submit():
+        service.update_sample(sample, form)
+        return redirect(url_for('.add_sample',
+                                admission_id=sample.admission_id))
+    return render_template(
+        template, form=form, sample=sample,
+        add_sample_link=url_for('.add_sample',
+                                admission_id=sample.admission_id))
+

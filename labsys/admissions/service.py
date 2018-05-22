@@ -1,8 +1,9 @@
+import datetime
 from labsys.extensions import db
 from labsys.admissions.models import (
     ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor,
     Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Antiviral, XRay,
+    Antiviral, XRay, Sample, CdcExam
 )
 
 
@@ -193,4 +194,23 @@ def upsert_xray(admission, xray_formdata):
         'other': xray_formdata['other'],
     })
     db.session.add(xray)
+    db.session.commit()
+
+
+def get_samples(admission):
+    return admission.samples.order_by(Sample.id)
+
+
+def add_sample(admission, form):
+    sample = Sample(admission=admission)
+    cdc_exam = CdcExam(sample=sample)
+    form.cdc_exam.form.populate_obj(cdc_exam)
+    form.populate_obj(sample)
+    db.session.add(sample)
+    db.session.commit()
+
+
+def update_sample(sample, form):
+    form.populate_obj(sample)
+    db.session.add(sample)
     db.session.commit()
