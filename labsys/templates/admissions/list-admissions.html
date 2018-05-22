@@ -13,9 +13,8 @@
   <thead>
     <tr>
       <th width="15%">Número Interno</th>
-      <th width="40%">Data de Coleta</th>
-      <!-- <th width="5%">Editar</th> -->
-      <!-- <th width="5%">Deletar</th> -->
+      <th width="20%">Data de Coleta</th>
+      <th width="30%">Adicionar amostras</th>
     </tr>
   </thead>
   <tbody>
@@ -27,6 +26,7 @@
         {% else %}
           <td>Sem amostras cadastrada</td>
         {% endif %}
+        <td><a href="{{ url_for('admissions.add_sample', admission_id=admission.id) }}">Visualizar ou Adicionar amostras</td>
       </tr>
     {% endfor %}
   </tbody>
