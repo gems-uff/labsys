@@ -185,14 +185,31 @@ def add_xray(admission_id):
 def add_sample(admission_id):
     admission = Admission.query.get_or_404(admission_id)
     template = 'admissions/samples.html'
-    samples_formdata = service.get_samples(admission_id)
+    samples = service.get_samples(admission)
     form = forms.SampleForm()
     if form.validate_on_submit():
-        service.add_sample(admission, form.data)
+        service.add_sample(admission, form)
         return redirect(url_for('.add_sample',
                                 admission_id=admission_id))
-    return render_template(template, form=form,
+    return render_template(template, form=form, samples=samples,
                            admission_link=url_for('.detail_admission',
                                                   admission_id=admission_id))
 
+
+@blueprint.route('/samples/<int:sample_id>', methods=['GET', 'POST'])
+@permission_required(Permission.CREATE)
+def edit_sample(sample_id):
+    sample = Sample.query.get_or_404(sample_id)
+    # TODO: find out why dates why weird years are not loaded correctly
+    template = 'admissions/sample.html'
+    form = forms.SampleForm(obj=sample)
+    form.submit.label.text = 'Salvar edição'
+    if form.validate_on_submit():
+        service.update_sample(sample, form)
+        return redirect(url_for('.add_sample',
+                                admission_id=sample.admission_id))
+    return render_template(
+        template, form=form, sample=sample,
+        add_sample_link=url_for('.add_sample',
+                                admission_id=sample.admission_id))
 

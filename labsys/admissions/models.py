@@ -161,7 +161,7 @@ class ObservedRiskFactor(db.Model):
         'observations', cascade='all, delete-orphan'))
 
     def __repr__(self):
-        return '<ObservedSymptom[{}]: {}>'.format(self.id, self.symptom.name)
+        return '<ObservedRiskFactor[{}]: {}>'.format(self.id, self.risk_factor.name)
 
 
 class Method(db.Model):
@@ -169,10 +169,15 @@ class Method(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Attributes
     name = db.Column(db.String(64))
-    primary = db.Column(db.Boolean)
-    # Relationships
-    samples = db.relationship(
-        'Sample', backref='method', uselist=False)
+
+    @staticmethod
+    def insert_methods():
+        method_name = 'Outro'
+        other_method = Method.query.filter_by(name=method_name).first()
+        if other_method is None:
+            other_method = Method(name=method_name)
+        db.session.add(other_method)
+        db.session.commit()
 
     def __repr__(self):
         return '<Method[{}]: {}>'.format(self.id, self.name)
@@ -191,28 +196,6 @@ class Sample(db.Model):
     # FKs
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
-    # Relationships
-    cdc_exam = db.relationship('CdcExam', backref='sample', uselist=False)
-
-    @hybrid_property
-    def admission(self):
-        return self._admission
-
-    @admission.setter
-    def admission(self, admission):
-        self._admission = admission
-        if self._admission is not None:
-            self.ordering = len(self._admission.samples.all())
-        else:
-            self.ordering = -1
-
-    @hybrid_property
-    def ordering(self):
-        return self._ordering
-
-    @ordering.setter
-    def ordering(self, ordering):
-        self._ordering = ordering
 
     def __repr__(self):
         return '<Sample[{}]: {}>'.format(self.id, self.collection_date)
@@ -227,6 +210,9 @@ class CdcExam(db.Model):
     flu_subtype = db.Column(db.String(16))
     dominant_ct = db.Column(db.Numeric(12, 2), nullable=True)
     details = db.Column(db.String(255), nullable=True)
+    # Relationship
+    admission = db.relationship('Sample', backref=db.backref(
+        'cdc_exam', cascade='all, delete-orphan'), uselist=False)
 
     def __repr__(self):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)
