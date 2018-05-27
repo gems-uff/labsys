@@ -229,7 +229,8 @@ class SampleForm(FlaskForm):
                                    validators=[InputRequired()])
     details = wtf.StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
-    cdc_exam = wtf.FormField(label='Resultado Exame CDC', form_class=CdcExamForm)
+    cdc_exam = wtf.FormField(label='Resultado Exame CDC',
+                             form_class=CdcExamForm)
     submit = wtf.SubmitField('Adicionar amostra')
 
 

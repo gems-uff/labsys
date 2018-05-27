@@ -211,8 +211,8 @@ class CdcExam(db.Model):
     dominant_ct = db.Column(db.Numeric(12, 2), nullable=True)
     details = db.Column(db.String(255), nullable=True)
     # Relationship
-    admission = db.relationship('Sample', backref=db.backref(
-        'cdc_exam', cascade='all, delete-orphan'), uselist=False)
+    sample = db.relationship('Sample', backref=db.backref(
+        'cdc_exam', cascade='all, delete-orphan', uselist=False))
 
     def __repr__(self):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)
