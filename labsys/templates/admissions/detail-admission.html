@@ -1,37 +1,15 @@
-{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% import "utils/_forms_rendering.html" as frender %}
+{% extends "admissions/forms_base.html" %}
 
-{% block page_content %}
-  <h2>Informações sobre admissão</h2>
-  <!-- Symptoms -->
-  <div>
-    <a href="{{ symptoms_link }}" class="btn btn-default">Sintomas</a>
-  </div>
-  <!-- Risk Factors -->
-  <div>
-    <a href="{{ risk_factors_link }}" class="btn btn-default">Fatores de Risco</a>
-  </div>
-  <!-- Dated Events -->
-  <div>
-    <a href="{{ dated_events_link }}" class="btn btn-default">Vacinação, Hospitalização e Óbito</a>
-  </div>
-  <!-- Antiviral -->
-  <div>
-    <a href="{{ antiviral_link }}" class="btn btn-default">Uso de Antiviral</a>
-  </div>
-  <!-- XRay -->
-  <div>
-    <a href="{{ xray_link }}" class="btn btn-default">Raio X de Toráx</a>
-  </div>
-  <!-- Samples -->
-  <div>
-    <a href="{{ samples_link }}" class="btn btn-default">Amostras coletadas</a>
-  </div>
-  <h2>Dados importados</h2>
+{% block form %}
+{{ frender.render_simple_errors(admission) }}
+<form class="form" method="post">
+  {{ admission.hidden_tag() }}
+  {{ wtf.form_errors(admission, hiddens="only") }}
   <!-- Admission -->
   {{ frender.render_admission(admission) }}
   <!-- Patient -->
   {{ frender.render_patient(admission.patient) }}
 
+  {{ wtf.form_field(admission.submit) }}
+</form>
 {% endblock %}

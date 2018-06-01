@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for, session
 from flask_login import login_required
 
 from labsys.auth.decorators import permission_required
@@ -18,8 +18,31 @@ from .models import (Address, Admission, CdcExam, ClinicalEvolution,
 @blueprint.app_context_processor
 def inject_permissions():
     '''This function is executed each request,
-    even though outside of the bluprint'''
+    even though outside of the blueprint'''
     return dict(Permission=Permission)
+
+
+@blueprint.context_processor
+def inject_sidebar_links():
+    admission_id = session.get('admission_id', 1)
+    admission_link = url_for('.detail_admission', admission_id=admission_id)
+    symptoms_link = url_for('.add_symptoms', admission_id=admission_id)
+    risk_factors_link = url_for('.add_risk_factors', admission_id=admission_id)
+    dated_events_link = url_for('.add_dated_events', admission_id=admission_id)
+    antiviral_link = url_for('.add_antiviral', admission_id=admission_id)
+    xray_link = url_for('.add_xray', admission_id=admission_id)
+    samples_link = url_for('.add_sample', admission_id=admission_id)
+    sidebar_links = {
+        'Admissão e Paciente': admission_link,
+        'Sintomas': symptoms_link,
+        'Fatores de risco': risk_factors_link,
+        'Vacinação, Hospitalização e Óbito': dated_events_link,
+        'Uso de antiviral': antiviral_link,
+        'Raio X de Tórax': xray_link,
+        'Amostras coletadas': samples_link,
+    }
+    return {'sidebar_links': sidebar_links}
+
 
 
 @blueprint.route('/', methods=['GET'])
@@ -45,6 +68,7 @@ def create_admission():
             id_lvrs_intern=form.id_lvrs_intern.data).first()
         if admission is not None:
             flash('Número Interno já cadastrado!', 'danger')
+            return redirect(url_for('.create_admission'))
         else:
             # Unfortunately I cannot use **form.data to create an instance nor populate_obj
             # because of nesting
@@ -77,28 +101,25 @@ def create_admission():
     return render_template(template, form=form)
 
 
-# TODO: merge symptoms and riskfactors
-@blueprint.route('/<int:admission_id>', methods=['GET'])
+@blueprint.route('/<int:admission_id>', methods=['GET', 'POST'])
 @permission_required(Permission.VIEW)
 def detail_admission(admission_id):
+    session['admission_id'] = admission_id
     admission = Admission.query.get_or_404(admission_id)
     template = 'admissions/detail-admission.html'
     admission_form = AdmissionForm(obj=admission)
-    symptoms_link = url_for('.add_symptoms', admission_id=admission_id)
-    risk_factors_link = url_for('.add_risk_factors', admission_id=admission_id)
-    dated_events_link = url_for('.add_dated_events', admission_id=admission_id)
-    antiviral_link = url_for('.add_antiviral', admission_id=admission_id)
-    xray_link = url_for('.add_xray', admission_id=admission_id)
-    samples_link = url_for('.add_sample', admission_id=admission_id)
+    if admission_form.validate_on_submit():
+        query_admission = Admission.query.filter_by(
+            id_lvrs_intern=admission_form.id_lvrs_intern.data).first()
+        if query_admission is not None and query_admission.id is not admission.id:
+            flash('Número Interno já cadastrado!', 'danger')
+        else:
+            service.upsert_admission(admission, admission_form)
+            flash('Admissão atualizada com sucesso', 'success')
+        return redirect(url_for('.detail_admission', admission_id=admission.id))
     return render_template(
         template,
         admission=admission_form,
-        symptoms_link=symptoms_link,
-        risk_factors_link=risk_factors_link,
-        dated_events_link=dated_events_link,
-        antiviral_link=antiviral_link,
-        xray_link=xray_link,
-        samples_link=samples_link,
     )
 
 
