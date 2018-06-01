@@ -1,21 +1,23 @@
-import datetime
 from labsys.extensions import db
 from labsys.admissions.models import (
     ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor,
-    Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Antiviral, XRay, Sample, CdcExam, Patient, Address
-)
+    Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution, Antiviral,
+    XRay, Sample, CdcExam, Patient, Address)
 
 
 def get_admission_symptoms(admission_id):
-    observed_symptoms_ids = [obs.symptom_id for obs in Admission.query.get(admission_id).symptoms]
+    # import ipdb; ipdb.set_trace()
+    observed_symptoms_ids = [
+        obs.symptom_id for obs in Admission.query.get(admission_id).symptoms
+    ]
     symptoms = [s for s in Symptom.query.all()]
 
     mapped_symptoms = []
 
     for symptom in symptoms:
         if symptom.id in observed_symptoms_ids:
-            observed_symptom = ObservedSymptom.query.filter_by(symptom_id=symptom.id).first()
+            observed_symptom = ObservedSymptom.query.filter_by(
+                symptom_id=symptom.id, admission_id=admission_id).first()
             symptom.observed = observed_symptom.observed
             symptom.details = observed_symptom.details
         else:
@@ -31,14 +33,18 @@ def get_admission_symptoms(admission_id):
 
 
 def get_admission_risk_factors(admission_id):
-    observed_factors_ids = [obs.risk_factor_id for obs in Admission.query.get(admission_id).risk_factors]
+    observed_factors_ids = [
+        obs.risk_factor_id
+        for obs in Admission.query.get(admission_id).risk_factors
+    ]
     factors = [f for f in RiskFactor.query.all()]
 
     mapped_factors = []
 
     for factor in factors:
         if factor.id in observed_factors_ids:
-            observed_factor = ObservedRiskFactor.query.filter_by(risk_factor_id=factor.id).first()
+            observed_factor = ObservedRiskFactor.query.filter_by(
+                risk_factor_id=factor.id, admission_id=admission_id).first()
             factor.observed = observed_factor.observed
             factor.details = observed_factor.details
         else:
@@ -136,14 +142,13 @@ def upsert_dated_events(admission, dated_events_formdata):
     if admission.clinicalevolution:
         admission.clinicalevolution.admission = None
 
-    vaccine = Vaccine(admission=admission,
-        **dated_events_formdata['vaccine'])
-    hospitalization = Hospitalization(admission=admission,
-        **dated_events_formdata['hospitalization'])
-    uti_hospitalization = UTIHospitalization(admission=admission,
-        **dated_events_formdata['uti_hospitalization'])
-    clinical_evolution = ClinicalEvolution(admission=admission,
-        **dated_events_formdata['clinical_evolution'])
+    vaccine = Vaccine(admission=admission, **dated_events_formdata['vaccine'])
+    hospitalization = Hospitalization(
+        admission=admission, **dated_events_formdata['hospitalization'])
+    uti_hospitalization = UTIHospitalization(
+        admission=admission, **dated_events_formdata['uti_hospitalization'])
+    clinical_evolution = ClinicalEvolution(
+        admission=admission, **dated_events_formdata['clinical_evolution'])
 
     db.session.add(vaccine)
     db.session.add(hospitalization)
@@ -166,11 +171,13 @@ def get_antiviral(admission):
 def upsert_antiviral(admission, antiviral_formdata):
     if admission.antiviral:
         admission.antiviral.admission = None
-    antiviral = Antiviral(admission=admission, **{
-        'usage': antiviral_formdata['usage'],
-        'start_date': antiviral_formdata['start_date'],
-        'other': antiviral_formdata['other'],
-    })
+    antiviral = Antiviral(
+        admission=admission,
+        **{
+            'usage': antiviral_formdata['usage'],
+            'start_date': antiviral_formdata['start_date'],
+            'other': antiviral_formdata['other'],
+        })
     db.session.add(antiviral)
     db.session.commit()
 
@@ -188,11 +195,13 @@ def get_xray(admission):
 def upsert_xray(admission, xray_formdata):
     if admission.xray:
         admission.xray.admission = None
-    xray = XRay(admission=admission, **{
-        'usage': xray_formdata['usage'],
-        'start_date': xray_formdata['start_date'],
-        'other': xray_formdata['other'],
-    })
+    xray = XRay(
+        admission=admission,
+        **{
+            'usage': xray_formdata['usage'],
+            'start_date': xray_formdata['start_date'],
+            'other': xray_formdata['other'],
+        })
     db.session.add(xray)
     db.session.commit()
 

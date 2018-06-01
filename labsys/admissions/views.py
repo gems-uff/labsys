@@ -1,5 +1,4 @@
 from flask import flash, redirect, render_template, url_for, session
-from flask_login import login_required
 
 from labsys.auth.decorators import permission_required
 from labsys.auth.models import Permission
@@ -44,7 +43,6 @@ def inject_sidebar_links():
     return {'sidebar_links': sidebar_links}
 
 
-
 @blueprint.route('/', methods=['GET'])
 @permission_required(Permission.VIEW)
 def list_admissions():
@@ -52,10 +50,11 @@ def list_admissions():
     view = 'admissions.list_admissions'
     query = Admission.query.order_by(Admission.id_lvrs_intern)
     context_title = 'admissions'
-    return paginated(query=query,
-                     template_name=template,
-                     view_method=view,
-                     context_title=context_title)
+    return paginated(
+        query=query,
+        template_name=template,
+        view_method=view,
+        context_title=context_title)
 
 
 @blueprint.route('/create', methods=['GET', 'POST'])
@@ -96,8 +95,8 @@ def create_admission():
             db.session.add(admission)
             db.session.commit()
             flash('Admissão criada com sucesso!', 'success')
-        return redirect(url_for('.detail_admission',
-                                admission_id=admission.id))
+        return redirect(
+            url_for('.detail_admission', admission_id=admission.id))
     return render_template(template, form=form)
 
 
@@ -111,12 +110,13 @@ def detail_admission(admission_id):
     if admission_form.validate_on_submit():
         query_admission = Admission.query.filter_by(
             id_lvrs_intern=admission_form.id_lvrs_intern.data).first()
-        if query_admission is not None and query_admission.id is not admission.id:
+        if query_admission is not None and query_admission.id != admission.id:
             flash('Número Interno já cadastrado!', 'danger')
         else:
             service.upsert_admission(admission, admission_form)
             flash('Admissão atualizada com sucesso', 'success')
-        return redirect(url_for('.detail_admission', admission_id=admission.id))
+        return redirect(
+            url_for('.detail_admission', admission_id=admission.id))
     return render_template(
         template,
         admission=admission_form,
@@ -132,8 +132,8 @@ def add_dated_events(admission_id):
     form = forms.DatedEventFormGroup(data=dated_events)
     if form.validate_on_submit():
         service.upsert_dated_events(admission, form.data)
-        return redirect(url_for('.detail_admission',
-                                admission_id=admission_id))
+        return redirect(
+            url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)
 
 
@@ -143,15 +143,17 @@ def add_symptoms(admission_id):
     admission = Admission.query.get_or_404(admission_id)
     template = 'admissions/entities_formlist.html'
     symptoms, symptoms_dict = service.get_admission_symptoms(admission_id)
-    form = forms.ObservedSymptomFormList(data={
-        'primary': symptoms_dict,
-        'secondary': admission.secondary_symptoms,
-    })
+    form = forms.ObservedSymptomFormList(
+        data={
+            'primary': symptoms_dict,
+            'secondary': admission.secondary_symptoms,
+        })
     if form.validate_on_submit():
         admission.secondary_symptoms = form.secondary.data
         for symptom in form.primary.entries:
             service.upsert_symptom(admission_id, symptom.data)
-        return redirect(url_for('.detail_admission', admission_id=admission_id))
+        return redirect(
+            url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)
 
 
@@ -160,16 +162,19 @@ def add_symptoms(admission_id):
 def add_risk_factors(admission_id):
     admission = Admission.query.get_or_404(admission_id)
     template = 'admissions/entities_formlist.html'
-    risk_factors, risk_factors_dict = service.get_admission_risk_factors(admission_id)
-    form = forms.ObservedRiskFactorFormList(data={
-        'primary': risk_factors_dict,
-        'secondary': admission.secondary_risk_factors,
-    })
+    risk_factors, risk_factors_dict = service.get_admission_risk_factors(
+        admission_id)
+    form = forms.ObservedRiskFactorFormList(
+        data={
+            'primary': risk_factors_dict,
+            'secondary': admission.secondary_risk_factors,
+        })
     if form.validate_on_submit():
         admission.secondary_risk_factors = form.secondary.data
         for risk_factor in form.primary.entries:
             service.upsert_risk_factor(admission_id, risk_factor.data)
-        return redirect(url_for('.detail_admission', admission_id=admission_id))
+        return redirect(
+            url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)
 
 
@@ -182,8 +187,8 @@ def add_antiviral(admission_id):
     form = forms.AntiviralForm(data=antiviral_formdata)
     if form.validate_on_submit():
         service.upsert_antiviral(admission, form.data)
-        return redirect(url_for('.detail_admission',
-                                admission_id=admission_id))
+        return redirect(
+            url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)
 
 
@@ -196,8 +201,8 @@ def add_xray(admission_id):
     form = forms.XRayForm(data=xray_formdata)
     if form.validate_on_submit():
         service.upsert_xray(admission, form.data)
-        return redirect(url_for('.detail_admission',
-                                admission_id=admission_id))
+        return redirect(
+            url_for('.detail_admission', admission_id=admission_id))
     return render_template(template, form=form)
 
 
@@ -210,11 +215,12 @@ def add_sample(admission_id):
     form = forms.SampleForm()
     if form.validate_on_submit():
         service.add_sample(admission, form)
-        return redirect(url_for('.add_sample',
-                                admission_id=admission_id))
-    return render_template(template, form=form, samples=samples,
-                           admission_link=url_for('.detail_admission',
-                                                  admission_id=admission_id))
+        return redirect(url_for('.add_sample', admission_id=admission_id))
+    return render_template(
+        template,
+        form=form,
+        samples=samples,
+        admission_link=url_for('.detail_admission', admission_id=admission_id))
 
 
 @blueprint.route('/samples/<int:sample_id>', methods=['GET', 'POST'])
@@ -227,10 +233,11 @@ def edit_sample(sample_id):
     form.submit.label.text = 'Salvar edição'
     if form.validate_on_submit():
         service.update_sample(sample, form)
-        return redirect(url_for('.add_sample',
-                                admission_id=sample.admission_id))
+        return redirect(
+            url_for('.add_sample', admission_id=sample.admission_id))
     return render_template(
-        template, form=form, sample=sample,
-        add_sample_link=url_for('.add_sample',
-                                admission_id=sample.admission_id))
-
+        template,
+        form=form,
+        sample=sample,
+        add_sample_link=url_for(
+            '.add_sample', admission_id=sample.admission_id))
