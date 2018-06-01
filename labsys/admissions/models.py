@@ -4,20 +4,10 @@ from sqlalchemy import asc
 
 from ..extensions import db
 
-from .mixins import AdmissionOneToOneMixin, DatedEvent
-
-'''
-Limitações conhecidas
-- O Patient só pode ter um Address, ou seja, a pergunta "Quando ele foi admitido no ano X, ele morava onde?" não pode ser respondida.
-    - Podemos futuramente pensar em uma maneira da Admission saber disso, ex.: Admission.patient_residence
-- Quando uma Admission é deletada, os "eventos" também o são: Vaccine, Hospitalization, UTIHospitalization e ClinicalEvolution
-'''
-
-# TODO: Add nullable to columns which are not present in initial importing CSV
-# TODO: Abstract ObservedSymptoms/Symptoms and ObservedRiskFactors, RiskFactors
+from .mixins import AdmissionOneToOneMixin, DatedEvent, TimeStampedModelMixin
 
 
-class Patient(db.Model):
+class Patient(TimeStampedModelMixin, db.Model):
     __tablename__ = 'patients'
     id = db.Column(db.Integer, primary_key=True)
     # Attributes
@@ -52,7 +42,7 @@ class Address(db.Model):
         return '<Address[{}]: Pat{}>'.format(self.id, self.patient)
 
 
-class Admission(db.Model):
+class Admission(TimeStampedModelMixin, db.Model):
     __tablename__ = 'admissions'
     id = db.Column(db.Integer, primary_key=True)
     # FK
@@ -183,7 +173,7 @@ class Method(db.Model):
         return '<Method[{}]: {}>'.format(self.id, self.name)
 
 
-class Sample(db.Model):
+class Sample(TimeStampedModelMixin, db.Model):
 
     __tablename__ = 'samples'
     id = db.Column(db.Integer, primary_key=True)
@@ -201,7 +191,7 @@ class Sample(db.Model):
         return '<Sample[{}]: {}>'.format(self.id, self.collection_date)
 
 
-class CdcExam(db.Model):
+class CdcExam(TimeStampedModelMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # FKs
     sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))

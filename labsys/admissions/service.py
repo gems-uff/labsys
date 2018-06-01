@@ -3,7 +3,7 @@ from labsys.extensions import db
 from labsys.admissions.models import (
     ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor,
     Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Antiviral, XRay, Sample, CdcExam
+    Antiviral, XRay, Sample, CdcExam, Patient, Address
 )
 
 
@@ -213,4 +213,16 @@ def add_sample(admission, form):
 def update_sample(sample, form):
     form.populate_obj(sample)
     db.session.add(sample)
+    db.session.commit()
+
+
+def upsert_admission(admission, form):
+    if admission is None:
+        admission = Admission()
+    if admission.patient is None:
+        admission.patient = Patient()
+    if admission.patient.residence is None:
+        admission.patient.residence = Address()
+    form.populate_obj(admission)
+    db.session.add(admission)
     db.session.commit()

@@ -1,4 +1,3 @@
-
 from flask_wtf import FlaskForm
 import wtforms as wtf
 import wtforms.widgets as widgets
@@ -30,7 +29,8 @@ class AddressForm(FlaskForm):
                           choices=ZONE_CHOICES,
                           default=9,
                           coerce=int, )
-    details = wtf.StringField('Observações', validators=[length(max=255)])
+    details = wtf.StringField('Detalhes sobre residência',
+                              validators=[length(max=255)])
 
 
 class PatientForm(FlaskForm):
@@ -75,7 +75,8 @@ class AdmissionForm(FlaskForm):
                            validators=[length(max=128)])
     health_unit = wtf.StringField('Unidade de Saúde')
     requesting_institution = wtf.StringField('Instituição Solicitante')
-    details = wtf.StringField('Informações Adicionais')
+    details = wtf.StringField('Informações Adicionais',
+                              widget=widgets.TextArea())
     patient = wtf.FormField(PatientForm, 'Dados do Paciente')
     submit = wtf.SubmitField('Salvar')
 
