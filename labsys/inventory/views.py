@@ -20,7 +20,6 @@ def index():
     return redirect(url_for('.show_stock'))
 
 
-
 @blueprint.route('/catalog', methods=['GET'])
 @permission_required(Permission.VIEW)
 def show_catalog():
@@ -28,10 +27,11 @@ def show_catalog():
     view = 'inventory.show_catalog'
     query = Product.query.order_by(Product.name)
     context_title = 'products'
-    return paginated(query=query,
-                     template_name=template,
-                     view_method=view,
-                     context_title=context_title)
+    return paginated(
+        query=query,
+        template_name=template,
+        view_method=view,
+        context_title=context_title)
 
 
 @blueprint.route('/stock', methods=['GET'])
@@ -39,12 +39,11 @@ def show_catalog():
 def show_stock():
     stock = Stock.query.first()
     template = 'inventory/index.html'
-    products = db.session.query(
-        Product).join(StockProduct).order_by(Product.name).all()
+    products = db.session.query(Product).join(StockProduct).order_by(
+        Product.name).all()
     for p in products:
         p.total = stock.total(p)
-    return render_template(template,
-                           products=products)
+    return render_template(template, products=products)
 
 
 @blueprint.route('/transactions', methods=['GET'])
@@ -54,10 +53,11 @@ def list_transactions():
     view = 'inventory.list_transactions'
     query = Transaction.query.order_by(Transaction.updated_on.desc())
     context_title = 'transactions'
-    return paginated(query=query,
-                     template_name=template,
-                     view_method=view,
-                     context_title=context_title)
+    return paginated(
+        query=query,
+        template_name=template,
+        view_method=view,
+        context_title=context_title)
 
 
 @blueprint.route('/orders', methods=['GET'])
@@ -67,10 +67,11 @@ def list_orders():
     view = 'inventory.list_orders'
     query = Order.query.order_by(Order.order_date.desc())
     context_title = 'orders'
-    return paginated(query=query,
-                     template_name=template,
-                     view_method=view,
-                     context_title=context_title)
+    return paginated(
+        query=query,
+        template_name=template,
+        view_method=view,
+        context_title=context_title)
 
 
 # TODO: Implement this method:
@@ -96,8 +97,9 @@ def purchase_product():
 
     if session.get('order_items') is None:
         session['order_items'] = []
-    order_items = [jsonpickle.decode(item)
-                   for item in session.get('order_items')]
+    order_items = [
+        jsonpickle.decode(item) for item in session.get('order_items')
+    ]
     for order_item in order_items:
         order_item.item = Specification.query.get(order_item.item_id)
 
@@ -136,8 +138,8 @@ def purchase_product():
             return redirect(url_for('.purchase_product'))
         logger.info('redirecting to route with or w/out errors and form')
     logger.info('GETting purchase_product')
-    return render_template('inventory/create-order.html',
-                           form=form, order_items=order_items)
+    return render_template(
+        'inventory/create-order.html', form=form, order_items=order_items)
 
 
 @blueprint.route('/orders/checkout', methods=['GET', 'POST'])
@@ -147,8 +149,9 @@ def checkout():
     stock = Stock.get_reactive_stock()
     if session.get('order_items') is None:
         session['order_items'] = []
-    order_items = [jsonpickle.decode(item)
-                   for item in session.get('order_items')]
+    order_items = [
+        jsonpickle.decode(item) for item in session.get('order_items')
+    ]
     for order_item in order_items:
         order_item.item = Specification.query.get(order_item.item_id)
     logger.info('Retrieve unpickled order_items from session')
@@ -177,11 +180,8 @@ def checkout():
                         expiration_date = order_item.expiration_date
                         logger.info('stock.add({}, {}, {}, {})'.format(
                             product, lot_number, expiration_date, total_units))
-                        stock.add(
-                            product,
-                            lot_number,
-                            expiration_date,
-                            total_units)
+                        stock.add(product, lot_number, expiration_date,
+                                  total_units)
                         order_item.added_to_stock = True
                         db.session.add(order_item)
                     logger.info('Comitting session...')
@@ -204,9 +204,11 @@ def checkout():
             flash('É necessário adicionar pelo menos 1 item ao carrinho.',
                   'warning')
             return redirect(url_for('.purchase_product'))
-    return render_template('inventory/checkout.html',
-                           form=form,
-                           order_items=order_items,)
+    return render_template(
+        'inventory/checkout.html',
+        form=form,
+        order_items=order_items,
+    )
 
 
 @blueprint.route('/products/consume', methods=['GET', 'POST'])
@@ -238,15 +240,11 @@ def consume_product():
             logger.info('Commiting subtraction')
             db.session.commit()
             logger.info('Creating sub-transaction')
-            services.create_sub_transaction(
-                current_user,
-                product,
-                lot_number,
-                amount,
-                stock
-            )
-            flash('{} unidades de {} removidas do estoque com sucesso!'.format(
-                form.amount.data, selected_stock_product.product.name),
+            services.create_sub_transaction(current_user, product, lot_number,
+                                            amount, stock)
+            flash(
+                '{} unidades de {} removidas do estoque com sucesso!'.format(
+                    form.amount.data, selected_stock_product.product.name),
                 'success')
 
             return redirect(url_for('.consume_product'))
@@ -291,14 +289,16 @@ def add_product_to_catalog():
             flash('Ocorreu um erro inesperado, contate um admministrador.',
                   'danger')
             return render_template('inventory/create-product.html', form=form)
-        return redirect(url_for('.detail_product',
-                                product_id=product.id,
-                                specifications=product.specifications))
+        return redirect(
+            url_for(
+                '.detail_product',
+                product_id=product.id,
+                specifications=product.specifications))
     return render_template('inventory/create-product.html', form=form)
 
 
-@blueprint.route('/products/<int:product_id>/specifications',
-                 methods=['GET', 'POST'])
+@blueprint.route(
+    '/products/<int:product_id>/specifications', methods=['GET', 'POST'])
 @permission_required(Permission.EDIT)
 def add_specification_to_product(product_id):
     product = Product.query.get_or_404(product_id)
@@ -320,8 +320,8 @@ def add_specification_to_product(product_id):
             db.session.rollback()
             flash('Já existe uma especificação com esse catálogo e fabricante',
                   'danger')
-    return render_template('inventory/create-specification.html',
-                           form=form, product=product)
+    return render_template(
+        'inventory/create-specification.html', form=form, product=product)
 
 
 @blueprint.route('/products/<int:product_id>', methods=['GET'])
@@ -332,9 +332,10 @@ def detail_product(product_id):
         [spec for spec in product.specifications],
         key=lambda spec: spec.units,
     )
-    return render_template('inventory/details-product.html',
-                           product=product,
-                           specifications=specifications)
+    return render_template(
+        'inventory/details-product.html',
+        product=product,
+        specifications=specifications)
 
 
 @blueprint.route('/export/<string:table>')

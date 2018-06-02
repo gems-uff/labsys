@@ -1,12 +1,11 @@
 import logging
-import jsonpickle
 from datetime import datetime
 
-from sqlalchemy import UniqueConstraint, CheckConstraint
+import jsonpickle
+from sqlalchemy import CheckConstraint, UniqueConstraint
 
-from labsys.extensions import db
 from labsys.auth.models import User
-
+from labsys.extensions import db
 
 ADD = 1
 SUB = 2
@@ -62,8 +61,7 @@ class Product(Base):
     name = db.Column(db.String(128), nullable=False)
     stock_minimum = db.Column(db.Integer, default=1, nullable=False)
     # Relationships
-    specifications = db.relationship(
-        'Specification', backref='product')
+    specifications = db.relationship('Specification', backref='product')
 
     def get_base_spec(self):
         if len(self.specifications) > 0:
@@ -72,9 +70,7 @@ class Product(Base):
 
 
 class Specification(Base):
-
-    def __init__(self, catalog_number, manufacturer, units=1,
-                 **kwargs):
+    def __init__(self, catalog_number, manufacturer, units=1, **kwargs):
         super().__init__(**kwargs)
         self.catalog_number = catalog_number
         self.manufacturer = manufacturer
@@ -128,8 +124,8 @@ class Stock(Base):
             raise ValueError('Amount must be a positive integer')
         stock_product = self.get_in_stock(product, lot_number)
         if stock_product is None:
-            stock_product = StockProduct(
-                self, product, lot_number, expiration_date)
+            stock_product = StockProduct(self, product, lot_number,
+                                         expiration_date)
         else:
             if expiration_date != stock_product.expiration_date:
                 logging.warning('Different expiration date, updating...')
@@ -169,8 +165,13 @@ class StockProduct(Base):
     __table_args__ = (UniqueConstraint(
         'product_id', 'stock_id', 'lot_number', name='stock_product'), )
 
-    def __init__(self, stock, product, lot_number, expiration_date,
-                 amount=0, **kwargs):
+    def __init__(self,
+                 stock,
+                 product,
+                 lot_number,
+                 expiration_date,
+                 amount=0,
+                 **kwargs):
         super().__init__(**kwargs)
         self.stock = stock
         self.product = product
@@ -234,8 +235,7 @@ class Order(Base, TimeStampedModelMixin):
     items = db.relationship(
         OrderItem, backref='order', cascade='all, delete-orphan')
     # lazy=True: accessing orders will load them from db (user.orders)
-    user = db.relationship(
-        User, backref=db.backref('orders', lazy=True))
+    user = db.relationship(User, backref=db.backref('orders', lazy=True))
 
     @property
     def is_executed(self):
@@ -250,30 +250,97 @@ class Order(Base, TimeStampedModelMixin):
 
 class Transaction(Base, TimeStampedModelMixin):
     __tablename__ = 'transactions'
-    # Columns
+    # FK's
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    order_item_id = db.Column(
+        db.Integer, db.ForeignKey('order_items.id'), nullable=True)
     product_id = db.Column(
         db.Integer, db.ForeignKey('products.id'), nullable=False)
     stock_id = db.Column(
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
+    # Attributes
+    patched_transaction_id = db.Column(db.Integer, nullable=True)
+    lot_number = db.Column(db.String(64), default='', nullable=True)
+    expiration_date = db.Column(db.Date, default=None, nullable=True)
     amount = db.Column(db.Integer, nullable=False)
+    __table_args__ = (CheckConstraint(amount > 0, name='amount_is_positive'),
+                      {})
     category = db.Column(db.Integer, nullable=False)
-    # TODO: make sure alembic migrations recognizes this
-    __table_args__ = (
-        CheckConstraint(amount > 0, name='amount_is_positive'), {})
-
     # Relationships
-    user = db.relationship(
-        User, backref=db.backref('transactions', lazy=True))
+    user = db.relationship(User, backref=db.backref('transactions', lazy=True))
+    order_item = db.relationship(
+        OrderItem, backref=db.backref('transaction', lazy=True, uselist=False))
     product = db.relationship(
         Product, backref=db.backref('transactions', lazy=True))
     stock = db.relationship(
         Stock, backref=db.backref('transactions', lazy=True))
 
-    def __init__(self, user, product, lot_number, amount, stock, category,
-                 expiration_date=None):
+    def __init__(self,
+                 user,
+                 product,
+                 lot_number,
+                 amount,
+                 stock,
+                 category,
+                 expiration_date=None,
+                 order_item=None,
+                 patched_transaction_id=None):
         self.user = user
         self.product = product
+        self.lot_number = lot_number
         self.amount = amount
         self.stock = stock
         self.category = category
+        self.expiration_date = expiration_date
+        self.order_item = order_item
+        self.patched_transaction_id = patched_transaction_id
+
+    def undo(self, user):
+        if self.category is SUB:
+            logging.info('Trying to revert a SUB transaction')
+            patch_trx = Transaction(
+                user=user,
+                category=ADD,
+                patched_transaction_id=self.id,
+                product=self.product,
+                lot_number=self.lot_number,
+                amount=self.amount,
+                stock=self.stock,
+                expiration_date=self.expiration_date,
+                order_item=self.order_item)
+            db.session.add(patch_trx)
+            db.session.add(self.stock)
+            self.stock.add(
+                self.product,
+                self.lot_number,
+                self.expiration_date,
+                self.amount,
+            )
+            db.session.commit()
+            logging.info('Successfully reverted')
+            return True
+        elif self.category is ADD:
+            logging.info('Trying to revert an ADD transaction')
+            patch_trx = Transaction(
+                user=user,
+                category=SUB,
+                patched_transaction_id=self.id,
+                product=self.product,
+                lot_number=self.lot_number,
+                amount=self.amount,
+                stock=self.stock,
+                expiration_date=self.expiration_date,
+                order_item=self.order_item)
+            db.session.add(self.stock)
+            try:
+                self.stock.subtract(self.product, self.lot_number, self.amount)
+                db.session.add(patch_trx)
+                db.session.commit()
+                logging.info('Successfully reverted')
+                return True
+            except Exception as exc:
+                logging.error(exc)
+            return False
+        else:
+            logging.error('Could not identify transaction category')
+            return False
