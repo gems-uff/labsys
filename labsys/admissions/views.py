@@ -14,11 +14,11 @@ from .models import (Address, Admission, CdcExam, ClinicalEvolution,
 
 
 # TODO: do I need this?
-@blueprint.app_context_processor
-def inject_permissions():
-    '''This function is executed each request,
-    even though outside of the blueprint'''
-    return dict(Permission=Permission)
+# @blueprint.app_context_processor
+# def inject_permissions():
+#     '''This function is executed each request,
+#     even though outside of the blueprint'''
+#     return dict(Permission=Permission)
 
 
 @blueprint.context_processor
