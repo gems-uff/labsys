@@ -13,12 +13,12 @@ def insert_admission(admission):
     query_admission = Admission.query.filter_by(
         id_lvrs_intern=admission.id_lvrs_intern).first()
     if query_admission:
-        # logger.info(f'{admission.id_lvrs_intern} already exists.')
+        logger.info(f'{admission.id_lvrs_intern} already exists.')
         flash(f'{admission.id_lvrs_intern} já existe no banco', 'warning')
         return
     db.session.add(admission)
     db.session.commit()
-    # logger.info(f'{admission.id_lvrs_intern} inserted')
+    logger.info(f'{admission.id_lvrs_intern} inserted')
 
 
 def get_admission_symptoms(admission_id):

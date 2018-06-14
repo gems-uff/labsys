@@ -1,3 +1,5 @@
+from datetime import datetime as dt
+
 from sqlalchemy import asc
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -35,8 +37,11 @@ class Patient(TimeStampedModelMixin, db.Model):
     def model_from_csv(cls, csv_row):
         p = Patient()
         p.name = csv_row.get(cls.csv_dict['name'])
-        p.birth_date = datetime.datetime.strptime(
-            csv_row.get(cls.csv_dict['birth_date']), '%d/%m/%Y')
+        try:
+            p.birth_date = dt.strptime(
+                csv_row.get(cls.csv_dict['birth_date']), '%m/%d/%Y')
+        except Exception:
+            p.birth_date = None
         p.age = int(csv_row.get(cls.csv_dict['age']))
         p.age_unit = csv_row.get(cls.csv_dict['age_unit'])
         p.gender = csv_row.get(cls.csv_dict['gender'])
@@ -62,7 +67,7 @@ class Address(db.Model):
     csv_dict = {
         'country': 'País de Residência',
         'state': 'Estado de Residência',
-        'city': 'Município de Residência',
+        'city': 'Municipio de Residência',
         'neighborhood': 'Bairro',
         'zone': 'Zona',
         # 'details': '', => does not exist in csv
@@ -85,7 +90,9 @@ class Admission(TimeStampedModelMixin, db.Model):
     # FK
     patient_id = db.Column(db.Integer, db.ForeignKey('patients.id'))
     # Attributes
+    # TODO: specific error for id_lvrs_intern not found in CSV
     id_lvrs_intern = db.Column(db.String(255), unique=True, nullable=False)
+    request_number = db.Column(db.String(255))
     state = db.Column(db.String(255))
     city = db.Column(db.String(255))
     first_symptoms_date = db.Column(db.Date)
@@ -94,8 +101,8 @@ class Admission(TimeStampedModelMixin, db.Model):
     requesting_institution = db.Column(db.String(128))
     details = db.Column(db.String(255))
     # maybe it should be in a separate table
-    secondary_symptoms = db.Column(db.String(512), nullable=True)
-    secondary_risk_factors = db.Column(db.String(512), nullable=True)
+    secondary_symptoms = db.Column(db.String(512))
+    secondary_risk_factors = db.Column(db.String(512))
     # relationships
     samples = db.relationship('Sample', backref='admission', lazy='dynamic')
 
@@ -104,8 +111,9 @@ class Admission(TimeStampedModelMixin, db.Model):
 
     csv_dict = {
         'id_lvrs_intern': 'Número Interno',
+        'request_number': 'Requisição',
         'state': 'Estado de Residência',
-        'city': 'Município de Residência',
+        'city': 'Municipio do Solicitante',
         'first_symptoms_date': 'Data do 1º Sintomas',
         # 'semepi_symptom': '', => does not exist in csv, might be computed
         'health_unit': 'Laboratório de Cadastro',
@@ -116,9 +124,18 @@ class Admission(TimeStampedModelMixin, db.Model):
     @classmethod
     def model_from_csv(cls, csv_row):
         a = Admission()
-        a.id_lvrs_intern = csv_row.get(cls.csv_dict['id_lvrs_intern'],
-                                       'NOT FOUND')
-        a.state = csv_row.get(cls.csv_dict['state'], 'NOT FOUND')
+        a.id_lvrs_intern = csv_row.get(cls.csv_dict['id_lvrs_intern'])
+        a.request_number = csv_row.get(cls.csv_dict['request_number'])
+        a.state = csv_row.get(cls.csv_dict['state'])
+        a.city = csv_row.get(cls.csv_dict['city'])
+        try:
+            a.first_symptoms_date = dt.strptime(
+                csv_row.get(cls.csv_dict['first_symptoms_date']), '%m/%d/%Y')
+        except Exception as exc:
+            a.first_symptoms_date = None
+        a.health_unit = csv_row.get(cls.csv_dict['health_unit'])
+        a.requesting_institution = csv_row.get(
+            cls.csv_dict['requesting_institution'])
         return a
 
 
