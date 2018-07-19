@@ -26,7 +26,6 @@ def insert_admission(admission):
 
 
 def create_models_from_csv(file_path):
-    file_path = '/home/gcrsaldanha/Repositories/labsys/gal.csv'
     try:
         with open(file_path, 'r', newline='') as csvfile:
             csv_reader = csv.DictReader(csvfile, delimiter=',', quotechar=r'"')
