@@ -85,7 +85,7 @@
 
 {% macro render_admission(form) -%}
   <fieldset>
-    <legend>Admissão</legend>
+    <legend>Admissão, número interno: {{ form.id_lvrs_intern.data }}</legend>
     {{ wtf.form_field(form.id_lvrs_intern) }}
     {{ wtf.form_field(form.first_symptoms_date) }}
     {{ wtf.form_field(form.semepi_symptom) }}
@@ -135,4 +135,20 @@
             <hr />
         {% endfor %}
     </fieldset>
+{%- endmacro %}
+
+
+{% macro render_cdc_exam(form) -%}
+<div class="form">
+    <fieldset>
+        <!-- <label><h3>{{ form.label }}</h3></label> -->
+    </fieldset>
+    <div class="form-group">
+        <!-- {{ form.flu_type }} -->
+        <!-- {{ form.flu_subtype }} -->
+        <!-- {{ form.dominant_ct }} -->
+        <!-- {{ form.details }} -->
+    </div>
+</div>
+<hr />
 {%- endmacro %}

@@ -1,6 +1,14 @@
+from datetime import datetime
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import asc
 from ..extensions import db
+
+
+class TimeStampedModelMixin(db.Model):
+    __abstract__ = True
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_on = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 class AdmissionOneToOneMixin(object):

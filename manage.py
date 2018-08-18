@@ -36,6 +36,9 @@ admin.add_views(
     ProtectedModelView(Symptom, db.session),
     ProtectedModelView(ObservedSymptom, db.session),
     ProtectedModelView(Admission, db.session),
+    ProtectedModelView(Sample, db.session),
+    ProtectedModelView(CdcExam, db.session),
+    ProtectedModelView(Method, db.session),
     ProtectedModelView(RiskFactor, db.session),
     ProtectedModelView(ObservedRiskFactor, db.session),
     ProtectedModelView(Vaccine, db.session),
@@ -84,6 +87,7 @@ def deploy():
     upgrade()
     Role.insert_roles()
     User.insert_admin()
+    Method.insert_methods()
     im.Stock.insert_stock('Reativos')
 
 

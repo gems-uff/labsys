@@ -4,20 +4,10 @@ from sqlalchemy import asc
 
 from ..extensions import db
 
-from .mixins import AdmissionOneToOneMixin, DatedEvent
-
-'''
-Limitações conhecidas
-- O Patient só pode ter um Address, ou seja, a pergunta "Quando ele foi admitido no ano X, ele morava onde?" não pode ser respondida.
-    - Podemos futuramente pensar em uma maneira da Admission saber disso, ex.: Admission.patient_residence
-- Quando uma Admission é deletada, os "eventos" também o são: Vaccine, Hospitalization, UTIHospitalization e ClinicalEvolution
-'''
-
-# TODO: Add nullable to columns which are not present in initial importing CSV
-# TODO: Abstract ObservedSymptoms/Symptoms and ObservedRiskFactors, RiskFactors
+from .mixins import AdmissionOneToOneMixin, DatedEvent, TimeStampedModelMixin
 
 
-class Patient(db.Model):
+class Patient(TimeStampedModelMixin, db.Model):
     __tablename__ = 'patients'
     id = db.Column(db.Integer, primary_key=True)
     # Attributes
@@ -52,7 +42,7 @@ class Address(db.Model):
         return '<Address[{}]: Pat{}>'.format(self.id, self.patient)
 
 
-class Admission(db.Model):
+class Admission(TimeStampedModelMixin, db.Model):
     __tablename__ = 'admissions'
     id = db.Column(db.Integer, primary_key=True)
     # FK
@@ -161,7 +151,7 @@ class ObservedRiskFactor(db.Model):
         'observations', cascade='all, delete-orphan'))
 
     def __repr__(self):
-        return '<ObservedSymptom[{}]: {}>'.format(self.id, self.symptom.name)
+        return '<ObservedRiskFactor[{}]: {}>'.format(self.id, self.risk_factor.name)
 
 
 class Method(db.Model):
@@ -169,16 +159,21 @@ class Method(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Attributes
     name = db.Column(db.String(64))
-    primary = db.Column(db.Boolean)
-    # Relationships
-    samples = db.relationship(
-        'Sample', backref='method', uselist=False)
+
+    @staticmethod
+    def insert_methods():
+        method_name = 'Outro'
+        other_method = Method.query.filter_by(name=method_name).first()
+        if other_method is None:
+            other_method = Method(name=method_name)
+        db.session.add(other_method)
+        db.session.commit()
 
     def __repr__(self):
         return '<Method[{}]: {}>'.format(self.id, self.name)
 
 
-class Sample(db.Model):
+class Sample(TimeStampedModelMixin, db.Model):
 
     __tablename__ = 'samples'
     id = db.Column(db.Integer, primary_key=True)
@@ -191,42 +186,23 @@ class Sample(db.Model):
     # FKs
     method_id = db.Column(db.Integer, db.ForeignKey('methods.id'))
     admission_id = db.Column(db.Integer, db.ForeignKey('admissions.id'))
-    # Relationships
-    cdc_exam = db.relationship('CdcExam', backref='sample', uselist=False)
-
-    @hybrid_property
-    def admission(self):
-        return self._admission
-
-    @admission.setter
-    def admission(self, admission):
-        self._admission = admission
-        if self._admission is not None:
-            self.ordering = len(self._admission.samples.all())
-        else:
-            self.ordering = -1
-
-    @hybrid_property
-    def ordering(self):
-        return self._ordering
-
-    @ordering.setter
-    def ordering(self, ordering):
-        self._ordering = ordering
 
     def __repr__(self):
         return '<Sample[{}]: {}>'.format(self.id, self.collection_date)
 
 
-class CdcExam(db.Model):
+class CdcExam(TimeStampedModelMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    # FKs
+    sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
     # Attributes
     flu_type = db.Column(db.String(16))
     flu_subtype = db.Column(db.String(16))
-    dominant_ct = db.Column(db.Integer)
-    details = db.Column(db.String(255))
-    # FKs
-    sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
+    dominant_ct = db.Column(db.Numeric(12, 2), nullable=True)
+    details = db.Column(db.String(255), nullable=True)
+    # Relationship
+    sample = db.relationship('Sample', backref=db.backref(
+        'cdc_exam', cascade='all, delete-orphan', uselist=False))
 
     def __repr__(self):
         return '<CdcExam[{}]: {}>'.format(self.id, self.details)

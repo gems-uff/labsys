@@ -1,8 +1,6 @@
-{% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% import "utils/_forms_rendering.html" as frender %}
+{% extends "admissions/forms_base.html" %}
 
-{% block page_content %}
+{% block form %}
   {{ frender.render_simple_errors(form) }}
   <form class="form" method="post">
     {{ form.hidden_tag() }}
