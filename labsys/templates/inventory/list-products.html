@@ -13,11 +13,11 @@
 <div class="form-group">
   <label for="search-product">Buscar produto</label>
   <select class="form-control" id="search-product" name="search-product">
-      <option value="#">...</option>
+    <option value="#">...</option>
     {% for product in products %}
-      <option value="{{ url_for('inventory.detail_product', product_id=product.id, _external='True' ) }}">
-          {{ product.name }}
-      </option>
+    <option value="{{ url_for('inventory.detail_product', product_id=product.id, _external='True' ) }}">
+      {{ product.name }}
+    </option>
     {% endfor %}
   </select>
 </div>
