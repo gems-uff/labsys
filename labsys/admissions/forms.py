@@ -10,51 +10,34 @@ from . import custom_fields as cfields
 
 
 class AddressForm(FlaskForm):
-    ZONE_CHOICES = (('Urbana', 'Urbana'), ('Rural', 'Rural'),
-                    ('Periurbana', 'Periurbana'), ('Ignorado', 'Ignorado'))
 
     class Meta:
         csrf = False
 
     country = wtf.StringField(
-        'País de residência', validators=[length(max=128)])
+        'País de residência', validators=[length(max=255)])
     state = wtf.StringField('UF (Estado)', validators=[length(max=2)])
-    city = wtf.StringField('Município', validators=[length(max=128)])
-    neighborhood = wtf.StringField('Bairro', validators=[length(max=128)])
-    zone = wtf.RadioField(
-        'Zona',
-        choices=ZONE_CHOICES,
-        default='Ignorado',
-        coerce=str,
-    )
+    city = wtf.StringField('Município', validators=[length(max=255)])
+    neighborhood = wtf.StringField('Bairro', validators=[length(max=255)])
+    zone = wtf.StringField('Zona', validators=[length(max=255)])
     details = wtf.StringField(
         'Detalhes sobre residência', validators=[length(max=255)])
 
 
 class PatientForm(FlaskForm):
-    AGE_UNIT_CHOICES = (('Anos', 'Anos'), ('Meses', 'Meses'), ('Dias', 'Dias'),
-                        ('Horas', 'Horas'))
-
-    GENDER_CHOICES = (('Masculino', 'Masculino'), ('Feminino', 'Feminino'),
-                      ('Ignorado', 'Ignorado'))
-
     name = wtf.StringField('Nome do paciente')
     birth_date = wtf.DateField(
         'Data de nascimento',
         widget=html5widgets.DateInput(),
         validators=[Optional()])
     age = wtf.IntegerField('Idade', validators=[Optional()])
-    age_unit = wtf.RadioField(
+    age_unit = wtf.StringField(
         'Tipo idade',
-        choices=AGE_UNIT_CHOICES,
-        default='Anos',
-        coerce=str,
+        validators=[Optional(), length(max=255)],
     )
-    gender = wtf.RadioField(
+    gender = wtf.StringField(
         'Sexo',
-        choices=GENDER_CHOICES,
-        default='Ignorado',
-        coerce=str,
+        validators=[Optional(), length(max=255)],
     )
     residence = wtf.FormField(AddressForm, 'Residência')
 
