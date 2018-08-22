@@ -22,6 +22,10 @@ class Config:
 
     PAGE_SIZE = 20
 
+    UPLOAD_FOLDER = f'{basedir}/labsys/tmp/csv/'
+    ALLOWED_EXTENSIONS = {'csv'}
+
+
     @staticmethod
     def init_app(app):
         pass

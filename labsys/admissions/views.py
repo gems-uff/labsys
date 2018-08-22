@@ -1,9 +1,12 @@
-from flask import flash, redirect, render_template, url_for, session
+import os
+from flask import (current_app, flash, redirect, render_template, request,
+                   session, url_for)
+from werkzeug.utils import secure_filename
 
+from labsys.admissions import service
 from labsys.auth.decorators import permission_required
 from labsys.auth.models import Permission
 from labsys.utils.decorators import paginated
-from labsys.admissions import service
 
 from . import blueprint, forms
 from ..extensions import db
@@ -11,14 +14,7 @@ from .forms import AdmissionForm
 from .models import (Address, Admission, CdcExam, ClinicalEvolution,
                      Hospitalization, ObservedSymptom, Patient, Sample,
                      Symptom, UTIHospitalization, Vaccine)
-
-
-# TODO: do I need this?
-@blueprint.app_context_processor
-def inject_permissions():
-    '''This function is executed each request,
-    even though outside of the blueprint'''
-    return dict(Permission=Permission)
+from .csv_loader import create_models_from_csv
 
 
 @blueprint.context_processor
@@ -69,8 +65,7 @@ def create_admission():
             flash('Número Interno já cadastrado!', 'danger')
             return redirect(url_for('.create_admission'))
         else:
-            # Unfortunately I cannot use **form.data to create an instance nor populate_obj
-            # because of nesting
+            # TODO: check if I cannot use form.populate_obj
             patient = Patient(
                 name=form.patient.data['name'],
                 birth_date=form.patient.data['birth_date'],
@@ -98,6 +93,35 @@ def create_admission():
         return redirect(
             url_for('.detail_admission', admission_id=admission.id))
     return render_template(template, form=form)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower(
+           ) in current_app.config['ALLOWED_EXTENSIONS']
+
+
+@blueprint.route('/import-csv', methods=['GET', 'POST'])
+@permission_required(Permission.CREATE)
+def import_csv():
+    template = 'admissions/import-csv.html'
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('Nenhum arquivo enviado!', 'warning')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            # TODO: understand the difference between file not in and filename
+            flash('Nenhum arquivo selecionado', 'warning')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            create_models_from_csv(filepath)
+
+            return redirect(url_for('.list_admissions'))
+    return render_template(template)
 
 
 @blueprint.route('/<int:admission_id>', methods=['GET', 'POST'])
