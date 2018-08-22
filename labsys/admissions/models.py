@@ -26,7 +26,7 @@ class Patient(TimeStampedModelMixin, db.Model):
         return '<Patient[{}]: {}>'.format(self.id, self.name)
 
     csv_dict = {
-        'name': 'Nome Profissional de Saúde',
+        'name': 'Paciente',
         'birth_date': 'Data de Nascimento',
         'age': 'Idade',
         'age_unit': 'Tipo Idade',
@@ -76,6 +76,7 @@ class Address(db.Model):
     @classmethod
     def model_from_csv(cls, csv_row):
         a = Address()
+        # import pdb; pdb.set_trace();
         a.country = csv_row.get(cls.csv_dict['country'])
         a.state = csv_row.get(cls.csv_dict['state'])
         a.city = csv_row.get(cls.csv_dict['city'])
@@ -112,12 +113,12 @@ class Admission(TimeStampedModelMixin, db.Model):
     csv_dict = {
         'id_lvrs_intern': 'Número Interno',
         'request_number': 'Requisição',
-        'state': 'Estado de Residência',
+        'state': 'Estado do Solicitante',
         'city': 'Municipio do Solicitante',
         'first_symptoms_date': 'Data do 1º Sintomas',
         # 'semepi_symptom': '', => does not exist in csv, might be computed
-        'health_unit': 'Laboratório de Cadastro',
-        'requesting_institution': 'Unidade Solicitante',
+        'health_unit': 'Unidade Solicitante',
+        'requesting_institution': 'Laboratório de Cadastro',
         # 'details': '', => does not exist in csv
     }
 
