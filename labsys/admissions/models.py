@@ -273,8 +273,7 @@ class CdcExam(TimeStampedModelMixin, db.Model):
     # FKs
     sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
     # Attributes
-    flu_type = db.Column(db.String(16))
-    flu_subtype = db.Column(db.String(16))
+    flu_type = db.Column(db.String(255))
     dominant_ct = db.Column(db.Numeric(12, 2), nullable=True)
     details = db.Column(db.String(255), nullable=True)
     # Relationship

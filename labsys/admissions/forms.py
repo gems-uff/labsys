@@ -188,26 +188,21 @@ class CdcExamForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
 
-    FLU_TYPE_CHOICES = (('A', 'A'), ('B', 'B'), ('Inconclusivo',
-                                                 'Inconclusivo'),
-                        ('Não Realizado', 'Não Realizado'), ('Ignorado',
-                                                             'Ignorado'))
-    FLU_SUBTYPE_CHOICES = (('H1', 'H1'), ('H3', 'H3'),
-                           ('Victoria', 'Victoria'), ('Yamagata', 'Yamagata'),
-                           ('Não Subtipado',
-                            'Não SubtipADO'), ('Não Subtipável',
-                                               'Não SubtipÁVEL'), ('Ignorado',
-                                                                   'Ignorado'))
+    FLU_TYPE_CHOICES = (
+        ('FluA(H1pdm09)', 'FluA(H1pdm09)'),
+        ('FluA(H3)', 'FluA(H3)'),
+        ('FluA não-subtipADO', 'FluA não-subtipADO'),
+        ('FluA não-subtipÁVEL', 'FluA não-subtipÁVEL'),
+        ('FluB', 'FluB'),
+        ('FluB(Victoria)', 'FluB(Victoria)'),
+        ('FluB(Yamagata)', 'FluB(Yamagata)'),
+        ('Inconclusivo', 'Inconclusivo'),
+        ('Ignorado', 'Ignorado'),
+    )
 
     flu_type = wtf.SelectField(
         'Tipagem',
         choices=FLU_TYPE_CHOICES,
-        default='Ignorado',
-        coerce=str,
-    )
-    flu_subtype = wtf.SelectField(
-        'Subtipo OU Linhagem',
-        choices=FLU_SUBTYPE_CHOICES,
         default='Ignorado',
         coerce=str,
     )
