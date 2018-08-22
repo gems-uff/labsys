@@ -14,6 +14,7 @@ def insert_admission(admission):
         id_lvrs_intern=admission.id_lvrs_intern).first()
     if query_admission:
         logger.info(f'{admission.id_lvrs_intern} already exists.')
+        # TODO: this renders too many messages when importing
         flash(f'{admission.id_lvrs_intern} já existe no banco', 'warning')
         return
     db.session.add(admission)

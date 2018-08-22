@@ -85,7 +85,6 @@ def deploy():
     upgrade()
     Role.insert_roles()
     User.insert_admin()
-    Method.insert_methods()
     im.Stock.insert_stock('Reativos')
 
 
