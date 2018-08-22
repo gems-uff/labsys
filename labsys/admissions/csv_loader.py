@@ -1,11 +1,15 @@
 import csv
+import logging
 
 from flask import flash
 
 from labsys.extensions import db
 
-from . import logger, service
+from . import service
 from .models import Address, Admission, Patient
+
+
+logger = logging.basicConfig(level=logging.INFO)
 
 
 def insert_admission(admission):

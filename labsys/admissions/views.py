@@ -14,6 +14,7 @@ from .forms import AdmissionForm
 from .models import (Address, Admission, CdcExam, ClinicalEvolution,
                      Hospitalization, ObservedSymptom, Patient, Sample,
                      Symptom, UTIHospitalization, Vaccine)
+from .csv_loader import create_models_from_csv
 
 
 @blueprint.context_processor
@@ -103,7 +104,7 @@ def allowed_file(filename):
 @blueprint.route('/import-csv', methods=['GET', 'POST'])
 @permission_required(Permission.CREATE)
 def import_csv():
-    template = 'admissions/import-csv'
+    template = 'admissions/import-csv.html'
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('Nenhum arquivo enviado!', 'warning')
@@ -115,9 +116,11 @@ def import_csv():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
-            import ipdb; ipdb.set_trace();
-            return redirect(url_for('list_admissions'))
+            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            create_models_from_csv(filepath)
+
+            return redirect(url_for('.list_admissions'))
     return render_template(template)
 
 
