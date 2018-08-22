@@ -163,7 +163,7 @@ class ObservedRiskFactorFormList(FlaskForm):
     submit = wtf.SubmitField('Salvar')
 
 
-class CdcExamForm(FlaskForm):
+class InfluenzaExamForm(FlaskForm):
     def __init__(self, **kwargs):
         super().__init__(csrf_enabled=False, **kwargs)
 
@@ -211,8 +211,8 @@ class SampleForm(FlaskForm):
         validators=[InputRequired()])
     details = wtf.StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
-    cdc_exam = wtf.FormField(
-        label='Resultado Exame CDC', form_class=CdcExamForm)
+    influenza_exam = wtf.FormField(
+        label='Resultado Influenza (RT-PCR)', form_class=InfluenzaExamForm)
     submit = wtf.SubmitField('Adicionar amostra')
 
 

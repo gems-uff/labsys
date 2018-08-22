@@ -11,7 +11,7 @@ from labsys.utils.decorators import paginated
 from . import blueprint, forms
 from ..extensions import db
 from .forms import AdmissionForm
-from .models import (Address, Admission, CdcExam, ClinicalEvolution,
+from .models import (Address, Admission, InfluenzaExam, ClinicalEvolution,
                      Hospitalization, ObservedSymptom, Patient, Sample,
                      Symptom, UTIHospitalization, Vaccine)
 from .csv_loader import create_models_from_csv

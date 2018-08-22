@@ -261,7 +261,7 @@ class Sample(TimeStampedModelMixin, db.Model):
         return '<Sample[{}]: {}>'.format(self.id, self.collection_date)
 
 
-class CdcExam(TimeStampedModelMixin, db.Model):
+class InfluenzaExam(TimeStampedModelMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # FKs
     sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
@@ -273,13 +273,29 @@ class CdcExam(TimeStampedModelMixin, db.Model):
     sample = db.relationship(
         'Sample',
         backref=db.backref(
-            'cdc_exam', cascade='all, delete-orphan', uselist=False))
+            'influenza_exam', cascade='all, delete-orphan', uselist=False))
 
     def __repr__(self):
-        return '<CdcExam[{}]: {}>'.format(self.id, self.details)
+        return '<InfluenzaExam[{}]: {}>'.format(self.id, self.details)
+
+class ORVExam(TimeStampedModelMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    # FKs
+    sample_id = db.Column(db.Integer, db.ForeignKey('samples.id'))
+    # Attributes
+    orv_type = db.Column(db.String(255))
+    dominant_ct = db.Column(db.Numeric(12, 2), nullable=True)
+    details = db.Column(db.String(255), nullable=True)
+    # Relationship
+    sample = db.relationship(
+        'Sample',
+        backref=db.backref(
+            'orv_exam', cascade='all, delete-orphan', uselist=False))
+
+    def __repr__(self):
+        return '<InfluenzaExam[{}]: {}>'.format(self.id, self.details)
 
 
-# TODO: merge Antiviral and XRay
 class Antiviral(AdmissionOneToOneMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
 

@@ -9,7 +9,7 @@ import labsys.admissions.forms as forms
 import labsys.admissions.models as models
 import labsys.inventory.models as im
 from labsys.admissions.models import (
-    Address, Admission, Antiviral, CdcExam, ClinicalEvolution, Hospitalization,
+    Address, Admission, Antiviral, InfluenzaExam, ClinicalEvolution, Hospitalization,
     Method, ObservedRiskFactor, ObservedSymptom, Patient, RiskFactor, Sample,
     Symptom, UTIHospitalization, Vaccine, XRay)
 from labsys.app import create_app
@@ -36,7 +36,7 @@ admin.add_views(
     ProtectedModelView(ObservedSymptom, db.session),
     ProtectedModelView(Admission, db.session),
     ProtectedModelView(Sample, db.session),
-    ProtectedModelView(CdcExam, db.session),
+    ProtectedModelView(InfluenzaExam, db.session),
     ProtectedModelView(Method, db.session),
     ProtectedModelView(RiskFactor, db.session),
     ProtectedModelView(ObservedRiskFactor, db.session),
