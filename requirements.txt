@@ -3,4 +3,3 @@
 Flask-SSLify
 Flask-DebugToolbar
 gunicorn
-psycopg2
