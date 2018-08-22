@@ -1,9 +1,9 @@
 from flask import flash
 
 from labsys.admissions.models import (
-    Address, Admission, Antiviral, InfluenzaExam, ClinicalEvolution, Hospitalization,
-    ObservedRiskFactor, ObservedSymptom, Patient, RiskFactor, Sample, Symptom,
-    UTIHospitalization, Vaccine, XRay)
+    Address, Admission, Antiviral, InfluenzaExam, ORVExam, ClinicalEvolution,
+    Hospitalization, ObservedRiskFactor, ObservedSymptom, Patient, RiskFactor,
+    Sample, Symptom, UTIHospitalization, Vaccine, XRay)
 from labsys.extensions import db
 
 from . import logger
@@ -228,7 +228,9 @@ def get_samples(admission):
 def add_sample(admission, form):
     sample = Sample(admission=admission)
     influenza_exam = InfluenzaExam(sample=sample)
+    orv_exam = ORVExam(sample=sample)
     form.influenza_exam.form.populate_obj(influenza_exam)
+    form.orv_exam.form.populate_obj(orv_exam)
     form.populate_obj(sample)
     db.session.add(sample)
     db.session.commit()

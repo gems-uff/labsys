@@ -293,7 +293,7 @@ class ORVExam(TimeStampedModelMixin, db.Model):
             'orv_exam', cascade='all, delete-orphan', uselist=False))
 
     def __repr__(self):
-        return '<InfluenzaExam[{}]: {}>'.format(self.id, self.details)
+        return '<ORVExam[{}]: {}>'.format(self.id, self.details)
 
 
 class Antiviral(AdmissionOneToOneMixin, db.Model):

@@ -182,7 +182,7 @@ class InfluenzaExamForm(FlaskForm):
     flu_type = wtf.SelectField(
         'Tipagem',
         choices=FLU_TYPE_CHOICES,
-        default='Ignorado',
+        default='Não realizado',
         coerce=str,
     )
     dominant_ct = wtf.FloatField('CT (principal)', validators=[Optional()])
@@ -195,6 +195,39 @@ class InfluenzaExamForm(FlaskForm):
     details = wtf.StringField(
         'Informações adicionais sobre exame',
         validators=[length(max=128)],
+        widget=widgets.TextArea())
+
+
+class ORVExamForm(FlaskForm):
+    def __init__(self, **kwargs):
+        super().__init__(csrf_enabled=False, **kwargs)
+
+    ORV_TYPE_CHOICES = (
+        ('ADV - Adenovírus', 'ADV - Adenovírus'),
+        ('hMPV - Metapneumovírus humano', 'hMPV - Metapneumovírus humano'),
+        ('PIV1 - Parainfluenza 1', 'PIV1 - Parainfluenza 1'),
+        ('PIV2 - Parainfluenza 2', 'PIV2 - Parainfluenza 2'),
+        ('PIV3 - Parainfluenza 3', 'PIV3 - Parainfluenza 3'),
+        ('RSV - Vírus Sincicial Respiratório', 'RSV - Vírus Sincicial Respiratório'),
+        ('Não realizado', 'Não realizado'),
+    )
+
+    orv_type = wtf.SelectField(
+        'Tipagem',
+        choices=ORV_TYPE_CHOICES,
+        default='Não realizado',
+        coerce=str,
+    )
+    dominant_ct = wtf.FloatField('CT (principal)', validators=[Optional()])
+    dominant_ct = wtf.FloatField(
+        'CT (principal)',
+        render_kw={'placeholder': 'Ex.: 20.50'},
+        validators=[Optional()],
+        widget=html5widgets.NumberInput(
+            step='0.01', min='0.00', max='99999.99'))
+    details = wtf.StringField(
+        'Informações adicionais sobre exame',
+        validators=[length(max=255)],
         widget=widgets.TextArea())
 
 
@@ -212,7 +245,9 @@ class SampleForm(FlaskForm):
     details = wtf.StringField('Informações adicionais')
     method_id = cfields.MethodSelectField()
     influenza_exam = wtf.FormField(
-        label='Resultado Influenza (RT-PCR)', form_class=InfluenzaExamForm)
+        label='Resultado Influenza (RT-PCR em tempo real)', form_class=InfluenzaExamForm)
+    orv_exam = wtf.FormField(
+        label='Resultado OVR (RT-PCR em tempo real)', form_class=ORVExamForm)
     submit = wtf.SubmitField('Adicionar amostra')
 
 
