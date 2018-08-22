@@ -10,7 +10,6 @@ from . import custom_fields as cfields
 
 
 class AddressForm(FlaskForm):
-
     class Meta:
         csrf = False
 
@@ -19,9 +18,6 @@ class AddressForm(FlaskForm):
     state = wtf.StringField('UF (Estado)', validators=[length(max=2)])
     city = wtf.StringField('Município', validators=[length(max=255)])
     neighborhood = wtf.StringField('Bairro', validators=[length(max=255)])
-    zone = wtf.StringField('Zona', validators=[length(max=255)])
-    details = wtf.StringField(
-        'Detalhes sobre residência', validators=[length(max=255)])
 
 
 class PatientForm(FlaskForm):
@@ -136,7 +132,7 @@ class ObservedSymptomFormList(FlaskForm):
     primary = wtf.FieldList(
         wtf.FormField(form_class=ObservedSymptomForm), 'Primários')
     secondary = wtf.TextField(
-        'Secundários (separar por vírgula)',
+        'Secundários',
         validators=[Optional()],
         render_kw={'placeholder': 'Ex.: tosse, desmaios, febre (40 graus)'})
     submit = wtf.SubmitField('Salvar')
@@ -161,7 +157,7 @@ class ObservedRiskFactorFormList(FlaskForm):
     primary = wtf.FieldList(
         wtf.FormField(form_class=ObservedRiskFactorForm), 'Primários')
     secondary = wtf.TextField(
-        'Secundários (separar por vírgula)',
+        'Secundários',
         validators=[Optional()],
         render_kw={'placeholder': 'Ex.: obesidade'})
     submit = wtf.SubmitField('Salvar')
@@ -180,7 +176,7 @@ class CdcExamForm(FlaskForm):
         ('FluB(Victoria)', 'FluB(Victoria)'),
         ('FluB(Yamagata)', 'FluB(Yamagata)'),
         ('Inconclusivo', 'Inconclusivo'),
-        ('Ignorado', 'Ignorado'),
+        ('Não realizado', 'Não realizado'),
     )
 
     flu_type = wtf.SelectField(
@@ -220,7 +216,6 @@ class SampleForm(FlaskForm):
     submit = wtf.SubmitField('Adicionar amostra')
 
 
-# TODO: normalize it (creating a separate tabel for models)
 class AntiviralForm(FlaskForm):
     ANTIVIRAL_CHOICES = (
         ('1 - Não usou', '1 - Não usou'),
@@ -246,7 +241,6 @@ class AntiviralForm(FlaskForm):
     submit = wtf.SubmitField('Salvar')
 
 
-# TODO: normalize it (creating a separate tabel for models)
 class XRayForm(FlaskForm):
     XRAY_CHOICES = (
         ('1 - Normal', '1 - Normal'),

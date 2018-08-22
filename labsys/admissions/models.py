@@ -58,8 +58,6 @@ class Address(db.Model):
     state = db.Column(db.String(255))
     city = db.Column(db.String(255))
     neighborhood = db.Column(db.String(255))
-    zone = db.Column(db.String(255))
-    details = db.Column(db.String(255))
 
     def __repr__(self):
         return '<Address[{}]: Pat{}>'.format(self.id, self.patient)
@@ -69,19 +67,15 @@ class Address(db.Model):
         'state': 'Estado de Residência',
         'city': 'Municipio de Residência',
         'neighborhood': 'Bairro',
-        'zone': 'Zona',
-        # 'details': '', => does not exist in csv
     }
 
     @classmethod
     def model_from_csv(cls, csv_row):
         a = Address()
-        # import pdb; pdb.set_trace();
         a.country = csv_row.get(cls.csv_dict['country'])
         a.state = csv_row.get(cls.csv_dict['state'])
         a.city = csv_row.get(cls.csv_dict['city'])
         a.neighborhood = csv_row.get(cls.csv_dict['neighborhood'])
-        a.zone = csv_row.get(cls.csv_dict['zone'])
         return a
 
 
@@ -116,10 +110,8 @@ class Admission(TimeStampedModelMixin, db.Model):
         'state': 'Estado do Solicitante',
         'city': 'Municipio do Solicitante',
         'first_symptoms_date': 'Data do 1º Sintomas',
-        # 'semepi_symptom': '', => does not exist in csv, might be computed
         'health_unit': 'Unidade Solicitante',
         'requesting_institution': 'Laboratório de Cadastro',
-        # 'details': '', => does not exist in csv
     }
 
     @classmethod
