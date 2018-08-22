@@ -1,15 +1,12 @@
 import csv
-import logging
+import builtins
 
 from flask import flash
 
 from labsys.extensions import db
 
-from . import service
+from . import service, logger
 from .models import Address, Admission, Patient
-
-
-logger = logging.basicConfig(level=logging.INFO)
 
 
 def insert_admission(admission):
@@ -31,9 +28,10 @@ def insert_admission(admission):
 
 def create_models_from_csv(file_path):
     try:
-        with open(file_path, 'r', newline='') as csvfile:
-            csv_reader = csv.DictReader(csvfile, delimiter=',', quotechar=r'"')
+        with open(file_path, 'r', newline='', encoding='cp1252') as csvfile:
+            csv_reader = csv.DictReader(csvfile, delimiter=';', quotechar=r'"')
             curr_request_number = None
+            inserted_amount = 0
             for csv_row in csv_reader:
                 if csv_row['Requisição'] != curr_request_number:
                     curr_request_number = csv_row['Requisição']
@@ -43,5 +41,11 @@ def create_models_from_csv(file_path):
                     patient.residence = address
                     admission.patient = patient
                     service.insert_admission(admission)
+                    # TODO: check if it was really inserted because it could be a duplicate
+                    inserted_amount += 1
+            flash(f'{inserted_amount} admissões inseridas.', 'success')
+    except builtins.UnicodeDecodeError as uniDecError:
+        logger.error(f'UnicodeDecodeError: {uniDecError}')
+        flash('Erro de formato no arquivo do GAL, contate um administrador.', 'danger')
     except FileNotFoundError:
-        flash(f'O arquivo {file_path} não existe', 'error')
+        flash(f'O arquivo {file_path} não existe', 'danger')
