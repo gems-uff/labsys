@@ -161,4 +161,6 @@ tags
 
 *.ipynb
 *.dump
-labsys/tmp/
+labsys/tmp/*
+
+*.csv
