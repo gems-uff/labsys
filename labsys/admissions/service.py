@@ -1,12 +1,28 @@
-from labsys.extensions import db
+from flask import flash
+
 from labsys.admissions.models import (
-    ObservedSymptom, Admission, Symptom, RiskFactor, ObservedRiskFactor,
-    Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution, Antiviral,
-    XRay, Sample, CdcExam, Patient, Address)
+    Address, Admission, Antiviral, InfluenzaExam, ORVExam, ClinicalEvolution,
+    Hospitalization, ObservedRiskFactor, ObservedSymptom, Patient, RiskFactor,
+    Sample, Symptom, UTIHospitalization, Vaccine, XRay)
+from labsys.extensions import db
+
+from . import logger
+
+
+def insert_admission(admission):
+    query_admission = Admission.query.filter_by(
+        id_lvrs_intern=admission.id_lvrs_intern).first()
+    if query_admission:
+        logger.info(f'{admission.id_lvrs_intern} already exists.')
+        # TODO: this renders too many messages when importing
+        flash(f'{admission.id_lvrs_intern} já existe no banco', 'warning')
+        return
+    db.session.add(admission)
+    db.session.commit()
+    logger.info(f'{admission.id_lvrs_intern} inserted')
 
 
 def get_admission_symptoms(admission_id):
-    # import ipdb; ipdb.set_trace()
     observed_symptoms_ids = [
         obs.symptom_id for obs in Admission.query.get(admission_id).symptoms
     ]
@@ -212,8 +228,10 @@ def get_samples(admission):
 
 def add_sample(admission, form):
     sample = Sample(admission=admission)
-    cdc_exam = CdcExam(sample=sample)
-    form.cdc_exam.form.populate_obj(cdc_exam)
+    influenza_exam = InfluenzaExam(sample=sample)
+    orv_exam = ORVExam(sample=sample)
+    form.influenza_exam.form.populate_obj(influenza_exam)
+    form.orv_exam.form.populate_obj(orv_exam)
     form.populate_obj(sample)
     db.session.add(sample)
     db.session.commit()

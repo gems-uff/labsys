@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}LVRS - Amostras{% endblock %}
+
+{% block page_content %}
+{% include "admissions/_navigation.html" %}
+<div class="page-header">
+    <h1>
+        Upload de amostras (arquivo CSV)
+    </h1>
+</div>
+<div>
+    <form method=post enctype=multipart/form-data>
+        <div class="form-group">
+            <label for="uploadcsv">Selecionar arquivo GAL</label>
+            <input type="file" name="file"class="form-control-file" id="uploadcsv" aria-describedby="fileHelp">
+            <small id="fileHelp" class="form-text text-muted">Selecione um arquivo no formato exportado pelo GAL (.csv)</small>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Enviar"/>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}

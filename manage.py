@@ -1,22 +1,21 @@
 #!/usr/bin/env python
 import os
 
+from flask_admin.menu import MenuLink
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
-from flask_admin.menu import MenuLink
 
-from labsys.app import create_app
-from labsys.extensions import db, admin
-from labsys.auth.models import User, Role, PreAllowedUser
-from labsys.auth.views import ProtectedModelView
-import labsys.inventory.models as im
-from labsys.admissions.models import (
-    Admission, Symptom, ObservedSymptom, Vaccine, Method, Sample, Patient,
-    CdcExam, Hospitalization, UTIHospitalization, ClinicalEvolution,
-    Address, RiskFactor, ObservedRiskFactor, Antiviral, XRay,
-)
 import labsys.admissions.forms as forms
 import labsys.admissions.models as models
+import labsys.inventory.models as im
+from labsys.admissions.models import (
+    Address, Admission, Antiviral, InfluenzaExam, ClinicalEvolution, Hospitalization,
+    Method, ObservedRiskFactor, ObservedSymptom, Patient, RiskFactor, Sample,
+    Symptom, UTIHospitalization, Vaccine, XRay)
+from labsys.app import create_app
+from labsys.auth.models import PreAllowedUser, Role, User
+from labsys.auth.views import ProtectedModelView
+from labsys.extensions import admin, db
 
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
@@ -37,7 +36,7 @@ admin.add_views(
     ProtectedModelView(ObservedSymptom, db.session),
     ProtectedModelView(Admission, db.session),
     ProtectedModelView(Sample, db.session),
-    ProtectedModelView(CdcExam, db.session),
+    ProtectedModelView(InfluenzaExam, db.session),
     ProtectedModelView(Method, db.session),
     ProtectedModelView(RiskFactor, db.session),
     ProtectedModelView(ObservedRiskFactor, db.session),
@@ -49,13 +48,12 @@ admin.add_views(
     ProtectedModelView(XRay, db.session),
 )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
+
 # endregion
 
 
 def make_shell_context():
-    return dict(
-        app=app, db=db, User=User, Role=Role, f=forms, m=models
-    )
+    return dict(app=app, db=db, User=User, Role=Role, f=forms, m=models)
 
 
 manager.add_command('shell', Shell(make_context=make_shell_context))
@@ -87,7 +85,6 @@ def deploy():
     upgrade()
     Role.insert_roles()
     User.insert_admin()
-    Method.insert_methods()
     im.Stock.insert_stock('Reativos')
 
 

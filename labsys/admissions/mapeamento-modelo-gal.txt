@@ -1,0 +1,23 @@
+
+Address
+    'country': 'País de Residência',
+    'state': 'Estado de Residência',
+    'city': 'Municipio de Residência',
+    'neighborhood': 'Bairro',
+    'zone': 'Zona',
+
+Patient
+    'name': 'Nome Profissional de Saúde',
+    'birth_date': 'Data de Nascimento',
+    'age': 'Idade',
+    'age_unit': 'Tipo Idade',
+    'gender': 'Sexo',
+
+Admission
+    'id_lvrs_intern': 'Número Interno',
+    'request_number': 'Requisição',
+    'state': 'Estado de Residência',
+    'city': 'Municipio do Solicitante',
+    'first_symptoms_date': 'Data do 1º Sintomas',
+    'health_unit': 'Unidade Solicitante',
+    'requesting_institution': 'Laboratório de Cadastro',

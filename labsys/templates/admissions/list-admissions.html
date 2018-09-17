@@ -14,9 +14,9 @@
     <thead>
         <tr>
             <th width="5%">
-                <a href="#" data-toggle="tooltip" title="Possui amostras cadastradas?">
-                Status<span class="glyphicon glyphicon-question-sign"></span>
-                </a>
+                <span data-toggle="tooltip" title="Possui amostras cadastradas?">
+                Status<i class="glyphicon glyphicon-question-sign"></i>
+                </span>
             </th>
             <th width="15%">Número Interno</th>
             <th width="15%">Data de cadastro</th>
@@ -32,7 +32,8 @@
                 {% if admission.samples.all()|length > 0 %}
                     <i style="color: green" class="glyphicon glyphicon-ok"></i>
                 {% else %}
-                    <i style="color: red" class="glyphicon glyphicon-remove"></i>
+                    <i style="color: red" class="glyphicon glyphicon-remove"
+                      title="Nenhuma amostra cadastrada"></i>
                 {% endif %}
                 </span>
             </td>
@@ -50,5 +51,6 @@
         {% endfor %}
     </tbody>
 </table>
+{% include "utils/_pagination.html" %}
 
 {% endblock %}

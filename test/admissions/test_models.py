@@ -3,7 +3,7 @@ import unittest
 from labsys.app import create_app, db
 from labsys.admissions.models import (
     Patient, Address, Admission, Symptom, ObservedSymptom, Method, Sample,
-    CdcExam, Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,)
+    InfluenzaExam, Vaccine, Hospitalization, UTIHospitalization, ClinicalEvolution,)
 from . import mock
 
 

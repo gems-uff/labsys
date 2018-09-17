@@ -218,7 +218,6 @@ def consume_product():
         [sp for sp in stock.stock_products if sp.amount > 0],
         key=lambda sp: sp.product.name,
     )
-    # sorted(student_tuples, key=lambda student: student[2])
     form_context = {
         'stock_products': stock_products,
     }

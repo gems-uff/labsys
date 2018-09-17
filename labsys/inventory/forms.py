@@ -15,11 +15,14 @@ class OrderItemForm(FlaskForm):
         super().__init__(*args, **kwargs)
         specs = kwargs.get('specs', [])
         self.item_id.choices = [
-            (s.id, '{} | Catálogo: {} | {} unidades/produto'.format(
-                s.product.name, s.catalog_number, s.units)) for s in specs
+            (s.id, '{} | {} | Catálogo: {} | {} unidades/produto'.format(
+                s.product.name,
+                s.manufacturer,
+                s.catalog_number,
+                s.units)
+            ) for s in specs
         ]
 
-    # TODO: make my own select field for foreign keys
     item_id = wtf.SelectField(
         'Reativo', coerce=int, validators=[InputRequired()])
     amount = wtf.IntegerField(
@@ -73,12 +76,12 @@ class ConsumeProductForm(FlaskForm):
         super().__init__(*args, **kwargs)
         stock_products = kwargs.get('stock_products', [])
         self.stock_product_id.choices = [
-            (sp.id, 'Nome: {} | Catálogo: {} | Lote: {} | Quantidade: {}'
+            (sp.id, '{} | Lote: {} | Validade: {} | Quantidade: {}'
              .format(
-                 sp.product.name,
-                 sp.product.get_base_spec().catalog_number,
-                 sp.lot_number,
-                 sp.amount,
+                sp.product.name,
+                sp.lot_number,
+                sp.expiration_date.strftime('%e-%m-%y'),
+                sp.amount,
              )) for sp in stock_products
         ]
 

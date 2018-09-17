@@ -72,11 +72,11 @@
       {{ wtf.form_field(sample_form.method_id) }}
       {{ wtf.form_field(sample_form.details) }}
       <fieldset>
-        <legend class="text-muted">{{ sample_form.cdc_exam.label.text }}</legend>
-        {{ wtf.form_field(sample_form.cdc_exam.flu_type) }}
-        {{ wtf.form_field(sample_form.cdc_exam.flu_subtype) }}
-        {{ wtf.form_field(sample_form.cdc_exam.dominant_ct) }}
-        {{ wtf.form_field(sample_form.cdc_exam.details) }}
+        <legend class="text-muted">{{ sample_form.influenza_exam.label.text }}</legend>
+        {{ wtf.form_field(sample_form.influenza_exam.flu_type) }}
+        {{ wtf.form_field(sample_form.influenza_exam.flu_subtype) }}
+        {{ wtf.form_field(sample_form.influenza_exam.dominant_ct) }}
+        {{ wtf.form_field(sample_form.influenza_exam.details) }}
       </fieldset>
       <hr />
     {% endfor %}
@@ -138,7 +138,7 @@
 {%- endmacro %}
 
 
-{% macro render_cdc_exam(form) -%}
+{% macro render_influenza_exam(form) -%}
 <div class="form">
     <fieldset>
         <!-- <label><h3>{{ form.label }}</h3></label> -->
