@@ -1,4 +1,4 @@
 -r ./prod.txt
 
-Flask-SSLify
-gunicorn
+Flask-SSLify==0.1.5
+gunicorn==19.9.0
