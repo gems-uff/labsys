@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import os
 
+from dotenv import load_dotenv
+load_dotenv(verbose=True)
+
 from flask_admin.menu import MenuLink
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
@@ -17,7 +20,8 @@ from labsys.auth.models import PreAllowedUser, Role, User
 from labsys.auth.views import ProtectedModelView
 from labsys.extensions import admin, db
 
-app = create_app(os.environ.get('FLASK_CONFIG'))
+
+app = create_app(os.environ.get('FLASK_ENV'))
 manager = Manager(app)
 migrate = Migrate(app, db, compare_type=True)
 
