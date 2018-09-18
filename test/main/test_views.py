@@ -1,9 +1,6 @@
-import os, unittest
-from flask import url_for
+import unittest
 
-from labsys.app import create_app, db
-from labsys.auth.models import Role
-import labsys.inventory.models as models
+from labsys.app import create_app
 
 
 class TestMain(unittest.TestCase):
@@ -16,9 +13,6 @@ class TestMain(unittest.TestCase):
 
     def tearDown(self):
         self.app_context.pop()
-
-    def test_dummy(self):
-        self.assertTrue(True)
 
     def test_home_page(self):
         response = self.client.get('/')

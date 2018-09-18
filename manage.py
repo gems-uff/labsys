@@ -39,13 +39,7 @@ def test():
     import pytest
     app.config.update(
         DATABASE_URL='sqlite:////tmp/test.db',
-        TESTING=True,
     )
-    if not app.testing:
-        raise EnvironmentError(
-            'Trying to run tests outside testing environment!')
-    if app.config.get('DATABASE_URL') is not 'sqlite:////tmp/test.db':
-        raise EnvironmentError(f'Wrong DATABASE_URL != sqlite:////tmp/test.db')
     rv = pytest.main(['--verbose'])
     exit(rv)
 

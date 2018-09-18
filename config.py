@@ -40,6 +40,7 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(Config):
+    DEBUG = True
     TESTING = True
     WTF_CSRF_ENABLED = False
     SERVER_NAME = 'localhost:5000'
@@ -47,6 +48,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     BOOTSTRAP_SERVE_LOCAL = False
+    DEBUG = False
 
     @classmethod
     def init_app(cls, app):
@@ -73,6 +75,7 @@ class ProductionConfig(Config):
 
 class HerokuConfig(ProductionConfig):
     BOOTSTRAP_SERVE_LOCAL = False
+    DEBUG = False
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
 
     @classmethod
