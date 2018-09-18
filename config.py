@@ -28,7 +28,6 @@ class Config:
     UPLOAD_FOLDER = f'{BASEDIR}/labsys/tmp/csv/'
     ALLOWED_EXTENSIONS = {'csv'}
 
-
     @staticmethod
     def init_app(app):
         pass
@@ -43,7 +42,9 @@ class TestingConfig(Config):
     DEBUG = True
     TESTING = True
     WTF_CSRF_ENABLED = False
-    SERVER_NAME = 'localhost:5000'
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
+    SERVER_NAME = 'localhost.localdomain'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL')
 
 
 class ProductionConfig(Config):

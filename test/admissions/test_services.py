@@ -13,10 +13,10 @@ class TestAdmissionServices(unittest.TestCase):
         self.app = create_app('testing')
         db.create_all()
 
-        self.symp_01 = Symptom(name='symptom1', primary=True)
+        self.symp_01 = Symptom(name='symptom1')
         db.session.add(self.symp_01)
 
-        self.symp_02 = Symptom(name='symptom2', primary=False)
+        self.symp_02 = Symptom(name='symptom2')
         db.session.add(self.symp_02)
 
         db.session.commit()
@@ -31,12 +31,12 @@ class TestAdmissionServices(unittest.TestCase):
         db.session.add(admission)
         db.session.commit()
         obs_symptom_dict_01 = {
-            'entity_id': self.symp_01.id,
+            'symptom_id': self.symp_01.id,
             'observed': True,
             'details': 'I do care',
         }
         obs_symptom_dict_02 = {
-            'entity_id': self.symp_02.id,
+            'symptom_id': self.symp_02.id,
             'observed': False,
             'details': 'Do not care'
         }
@@ -53,7 +53,7 @@ class TestAdmissionServices(unittest.TestCase):
         # And assert it has the correct values
         self.assertEqual(obs_symptom_01.observed, True)
         self.assertEqual(obs_symptom_01.details, 'I do care')
-        self.assertEqual(obs_symptom_01.symptom.primary, True)
+        self.assertEqual(obs_symptom_01.symptom.name, 'symptom1')
 
         # ObsSymptom01 must NOT be created but UPDATED
         obs_symptom_dict_01['observed'] = False
@@ -70,4 +70,4 @@ class TestAdmissionServices(unittest.TestCase):
         obs_symptom_02 = admission.symptoms[1]
         self.assertEqual(obs_symptom_02.observed, False)
         self.assertEqual(obs_symptom_02.details, 'Do not care')
-        self.assertEqual(obs_symptom_02.symptom.primary, False)
+        self.assertEqual(obs_symptom_02.symptom.name, 'symptom2')

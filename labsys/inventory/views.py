@@ -20,7 +20,6 @@ def index():
     return redirect(url_for('.show_stock'))
 
 
-
 @blueprint.route('/catalog', methods=['GET'])
 @permission_required(Permission.VIEW)
 def show_catalog():
@@ -246,7 +245,8 @@ def consume_product():
             )
             flash('{} unidades de {} removidas do estoque com sucesso!'.format(
                 form.amount.data, selected_stock_product.product.name),
-                'success')
+                'success',
+            )
 
             return redirect(url_for('.consume_product'))
         except ValueError as err:

@@ -37,9 +37,6 @@ manager.add_command('db', MigrateCommand)
 def test():
     """Run the tests."""
     import pytest
-    app.config.update(
-        DATABASE_URL='sqlite:////tmp/test.db',
-    )
     rv = pytest.main(['--verbose'])
     exit(rv)
 
@@ -55,6 +52,7 @@ def load_initial_data():
 def deploy():
     """Run deployment tasks"""
     from flask_migrate import upgrade
+    db.create_all()
     upgrade()
     Role.insert_roles()
     User.insert_admin()

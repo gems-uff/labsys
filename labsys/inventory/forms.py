@@ -1,5 +1,3 @@
-import datetime as dt
-
 import wtforms as wtf
 import wtforms.widgets.html5 as widgets
 from flask_wtf import FlaskForm
@@ -20,7 +18,7 @@ class OrderItemForm(FlaskForm):
                 s.manufacturer,
                 s.catalog_number,
                 s.units)
-            ) for s in specs
+             ) for s in specs
         ]
 
     item_id = wtf.SelectField(
@@ -76,13 +74,12 @@ class ConsumeProductForm(FlaskForm):
         super().__init__(*args, **kwargs)
         stock_products = kwargs.get('stock_products', [])
         self.stock_product_id.choices = [
-            (sp.id, '{} | Lote: {} | Validade: {} | Quantidade: {}'
-             .format(
-                sp.product.name,
-                sp.lot_number,
-                sp.expiration_date.strftime('%e-%m-%y'),
-                sp.amount,
-             )) for sp in stock_products
+            (sp.id, (f'''
+                {sp.product.name}
+                 | Lote: {sp.lot_number}
+                 | Validade: {sp.expiration_date.strftime('%d-%m-%y')}
+                 | Quantidade: {sp.amount}
+            ''')) for sp in stock_products
         ]
 
     stock_product_id = wtf.SelectField(
@@ -107,15 +104,16 @@ class AddProductForm(FlaskForm):
         'Número de catálogo', validators=[InputRequired()])
     manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
     units = wtf.IntegerField('<a href="#" data-toggle="tooltip" title="Quantidade de unidades que essa apresentação possui. Representa a quantidade física dessa apresentação que será adicionada ao estoque quando comprado.">Unidades de estoque</a>',
-        default=1,
-        validators=[
-            InputRequired(),
-            NumberRange(min=1, max=None, message='Deve ser maior que zero!')
-        ],
-        widget=widgets.NumberInput(),
-        render_kw={'autocomplete': 'off'},
+                             default=1,
+                             validators=[
+                                 InputRequired(),
+                                 NumberRange(min=1, max=None,
+                                             message='Deve ser maior que zero!')
+                             ],
+                             widget=widgets.NumberInput(),
+                             render_kw={'autocomplete': 'off'},
 
-    )
+                             )
     stock_minimum = wtf.IntegerField(
         'Alertar quando estoque atingir',
         default=1,
@@ -146,12 +144,13 @@ class AddSpecificationForm(FlaskForm):
     manufacturer = wtf.StringField('Fabricante', validators=[InputRequired()])
     catalog_number = wtf.StringField('Catálogo', validators=[InputRequired()])
     units = wtf.IntegerField('<a href="#" data-toggle="tooltip" title="Quantidade de unidades que essa apresentação possui. Representa a quantidade física dessa apresentação que será adicionada ao estoque quando comprado.">Unidades de estoque</a>',
-        default=1,
-        validators=[
-            InputRequired(),
-            NumberRange(min=1, max=None, message='Deve ser maior que zero!')
-        ],
-        widget=widgets.NumberInput(),
-        render_kw={'autocomplete': 'off'},
-    )
+                             default=1,
+                             validators=[
+                                 InputRequired(),
+                                 NumberRange(min=1, max=None,
+                                             message='Deve ser maior que zero!')
+                             ],
+                             widget=widgets.NumberInput(),
+                             render_kw={'autocomplete': 'off'},
+                             )
     submit = wtf.SubmitField('Confirmar')
