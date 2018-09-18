@@ -1,11 +1,14 @@
 import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SSL_DISABLE = True
 
     MAIL_SERVER = 'smtp.googlemail.com'
@@ -22,7 +25,7 @@ class Config:
 
     PAGE_SIZE = 20
 
-    UPLOAD_FOLDER = f'{basedir}/labsys/tmp/csv/'
+    UPLOAD_FOLDER = f'{BASEDIR}/labsys/tmp/csv/'
     ALLOWED_EXTENSIONS = {'csv'}
 
 
@@ -33,26 +36,17 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    BOOTSTRAP_SERVE_LOCAL = True
-    DATABASE_URI_ENV_KEY = 'DEV_DATABASE_URL'
     DEBUG_TB_INTERCEPT_REDIRECTS = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
 
 
 class TestingConfig(Config):
     TESTING = True
-    BOOTSTRAP_SERVE_LOCAL = True
-    DATABASE_URI_ENV_KEY = 'TEST_DATABASE_URL'
-    SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
     WTF_CSRF_ENABLED = False
-    # LOGIN_DISABLED = True
     SERVER_NAME = 'localhost:5000'
 
 
 class ProductionConfig(Config):
     BOOTSTRAP_SERVE_LOCAL = False
-    DATABASE_URI_ENV_KEY = 'DATABASE_URL'
-    SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
 
     @classmethod
     def init_app(cls, app):
@@ -80,8 +74,6 @@ class ProductionConfig(Config):
 class HerokuConfig(ProductionConfig):
     BOOTSTRAP_SERVE_LOCAL = False
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
-    DATABASE_URI_ENV_KEY = 'DATABASE_URL'
-    SQLALCHEMY_DATABASE_URI = os.environ.get(DATABASE_URI_ENV_KEY)
 
     @classmethod
     def init_app(cls, app):
@@ -94,7 +86,7 @@ class HerokuConfig(ProductionConfig):
         app.logger.addHandler(file_handler)
 
 
-config = {
+CONFIG = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
