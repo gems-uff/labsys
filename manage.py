@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import os
-
 from dotenv import load_dotenv
-load_dotenv(verbose=True)
+load_dotenv(verbose=True, override=True)
 
 from flask_admin.menu import MenuLink
 from flask_migrate import Migrate, MigrateCommand
