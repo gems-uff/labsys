@@ -15,6 +15,7 @@
       <th width="25%">Reativo</th>
       <th width="10%">Tipo</th>
       <th width="5%">Quantidade</th>
+      <th width="10%">Lote</th>
       <th width="10%">Data da Transação</th>
       <th width="10%">Responsável</th>
       <th width="10%">Ação</th>
@@ -30,6 +31,7 @@
           <td class="danger">Retirada</td>
         {% endif %}
         <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.lot_number }}</td>
         <td>{{ moment(transaction.created_on).format('DD/MM/YYYY [-] HH:mm') }}</td>
         <td>{{ transaction.user.email }}</td>
         <td><a href="{{ url_for('inventory.delete_transaction', transaction_id=transaction.id) }}">Desfazer (Não funciona ainda!)</a></td>
