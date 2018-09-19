@@ -1,5 +1,7 @@
 import unittest
 
+import pytest
+
 from labsys.app import create_app, db
 from labsys.admissions.service import upsert_symptom
 from labsys.admissions.models import Symptom, ObservedSymptom, Admission
@@ -7,10 +9,13 @@ from labsys.admissions.models import Symptom, ObservedSymptom, Admission
 from . import mock
 
 
+# @pytest.mark.skip
 class TestAdmissionServices(unittest.TestCase):
 
     def setUp(self):
         self.app = create_app('testing')
+        self.app_context = self.app.app_context()
+        self.app_context.push()
         db.create_all()
 
         self.symp_01 = Symptom(name='symptom1')
@@ -24,6 +29,7 @@ class TestAdmissionServices(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        self.app_context.pop()
 
     def test_upsert_symptom_to_admission(self):
         # TODO: test excluding
