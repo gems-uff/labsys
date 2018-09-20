@@ -28,7 +28,9 @@
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
           <li><a href="{{ url_for('inventory.index') }}">Estoque</a></li>
-          <li><a href="{{ url_for('admissions.list_admissions') }}">Amostras</a></li>
+          {% if show_labsys %}
+            <li><a href="{{ url_for('admissions.list_admissions') }}">Amostras</a></li>
+          {% endif %}
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li><a href="{{ url_for('admin.index') }}">Administração</a></li>
