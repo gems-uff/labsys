@@ -1,9 +1,10 @@
 import unittest
-from flask import url_for, request
+import datetime
+
+from flask import request, url_for
 
 from labsys.app import create_app, db
 from labsys.auth.models import Role, User
-
 from labsys.inventory import models
 
 
@@ -291,7 +292,7 @@ class TestInventoryViews(unittest.TestCase):
         spec1 = models.Specification('cat1', 'man1')
         prod1 = models.Product('Prod1', spec1)
         # Add product to stock
-        models.Stock.get_reactive_stock().add(prod1, 'lot1', '2018-03-30', 10)
+        models.Stock.get_reactive_stock().add(prod1, 'lot1', datetime.date.today(), 10)
         stock_products = models.StockProduct.query.all()
         # Asserts they were added
         self.assertEqual(len(stock_products), 1)
@@ -307,7 +308,7 @@ class TestInventoryViews(unittest.TestCase):
             # Try to consume amount greater than available
             greater_amount_data = {
                 'stock_product_id': stock_products[0].id,
-                'amount': 11
+                'amount': 11,
             }
             res = client.post(url_for('inventory.consume_product'),
                               data=greater_amount_data,
@@ -319,7 +320,7 @@ class TestInventoryViews(unittest.TestCase):
             # Try to consume a sufficient amount
             sufficient_amount_data = {
                 'stock_product_id': stock_products[0].id,
-                'amount': 9
+                'amount': 9,
             }
             res = client.post(url_for('inventory.consume_product'),
                               data=sufficient_amount_data,

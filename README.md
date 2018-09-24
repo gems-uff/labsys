@@ -2,6 +2,12 @@
 
 LabSys main objective is to assist scientists from the Laboratory of Respiratory Virus and Measles (Fiocruz) to manage and analyze laboratorial samples received in their lab.
 
+# Deploying
+
+1. Create a Postgres database
+2. Set values for environment variables accordingly to env.example
+3. Run `python manage.py deploy`
+
 # Team
 
 * [Gabriel Saldanha](https://github.com/gcrsaldanha) (joined in January 2017)
@@ -17,14 +23,15 @@ LabSys main objective is to assist scientists from the Laboratory of Respiratory
 
 # Technologies
 
-* [Python](https://www.python.org) (v3.6.1)
-* [Flask](http://flask.pocoo.org) (v0.12)
+* [Python](https://www.python.org) (v3.6.6)
+* [Flask](http://flask.pocoo.org) (v1.0.2)
 * [PostgreSQL](https://www.postgresql.org) (v9.6.2)
 
 ## Deprecated (was being formerly used)
 * [Django](https://www.djangoproject.com) (v1.11)
 
 # Acknowledgements
+
 
 # License
 

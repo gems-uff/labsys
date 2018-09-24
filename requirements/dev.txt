@@ -1,15 +1,15 @@
 -r ./base.txt
 
+autopep8==1.4
 click==6.7
-ipython==6.1.0
-ipython-genutils==0.2.0
-jedi==0.12.0
-psycopg2==2.7.5
-Pygments==2.2.0
-neovim==0.2.0
-flask-debugtoolbar==0.10.1
-
-# Testing
-pytest==3.2.1
-WebTest==2.0.28
 factory-boy==2.9.2
+flask-debugtoolbar==0.10.1
+ipython-genutils==0.2.0
+ipython==6.1.0
+jedi==0.12.0
+neovim==0.2.0
+Pygments==2.2.0
+pylint==2.1.1
+pytest==3.2.1
+rope==0.11.0
+WebTest==2.0.28

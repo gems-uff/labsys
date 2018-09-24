@@ -20,7 +20,6 @@ def index():
     return redirect(url_for('.show_stock'))
 
 
-
 @blueprint.route('/catalog', methods=['GET'])
 @permission_required(Permission.VIEW)
 def show_catalog():
@@ -109,7 +108,7 @@ def purchase_product():
             return redirect(url_for('.purchase_product'))
         if form.finish_order.data is True:
             logger.info('checking if there is at least 1 o_item in session')
-            if len(session.get('order_items')) > 0:
+            if session.get('order_items'):
                 logger.info('Finishing order => redirect to checkout()')
                 return redirect(url_for('.checkout'))
             logger.info('None order item added to session')
@@ -121,7 +120,7 @@ def purchase_product():
             order_item = OrderItem()
             form.populate_obj(order_item)
             logger.info('order_item obj was populated')
-            if len(session.get('order_items')) is 0:
+            if not session.get('order_items'):
                 logger.info('order_items not found in session => create [oi]')
                 session['order_items'] = [order_item.toJSON()]
             else:
@@ -158,7 +157,7 @@ def checkout():
             logger.info('Cancel order, cleaning session')
             session['order_items'] = []
             return redirect(url_for('.purchase_product'))
-        if len(order_items) > 0:
+        if order_items:
             if form.validate():
                 logger.info('starting check out...')
                 order = Order()
@@ -187,7 +186,7 @@ def checkout():
                     logger.info('Comitting session...')
                     db.session.commit()
                     logger.info('Creating transactions from order...')
-                    services.create_add_transaction_from_order(order, stock)
+                    services.create_add_transactions_from_order(order, stock)
                     logger.info('Flashing success and returning to index')
                     flash('Ordem executada com sucesso', 'success')
                     session['order_items'] = []
@@ -246,7 +245,8 @@ def consume_product():
             )
             flash('{} unidades de {} removidas do estoque com sucesso!'.format(
                 form.amount.data, selected_stock_product.product.name),
-                'success')
+                'success',
+            )
 
             return redirect(url_for('.consume_product'))
         except ValueError as err:

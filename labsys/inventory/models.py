@@ -256,6 +256,7 @@ class Transaction(Base, TimeStampedModelMixin):
         db.Integer, db.ForeignKey('products.id'), nullable=False)
     stock_id = db.Column(
         db.Integer, db.ForeignKey('stocks.id'), nullable=False)
+    lot_number = db.Column(db.String(64), nullable=True)
     amount = db.Column(db.Integer, nullable=False)
     category = db.Column(db.Integer, nullable=False)
     # TODO: make sure alembic migrations recognizes this
@@ -270,10 +271,10 @@ class Transaction(Base, TimeStampedModelMixin):
     stock = db.relationship(
         Stock, backref=db.backref('transactions', lazy=True))
 
-    def __init__(self, user, product, lot_number, amount, stock, category,
-                 expiration_date=None):
+    def __init__(self, user, product, lot_number, amount, stock, category):
         self.user = user
         self.product = product
+        self.lot_number = lot_number
         self.amount = amount
         self.stock = stock
         self.category = category

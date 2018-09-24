@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 
-from config import config
+from config import CONFIG
 
 from .main.views import blueprint as main_blueprint
 from .admissions.views import blueprint as admissions_blueprint
@@ -13,7 +13,7 @@ from .extensions import (
 
 def create_app(config_name):
     app = Flask(__name__)
-    app.config.from_object(config[config_name])
+    app.config.from_object(CONFIG[config_name])
     register_extensions(app)
     register_blueprints(app)
     register_error_handlers(app)

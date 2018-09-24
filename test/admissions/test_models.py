@@ -80,13 +80,13 @@ class TestModelsRelationships(unittest.TestCase):
             observed=True,
             details='obs symptom details',
             admission=admission,
-            symptom=Symptom(name='symptom1', primary=True),
+            symptom=Symptom(name='symptom1'),
         )
         obs_symptom1 = ObservedSymptom(
             observed=False,
             details='obs symptom details',
             admission=admission,
-            symptom=Symptom(name='symptom2', primary=True),
+            symptom=Symptom(name='symptom2'),
         )
         # Assert relationship between is setup
         self.assertEqual(len(admission.symptoms), 2)
@@ -105,7 +105,7 @@ class TestModelsRelationships(unittest.TestCase):
         self.assertEqual(len(ObservedSymptom.query.all()), 0)
 
     def test_syptom_observations_Mto1(self):
-        symptom = Symptom(name='symptom', primary=True)
+        symptom = Symptom(name='symptom')
         admission0 = mock.admission()
         admission1 = mock.admission()
         # id_lvrs_intern must be unique

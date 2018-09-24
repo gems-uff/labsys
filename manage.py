@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import os
+from dotenv import load_dotenv
+load_dotenv(verbose=True, override=True)
 
 from flask_admin.menu import MenuLink
 from flask_migrate import Migrate, MigrateCommand
@@ -17,9 +19,44 @@ from labsys.auth.models import PreAllowedUser, Role, User
 from labsys.auth.views import ProtectedModelView
 from labsys.extensions import admin, db
 
+
 app = create_app(os.environ.get('FLASK_CONFIG'))
 manager = Manager(app)
 migrate = Migrate(app, db, compare_type=True)
+
+
+def make_shell_context():
+    return dict(app=app, db=db, User=User, Role=Role, f=forms, m=models)
+
+
+manager.add_command('shell', Shell(make_context=make_shell_context))
+manager.add_command('db', MigrateCommand)
+
+
+@manager.command
+def test():
+    """Run the tests."""
+    import pytest
+    rv = pytest.main(['--verbose', '--pdb'])
+    exit(rv)
+
+
+@manager.command
+def load_initial_data():
+    """Load initial models data"""
+    import labsys.utils.data_loader as dl
+    dl.load_data(db)
+
+
+@manager.command
+def deploy():
+    """Run deployment tasks"""
+    from flask_migrate import upgrade
+    upgrade()
+    Role.insert_roles()
+    User.insert_admin()
+    im.Stock.insert_stock('Reativos')
+
 
 # region Add ModelView
 admin.add_views(
@@ -48,44 +85,7 @@ admin.add_views(
     ProtectedModelView(XRay, db.session),
 )
 admin.add_link(MenuLink(name='Voltar para Dashboard', url=('/')))
-
 # endregion
-
-
-def make_shell_context():
-    return dict(app=app, db=db, User=User, Role=Role, f=forms, m=models)
-
-
-manager.add_command('shell', Shell(make_context=make_shell_context))
-manager.add_command('db', MigrateCommand)
-
-
-@manager.command
-def test():
-    """Run the tests."""
-    if app.config['DATABASE_URI_ENV_KEY'] != 'TEST_DATABASE_URL':
-        raise EnvironmentError(
-            'Trying to run tests outside testing environment!')
-    import pytest
-    rv = pytest.main(['--verbose'])
-    exit(rv)
-
-
-@manager.command
-def load_initial_data():
-    """Load initial models data"""
-    import labsys.utils.data_loader as dl
-    dl.load_data(db)
-
-
-@manager.command
-def deploy():
-    """Run deployment tasks"""
-    from flask_migrate import upgrade
-    upgrade()
-    Role.insert_roles()
-    User.insert_admin()
-    im.Stock.insert_stock('Reativos')
 
 
 if __name__ == '__main__':

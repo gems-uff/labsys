@@ -22,10 +22,9 @@ def patient():
 def address():
     return Address(
         country='Brasil',
-        state='RJ', city='Niterói',
+        state='RJ',
+        city='Niterói',
         neighborhood='Icaraí',
-        zone=1,
-        details='detalhes residência',
     )
 
 

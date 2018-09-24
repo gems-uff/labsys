@@ -63,12 +63,12 @@ def register():
 @login_required
 def confirm(token):
     if current_user.confirmed:
-        return redirect(url_for('admissions.list_admissions'))
+        return redirect(url_for('inventory.index'))
     if current_user.confirm(token):
         flash('Conta verificada. Obrigado!', 'warning')
     else:
         flash('O link de confirmação não é válido ou expirou.', 'warning')
-    return redirect(url_for('admissions.list_admissions'))
+    return redirect(url_for('inventory.index'))
 
 
 @blueprint.before_app_request
@@ -83,7 +83,7 @@ def before_request():
 @blueprint.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
-        return redirect(url_for('admissions.list_admissions'))
+        return redirect(url_for('inventory.index'))
     return render_template('auth/unconfirmed.html')
 
 
@@ -99,7 +99,7 @@ def resend_confirmation():
         token=token)
     flash('Uma nova mensagem de confirmação foi enviada ao seu email.',
           'success')
-    return redirect(url_for('admissions.list_admissions'))
+    return redirect(url_for('inventory.index'))
 
 
 class ProtectedModelView(ModelView):
